@@ -3,14 +3,12 @@ import { useState, useEffect } from 'react';
 import { signIn, useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button'; // Z shadcn
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog';
 import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const {data: session} = useSession();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [preferences, setPreferences] = useState({ genres: [] });
   const router = useRouter();
 
   useEffect(() => {
@@ -46,21 +44,6 @@ export default function RegisterPage() {
         className="mb-4"
       />
       <Button onClick={handleEmailSignUp}>Zarejestruj przez Email</Button>
-      
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline" className="mt-4">Dodaj preferencje (opcjonalne)</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogTitle>Twoje preferencje</DialogTitle>
-          <h2>Twoje preferencje</h2>
-          <Input
-            placeholder="Ulubione gatunki (np. fantasy, sci-fi)"
-            onChange={(e) => setPreferences({ genres: e.target.value.split(',') })}
-          />
-          <Button onClick={() => alert('Zapisano preferencje')}>Zapisz</Button>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
