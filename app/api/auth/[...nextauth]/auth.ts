@@ -12,20 +12,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
     CredentialsProvider({
-      name: 'credentials',
-      credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
-      },
-      async authorize(credentials) {
-        await connectToDB();
-        const user = await User.findOne({ email: credentials?.email });
-        if (user && await bcrypt.compare(credentials!.password, user.password)) {
-          return { id: user._id.toString(), email: user.email, name: user.name };
-        }
-        return null;
-      },
-    }),
+  name: 'credentials',
+  credentials: {
+    email: { label: 'Email', type: 'email' },
+    password: { label: 'Password', type: 'password' },
+  },
+  async authorize(credentials) {
+  await connectToDB();
+  const user = await User.findOne({ email: credentials?.email }).select('+password');
+  if (user && user.password) {
+    const isValid = await bcrypt.compare(credentials!.password, user.password);
+    if (isValid) {
+      return { id: user._id.toString(), email: user.email, name: user.name };
+    }
+  }
+  return null;
+},
+}),
   ],
   callbacks: {
     async signIn({ user, account }) {
@@ -54,6 +57,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   pages: {
-    signIn: '/register',
+    signIn: '/login',
   },
 });
