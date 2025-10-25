@@ -3,13 +3,14 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IUser extends Document {
   email: string;
   name: string;
-  googleId?: string; // rejestracja przez Google
-  wishlist: mongoose.Types.ObjectId[]; // array ID ksiazek z wishlisty
-  offeredBooks: mongoose.Types.ObjectId[]; // array ID oferowanych ksiazek
-  points: number; // punkty za transkacje
-  averageRating: number; // srednia ocena z recenzji
+  googleId?: string;
+  password?: string;
+  wishlist: mongoose.Types.ObjectId[];
+  offeredBooks: mongoose.Types.ObjectId[];
+  points: number;
+  averageRating: number;
   preferences?: {
-    genres?: string[]; // opcjonalne preferencje (gatunki itd)
+    genres?: string[];
   };
   createdAt: Date;
 }
@@ -17,7 +18,8 @@ export interface IUser extends Document {
 const UserSchema: Schema = new Schema({
   email: { type: String, required: true, unique: true },
   name: { type: String, required: true },
-  googleId: { type: String, sparse: true }, // sparse dla opcjonalnego
+  googleId: { type: String, sparse: true },
+  password: { type: String },
   wishlist: [{ type: Schema.Types.ObjectId, ref: 'Book' }],
   offeredBooks: [{ type: Schema.Types.ObjectId, ref: 'Book' }],
   points: { type: Number, default: 0 },
