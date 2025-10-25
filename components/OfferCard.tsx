@@ -14,6 +14,22 @@ interface OfferCardProps {
 }
 
 export default function OfferCard({ offer, onPropose }: OfferCardProps) {
+  const handlePropose = async () => {
+    const res = await fetch('/api/transactions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        offeredBookId: offer.offeredBook._id,
+        receiverEmail: offer.owner.email,
+      }),
+    });
+    const data = await res.json();
+    if (data.transactionId) {
+      alert('Transakcja zaproponowana!');
+      onPropose(offer);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -25,7 +41,7 @@ export default function OfferCard({ offer, onPropose }: OfferCardProps) {
       <p>Autor: {offer.offeredBook.author}</p>
       <p>Oferuje: {offer.owner.name}</p>
       <p>Dopasowanie: {offer.matchType}</p>
-      <Button onClick={() => onPropose(offer)}>Zaproponuj Wymianę</Button>
+      <Button onClick={handlePropose}>Zaproponuj Wymianę</Button>
     </motion.div>
   );
 }
