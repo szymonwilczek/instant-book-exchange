@@ -20,7 +20,7 @@
     "framer-motion": "^12.23.24",
     "google-books-search": "^0.3.1",
     "lucide-react": "^0.548.0",
-    "mongoose": "^8.19.2",
+    "mongoose": "^7.8.7",
     "next": "^15.5.6",
     "next-auth": "^5.0.0-beta.29",
     "prettier": "^3.6.2",
