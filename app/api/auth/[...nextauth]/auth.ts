@@ -12,23 +12,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
     CredentialsProvider({
-  name: 'credentials',
-  credentials: {
-    email: { label: 'Email', type: 'email' },
-    password: { label: 'Password', type: 'password' },
-  },
-  async authorize(credentials) {
-  await connectToDB();
-  const user = await User.findOne({ email: credentials?.email }).select('+password');
-  if (user && user.password) {
-    const isValid = await bcrypt.compare(credentials!.password, user.password);
-    if (isValid) {
-      return { id: user._id.toString(), email: user.email, name: user.name };
-    }
-  }
-  return null;
-},
-}),
+      name: 'credentials',
+      credentials: {
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
+        rememberMe: { label: 'Remember me', type: 'checkbox' },
+      },
+      async authorize(credentials) {
+        await connectToDB();
+        const user = await User.findOne({ email: credentials?.email }).select('+password');
+        if (user && user.password) {
+          const isValid = await bcrypt.compare(credentials!.password, user.password);
+          if (isValid) {
+            return { 
+              id: user._id.toString(), 
+              email: user.email, 
+              name: user.username, 
+              rememberMe: credentials?.rememberMe === 'true' 
+            };
+          }
+        }
+        return null;
+      },
+    }),
   ],
   callbacks: {
     async signIn({ user, account }) {
@@ -38,7 +44,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!existingUser) {
           await User.create({
             email: user.email,
-            name: user.name,
+            username: user.name,
             googleId: user.id,
             profileImage: user.image,
           });
@@ -49,11 +55,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.rememberMe = user.rememberMe;
       }
       return token;
     },
     async session({ session, token }) {
       session.user.id = token.id as string;
+      session.rememberMe = token.rememberMe as boolean;
+      if (session.rememberMe) {
+        session.maxAge = 30 * 24 * 60 * 60; // 30 dni
+      } else {
+        session.maxAge = 24 * 60 * 60; // 1 dzień
+      }
       return session;
     },
   },

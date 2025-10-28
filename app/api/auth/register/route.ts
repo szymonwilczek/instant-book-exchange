@@ -4,9 +4,9 @@ import User from '@/lib/models/User';
 import bcrypt from 'bcryptjs';
 
 export async function POST(req: NextRequest) {
-  const { email, password, name } = await req.json();
+  const { email, password, username } = await req.json();
 
-  if (!email || !password || !name) {
+  if (!email || !password || !username) {
     return NextResponse.json({ error: 'All fields required' }, { status: 400 });
   }
 
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   }
 
   const hashedPassword = await bcrypt.hash(password, 12);
-  const user = await User.create({ email, name, password: hashedPassword, profileImage: 'https://i.imgur.com/4vb5jWt.png' });
+  const user = await User.create({ email, username, password: hashedPassword, profileImage: 'https://i.imgur.com/4vb5jWt.png' });
 
   return NextResponse.json({ message: 'User created', userId: user._id });
 }

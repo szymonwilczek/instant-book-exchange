@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IUser extends Document {
   email: string;
-  name: string;
+  username: string;
   googleId?: string;
   password?: string;
   wishlist: mongoose.Types.ObjectId[];
@@ -18,7 +18,7 @@ export interface IUser extends Document {
 
 const UserSchema: Schema = new Schema({
   email: { type: String, required: true, unique: true },
-  name: { type: String, required: true },
+  username: { type: String, required: true },
   googleId: { type: String, sparse: true },
   password: { type: String },
   wishlist: [{ type: Schema.Types.ObjectId, ref: 'Book' }],
