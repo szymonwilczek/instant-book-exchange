@@ -102,7 +102,7 @@ interface Book {
   title: string;
   author?: string;
   image?: string;
-  createdAt: string; 
+  createdAt: string;
   status: "active" | "inactive";
 }
 
@@ -581,7 +581,7 @@ export function ProfileDashboard({
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Product Management</CardTitle>
+            <CardTitle>Offered Books</CardTitle>
             <Button
               variant="outline"
               size="sm"
@@ -650,8 +650,8 @@ export function ProfileDashboard({
           <DialogHeader>
             <DialogTitle>Confirm Deletion</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete &quot;{selectedBookToDelete?.title}&quot;?
-              This action cannot be undone.
+              Are you sure you want to delete &quot;
+              {selectedBookToDelete?.title}&quot;? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
