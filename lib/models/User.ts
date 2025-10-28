@@ -12,6 +12,9 @@ export interface IUser extends Document {
   preferences?: {
     genres?: string[];
   };
+  phone?: string;
+  location?: string;
+  bio?: string;
   createdAt: Date;
   profileImage?: string;
 }
@@ -28,6 +31,9 @@ const UserSchema: Schema = new Schema({
   preferences: {
     genres: [{ type: String }],
   },
+  phone: { type: String },
+  location: { type: String },
+  bio: { type: String },
   profileImage: { type: String },
 }, { timestamps: true });
 
