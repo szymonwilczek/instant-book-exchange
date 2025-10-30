@@ -1,39 +1,47 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-interface Book {
+interface BookBase {
   id: string;
   title: string;
   author?: string;
   image?: string;
-  createdAt: string;
-  status: "active" | "inactive";
+  createdAt?: string;
+  status?: "active" | "inactive";
 }
 
 interface BookCardProps {
-  book: Book;
-  onEdit: (book: Book) => void;
-  onDelete: (bookId: string) => void;
+  book: BookBase;
+  isReadOnly?: boolean;
+  onEdit?: (book: BookBase) => void;
+  onDelete?: (bookId: string) => void;
 }
 
-export function BookCard({ book, onEdit, onDelete }: BookCardProps) {
+export function BookCard({
+  book,
+  isReadOnly,
+  onEdit,
+  onDelete,
+}: BookCardProps) {
   const formatDate = (date: string) => new Date(date).toLocaleDateString();
 
   return (
-    <Card className="overflow-hidden min-w-[200px] h-102">
+    <Card className="overflow-hidden min-w-[200px] h-auto">
       <div className="aspect-square relative bg-muted max-h-48">
         <img
           src={book.image || "/placeholder.svg"}
           alt={book.title}
           className="object-contain w-full h-full"
         />
-        <div
-          className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium text-white ${
-            book.status === "active" ? "bg-green-500" : "bg-gray-500"
-          }`}
-        >
-          {book.status}
-        </div>
+        {book.status && (
+          <div
+            className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium text-white ${
+              book.status === "active" ? "bg-green-500" : "bg-gray-500"
+            }`}
+          >
+            {book.status}
+          </div>
+        )}
       </div>
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-medium text-center">
@@ -46,33 +54,41 @@ export function BookCard({ book, onEdit, onDelete }: BookCardProps) {
           </p>
         </div>
         <br />
-        <div className="flex justify-center">
-          <p className="text-xs text-muted-foreground font-normal">Added:</p>
-          <p className="ml-1 text-xs font-semibold">
-            {formatDate(book.createdAt)}
-          </p>
-        </div>
+        {book.createdAt && (
+          <div className="flex justify-center">
+            <p className="text-xs text-muted-foreground font-normal">Added:</p>
+            <p className="ml-1 text-xs font-semibold">
+              {formatDate(book.createdAt)}
+            </p>
+          </div>
+        )}
       </CardHeader>
-      <CardContent className="pt-0">
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1 cursor-pointer hover:bg-accent hover:text-accent-foreground"
-            onClick={() => onEdit(book)}
-          >
-            Edit
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1 cursor-pointer hover:bg-red-500"
-            onClick={() => onDelete(book.id)}
-          >
-            Delete
-          </Button>
-        </div>
-      </CardContent>
+      {!isReadOnly && (
+        <CardContent className="pt-0">
+          <div className="flex gap-2">
+            {onEdit && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                onClick={() => onEdit(book)}
+              >
+                Edit
+              </Button>
+            )}
+            {onDelete && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 cursor-pointer hover:bg-red-500"
+                onClick={() => onDelete(book.id)}
+              >
+                Delete
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      )}
     </Card>
   );
 }
