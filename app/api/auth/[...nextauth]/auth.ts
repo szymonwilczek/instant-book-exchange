@@ -47,6 +47,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             username: user.name,
             googleId: user.id,
             profileImage: user.image,
+            hasCompletedOnboarding: false,
           });
         }
       }

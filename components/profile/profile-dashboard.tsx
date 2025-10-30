@@ -47,6 +47,9 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 import { BookCard } from "@/components/profile/book-card";
 import { EditBookModal } from "./edit-book-modal";
+import { Checkbox } from "@/components/ui/checkbox";
+import { OnboardingBookSearch } from "@/components/profile/onboarding-book-search";
+import { Label } from "@/components/ui/label";
 
 interface BookBase {
   id: string;
@@ -54,6 +57,7 @@ interface BookBase {
   author?: string;
   image?: string;
   createdAt: string;
+  status?: "active" | "inactive";
 }
 
 interface Book extends BookBase {
@@ -68,6 +72,10 @@ interface UserData {
   profileImage?: string;
   bio?: string;
   averageRating?: number;
+  hasCompletedOnboarding?: boolean;
+  preferences?: {
+    genres?: string[];
+  };
   wishlist?: BookBase[];
   offeredBooks?: {
     _id: string;
@@ -97,15 +105,6 @@ interface Transaction {
   buyer: string;
 }
 
-interface Book {
-  id: string;
-  title: string;
-  author?: string;
-  image?: string;
-  createdAt: string;
-  status: "active" | "inactive";
-}
-
 interface ProfileDashboardProps {
   userData: UserData;
   onUpdate: () => void;
@@ -133,6 +132,34 @@ export function ProfileDashboard({
   const [selectedBookToDelete, setSelectedBookToDelete] = useState<Book | null>(
     null
   );
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [selectedBooks, setSelectedBooks] = useState<BookBase[]>([]);
+  const [isAddBookOpen, setIsAddBookOpen] = useState(false);
+
+  const genres = [
+    "Fantasy",
+    "Science Fiction",
+    "Crime",
+    "Thriller",
+    "Horror",
+    "Romance",
+    "Contemporary Fiction",
+    "Historical Fiction",
+    "Adventure",
+    "Biography",
+    "Non-fiction",
+    "Essay",
+    "Memoir",
+    "Young Adult",
+    "Journalism",
+  ];
+
+  useEffect(() => {
+    if (userData && !userData.hasCompletedOnboarding) {
+      setIsOnboardingOpen(true);
+    }
+  }, [userData]);
 
   useEffect(() => {
     if (userData) {
@@ -191,6 +218,7 @@ export function ProfileDashboard({
   ]);
 
   const [books, setBooks] = useState<Book[]>([]);
+  const [wishlistBooks, setWishlistBooks] = useState<BookBase[]>([]);
 
   useEffect(() => {
     if (userData?.offeredBooks) {
@@ -207,23 +235,36 @@ export function ProfileDashboard({
     }
   }, [userData]);
 
-  const totalBooksOffered = books.length; // mock: suma wszystkich offeredBooks (potem zmienic na query do bazy)
+  useEffect(() => {
+    if (userData?.wishlist) {
+      setWishlistBooks(
+        userData.wishlist?.map((book) => ({
+          id: book._id,
+          title: book.title,
+          author: book.author,
+          image: book.imageUrl,
+          createdAt: new Date(book.createdAt).toISOString(),
+        })) || []
+      );
+    }
+  }, [userData]);
+
+  const totalBooksOffered = books.length;
   const totalExchanges = transactions.filter(
     (t) => t.status === "completed"
   ).length;
-  const newUsersThisMonth = 12; // mock: uzytkownicy z createdAt w tym miesiacu (query do bazy)
+  const newUsersThisMonth = 12;
   const booksExchangedUser = books.length;
   const averageRatingUser = userData?.averageRating || 0;
-  const booksInWishlistUser = userData?.wishlist?.length || 0;
+  const booksInWishlistUser = wishlistBooks.length;
   const pendingExchanges = transactions.filter(
     (t) => t.status === "pending"
   ).length;
-  const averageExchangeTime = "2.5 days"; // mock: sredni czas wymiany (obliczenie z transakcji)
-  const wishlistMatches = 8; // mock: dopasowania zyczen (query do bazy)
-
   const [currentPlatformIndex, setCurrentPlatformIndex] = useState(0);
   const [currentUserIndex, setCurrentUserIndex] = useState(0);
   const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
+  const averageExchangeTime = "2.5 days";
+  const wishlistMatches = 8;
 
   const platformStats = [
     { title: "Total Books Offered", value: totalBooksOffered, icon: Package },
@@ -305,9 +346,9 @@ export function ProfileDashboard({
     onUpdate();
   };
 
-  const handleProductUpdate = (updatedProduct: Product) => {
-    setProducts(
-      products.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
+  const handleProductUpdate = (updatedProduct: Book) => {
+    setBooks(
+      books.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
     );
   };
 
@@ -325,15 +366,25 @@ export function ProfileDashboard({
   };
 
   const handleUpdateBook = async (updatedBook: Book) => {
-    // TODO: dodac API do aktualizacji statusu ksiazki PUT /api/user/offered-books
-    // na razie symulacja
     setBooks(books.map((b) => (b.id === updatedBook.id ? updatedBook : b)));
     onUpdate();
   };
 
+  const handleDeleteWishlistBook = (bookId: string) => {
+    const book = wishlistBooks.find((b) => b.id === bookId);
+    if (book) {
+      setSelectedBookToDelete(book);
+      setIsDeleteConfirmOpen(true);
+    }
+  };
+
   const confirmDeleteBook = async () => {
     if (selectedBookToDelete) {
-      await fetch("/api/user/offered-books", {
+      const isOffered = books.some((b) => b.id === selectedBookToDelete.id);
+      const endpoint = isOffered
+        ? "/api/user/offered-books"
+        : "/api/user/wishlist";
+      await fetch(endpoint, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ bookId: selectedBookToDelete.id }),
@@ -359,6 +410,47 @@ export function ProfileDashboard({
     }
   };
 
+  const handleGenreChange = (genre: string, checked: boolean) => {
+    if (checked) {
+      setSelectedGenres([...selectedGenres, genre]);
+    } else {
+      setSelectedGenres(selectedGenres.filter((g) => g !== genre));
+    }
+  };
+
+  const handleAddBook = (book: BookBase) => {
+    setSelectedBooks([...selectedBooks, book]);
+    setIsAddBookOpen(false);
+  };
+
+  const handleOnboardingSubmit = async () => {
+    await fetch("/api/user/onboarding", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        genres: selectedGenres,
+        books: selectedBooks.map((b) => ({
+          title: b.title,
+          author: b.author,
+          image: b.image,
+          isbn: b.isbn,
+        })),
+      }),
+    });
+    setIsOnboardingOpen(false);
+    onUpdate();
+  };
+
+  const handleOnboardingSkip = async () => {
+    await fetch("/api/user/onboarding", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ genres: [], books: [] }),
+    });
+    setIsOnboardingOpen(false);
+    onUpdate();
+  };
+
   return (
     <div className="container mx-auto p-4 md:p-6 lg:p-8 space-y-6">
       <div className="flex flex-col gap-2">
@@ -377,7 +469,7 @@ export function ProfileDashboard({
               Platform Stats
             </CardTitle>
             {(() => {
-              const IconComponent = platformStats[currentPlatformIndex].icon;
+              const IconComponent = platformStats[0].icon;
               return (
                 <IconComponent className="h-4 w-4 text-muted-foreground" />
               );
@@ -412,7 +504,7 @@ export function ProfileDashboard({
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Your Stats</CardTitle>
             {(() => {
-              const IconComponent = userStats[currentUserIndex].icon;
+              const IconComponent = userStats[0].icon;
               return (
                 <IconComponent className="h-4 w-4 text-muted-foreground" />
               );
@@ -449,7 +541,7 @@ export function ProfileDashboard({
               Activity Stats
             </CardTitle>
             {(() => {
-              const IconComponent = activityStats[currentActivityIndex].icon;
+              const IconComponent = activityStats[0].icon;
               return (
                 <IconComponent className="h-4 w-4 text-muted-foreground" />
               );
@@ -529,6 +621,13 @@ export function ProfileDashboard({
                 <MapPin className="h-4 w-4 text-muted-foreground" />
                 <span className="text-foreground">{profile.location}</span>
               </div>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {userData?.preferences?.genres?.map((genre) => (
+                  <Badge key={genre} variant="secondary">
+                    {genre}
+                  </Badge>
+                ))}
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -606,9 +705,41 @@ export function ProfileDashboard({
                   className="basis-1/2 md:basis-1/3 lg:basis-1/4"
                 >
                   <BookCard
+                    isReadOnly={false}
                     book={book}
                     onEdit={handleEditBook}
                     onDelete={handleDeleteBook}
+                  />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="left-2" />
+            <CarouselNext className="right-2" />
+          </Carousel>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Wishlist</CardTitle>
+          <CardDescription>Books you want to receive</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Carousel
+            className="w-full"
+            opts={{ loop: false }}
+            plugins={[Autoplay({ delay: 7500 })]}
+          >
+            <CarouselContent>
+              {wishlistBooks.map((book) => (
+                <CarouselItem
+                  key={book.id}
+                  className="basis-1/2 md:basis-1/3 lg:basis-1/4"
+                >
+                  <BookCard
+                    book={book}
+                    isReadOnly={false}
+                    onDelete={handleDeleteWishlistBook}
                   />
                 </CarouselItem>
               ))}
@@ -667,6 +798,74 @@ export function ProfileDashboard({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={isOnboardingOpen} onOpenChange={setIsOnboardingOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Witaj! Uzupełnij swój profil</DialogTitle>
+            <DialogDescription>
+              Wybierz ulubione gatunki i książki, które chcesz otrzymać.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Ulubione gatunki</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  {genres.map((genre) => (
+                    <div key={genre} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={genre}
+                        checked={selectedGenres.includes(genre)}
+                        onCheckedChange={(checked) =>
+                          handleGenreChange(genre, checked as boolean)
+                        }
+                      />
+                      <Label htmlFor={genre}>{genre}</Label>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  Książki, które chcesz otrzymać (opcjonalne)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Button onClick={() => setIsAddBookOpen(true)}>
+                  Dodaj książkę
+                </Button>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  {selectedBooks.map((book) => (
+                    <BookCard key={book.id} book={book} isReadOnly={true} />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          <DialogFooter>
+            <Button variant="link" onClick={handleOnboardingSkip}>
+              Pomiń
+            </Button>
+            <Button
+              onClick={handleOnboardingSubmit}
+              disabled={selectedGenres.length === 0}
+            >
+              OK
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <OnboardingBookSearch
+        open={isAddBookOpen}
+        onOpenChange={setIsAddBookOpen}
+        onSelectBook={handleAddBook}
+      />
     </div>
   );
 }

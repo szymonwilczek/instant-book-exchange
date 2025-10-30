@@ -9,6 +9,7 @@ export interface IUser extends Document {
   offeredBooks: mongoose.Types.ObjectId[];
   points: number;
   averageRating: number;
+  hasCompletedOnboarding: boolean,
   preferences?: {
     genres?: string[];
   };
@@ -28,6 +29,7 @@ const UserSchema: Schema = new Schema({
   offeredBooks: [{ type: Schema.Types.ObjectId, ref: 'Book' }],
   points: { type: Number, default: 0 },
   averageRating: { type: Number, default: 0, min: 0, max: 5 },
+  hasCompletedOnboarding: { type: Boolean, default: false },
   preferences: {
     genres: [{ type: String }],
   },
