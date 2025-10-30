@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,61 +10,89 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 interface UserProfile {
-  username: string
-  email: string
-  phone: string
-  location: string
-  avatar: string | File
-  bio: string
+  username: string;
+  email: string;
+  phone: string;
+  location: string;
+  avatar: string | File;
+  bio: string;
+  github?: string;
+  twitter?: string;
+  linkedin?: string;
 }
 
 interface EditProfileModalProps {
-  profile: UserProfile
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSave: (profile: UserProfile) => void
+  profile: UserProfile;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSave: (profile: UserProfile) => void;
 }
 
-export function EditProfileModal({ profile, open, onOpenChange, onSave }: EditProfileModalProps) {
-  const [formData, setFormData] = useState<UserProfile>(profile)
+export function EditProfileModal({
+  profile,
+  open,
+  onOpenChange,
+  onSave,
+}: EditProfileModalProps) {
+  const [formData, setFormData] = useState<UserProfile>(profile);
 
   useEffect(() => {
-    setFormData(profile)
-  }, [profile])
+    setFormData(profile);
+  }, [profile]);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSave(formData)
-    onOpenChange(false)
-  }
+    e.preventDefault();
+    onSave(formData);
+    onOpenChange(false);
+  };
 
   const handleChange = (field: keyof UserProfile, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setFormData((prev) => ({ ...prev, avatar: file }))
+      setFormData((prev) => ({ ...prev, avatar: file }));
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
-          <DialogDescription>Update your profile information. Click save when you&apos;re done.</DialogDescription>
+          <DialogDescription>
+            Update your profile information. Click save when you&apos;re done.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="avatar">Avatar</Label>
+              <Input
+                id="avatar"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+              {typeof formData.avatar === "string" &&
+                formData.avatar &&
+                formData.avatar.startsWith("data:") && (
+                  <img
+                    src={formData.avatar}
+                    alt="Current avatar"
+                    className="w-16 h-16 mt-2 rounded"
+                  />
+                )}
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="username">Username</Label>
               <Input
@@ -113,21 +141,42 @@ export function EditProfileModal({ profile, open, onOpenChange, onSave }: EditPr
                 rows={3}
               />
             </div>
+
             <div className="grid gap-2">
-              <Label htmlFor="avatar">Avatar</Label>
+              <Label htmlFor="github">GitHub</Label>
               <Input
-                id="avatar"
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
+                id="github"
+                value={formData.github || ""}
+                onChange={(e) => handleChange("github", e.target.value)}
+                placeholder="https://github.com/username"
               />
-              {typeof formData.avatar === 'string' && formData.avatar && formData.avatar.startsWith('data:') && (
-                <img src={formData.avatar} alt="Current avatar" className="w-16 h-16 mt-2 rounded" />
-              )}
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="twitter">Twitter</Label>
+              <Input
+                id="twitter"
+                value={formData.twitter || ""}
+                onChange={(e) => handleChange("twitter", e.target.value)}
+                placeholder="https://twitter.com/username"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="linkedin">LinkedIn</Label>
+              <Input
+                id="linkedin"
+                value={formData.linkedin || ""}
+                onChange={(e) => handleChange("linkedin", e.target.value)}
+                placeholder="https://linkedin.com/in/username"
+              />
             </div>
           </div>
+
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancel
             </Button>
             <Button type="submit">Save Changes</Button>
@@ -135,5 +184,5 @@ export function EditProfileModal({ profile, open, onOpenChange, onSave }: EditPr
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

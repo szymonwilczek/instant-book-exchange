@@ -51,6 +51,9 @@ interface UserData {
     createdAt: string;
     status: string;
   }[];
+  github?: string;
+  twitter?: string;
+  linkedin?: string;
 }
 
 interface UserProfile {
@@ -60,6 +63,9 @@ interface UserProfile {
   location: string;
   avatar: string;
   bio: string;
+  github?: string;
+  twitter?: string;
+  linkedin?: string;
 }
 
 interface Transaction {
@@ -135,6 +141,9 @@ export function ProfileDashboard({
       location: currentUserData?.location || "",
       avatar: currentUserData?.profileImage || "",
       bio: currentUserData?.bio || "",
+      github: currentUserData?.github || "",
+      twitter: currentUserData?.twitter || "",
+      linkedin: currentUserData?.linkedin || "",
     }),
     [currentUserData]
   );
@@ -176,14 +185,6 @@ export function ProfileDashboard({
       date: "2025-10-22",
       status: "completed",
       buyer: "Emma Brown",
-    },
-    {
-      id: "TXN005",
-      product: "Laptop Stand",
-      amount: 49.99,
-      date: "2025-10-21",
-      status: "cancelled",
-      buyer: "David Wilson",
     },
   ]);
 
@@ -271,6 +272,9 @@ export function ProfileDashboard({
     formData.append("phone", updatedProfile.phone);
     formData.append("location", updatedProfile.location);
     formData.append("bio", updatedProfile.bio);
+    formData.append("github", updatedProfile.github || "");
+    formData.append("twitter", updatedProfile.twitter || "");
+    formData.append("linkedin", updatedProfile.linkedin || "");
     if (updatedProfile.avatar instanceof File) {
       formData.append("avatar", updatedProfile.avatar);
     } else {

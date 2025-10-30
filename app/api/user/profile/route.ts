@@ -25,6 +25,9 @@ export async function PUT(req: NextRequest) {
   const phone = formData.get('phone') as string;
   const location = formData.get('location') as string;
   const bio = formData.get('bio') as string;
+  const github = formData.get('github') as string;
+  const twitter = formData.get('twitter') as string;
+  const linkedin = formData.get('linkedin') as string;
   const avatarFile = formData.get('avatar');
 
   let profileImage = '';
@@ -39,7 +42,7 @@ export async function PUT(req: NextRequest) {
 
   await User.findOneAndUpdate(
     { email: session.user.email },
-    { username, email, phone, location, bio, profileImage },
+    { username, email, phone, location, bio, github, twitter, linkedin, profileImage },
     { new: true }
   );
 

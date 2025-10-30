@@ -18,6 +18,9 @@ export interface IUser extends Document {
   bio?: string;
   createdAt: Date;
   profileImage?: string;
+  github?: string;
+  twitter?: string;
+  linkedin?: string;
 }
 
 const UserSchema: Schema = new Schema({
@@ -37,6 +40,9 @@ const UserSchema: Schema = new Schema({
   location: { type: String },
   bio: { type: String },
   profileImage: { type: String },
+  github: { type: String },
+  twitter: { type: String },
+  linkedin: { type: String },
 }, { timestamps: true });
 
 export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
