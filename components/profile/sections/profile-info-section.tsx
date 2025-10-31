@@ -16,8 +16,8 @@ import {
   Phone,
   MapPin,
   Github,
-  Linkedin,
   Twitter,
+  Globe,
 } from "lucide-react";
 
 interface UserData {
@@ -32,7 +32,7 @@ interface UserData {
   };
   github?: string;
   twitter?: string;
-  linkedin?: string;
+  website?: string;
 }
 
 interface UserProfile {
@@ -109,47 +109,49 @@ export function ProfileInfoSection({
           </div>
         </div>
 
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium">Social Links</h4>
-          <div className="flex gap-2">
-            {userData?.github && (
-              <Button variant="ghost" size="icon" asChild>
-                <a
-                  href={userData.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Github className="h-4 w-4" />
-                  <span className="sr-only">GitHub</span>
-                </a>
-              </Button>
-            )}
-            {userData?.twitter && (
-              <Button variant="ghost" size="icon" asChild>
-                <a
-                  href={userData.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Twitter className="h-4 w-4" />
-                  <span className="sr-only">Twitter</span>
-                </a>
-              </Button>
-            )}
-            {userData?.linkedin && (
-              <Button variant="ghost" size="icon" asChild>
-                <a
-                  href={userData.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Linkedin className="h-4 w-4" />
-                  <span className="sr-only">LinkedIn</span>
-                </a>
-              </Button>
-            )}
+        {(userData?.github || userData?.twitter || userData?.website) && (
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium">Social Links</h4>
+            <div className="flex gap-2">
+              {userData?.github && (
+                <Button variant="ghost" size="icon" asChild>
+                  <a
+                    href={userData.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Github className="h-4 w-4" />
+                    <span className="sr-only">GitHub</span>
+                  </a>
+                </Button>
+              )}
+              {userData?.twitter && (
+                <Button variant="ghost" size="icon" asChild>
+                  <a
+                    href={userData.twitter}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Twitter className="h-4 w-4" />
+                    <span className="sr-only">Twitter</span>
+                  </a>
+                </Button>
+              )}
+              {userData?.website && (
+                <Button variant="ghost" size="icon" asChild>
+                  <a
+                    href={userData.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Globe className="h-4 w-4" />
+                    <span className="sr-only">Website</span>
+                  </a>
+                </Button>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );

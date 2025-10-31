@@ -25,7 +25,7 @@ interface UserProfile {
   bio: string;
   github?: string;
   twitter?: string;
-  linkedin?: string;
+  website?: string;
 }
 
 interface EditProfileModalProps {
@@ -161,12 +161,12 @@ export function EditProfileModal({
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="linkedin">LinkedIn</Label>
+              <Label htmlFor="website">Website</Label>
               <Input
-                id="linkedin"
-                value={formData.linkedin || ""}
-                onChange={(e) => handleChange("linkedin", e.target.value)}
-                placeholder="https://linkedin.com/in/username"
+                id="website"
+                value={formData.website || ""}
+                onChange={(e) => handleChange("website", e.target.value)}
+                placeholder="https://your.website.com"
               />
             </div>
           </div>

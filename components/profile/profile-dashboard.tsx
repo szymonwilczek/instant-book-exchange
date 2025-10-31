@@ -65,7 +65,7 @@ interface UserProfile {
   bio: string;
   github?: string;
   twitter?: string;
-  linkedin?: string;
+  website?: string;
 }
 
 interface Transaction {
@@ -143,7 +143,7 @@ export function ProfileDashboard({
       bio: currentUserData?.bio || "",
       github: currentUserData?.github || "",
       twitter: currentUserData?.twitter || "",
-      linkedin: currentUserData?.linkedin || "",
+      website: currentUserData?.website || "",
     }),
     [currentUserData]
   );
@@ -274,7 +274,7 @@ export function ProfileDashboard({
     formData.append("bio", updatedProfile.bio);
     formData.append("github", updatedProfile.github || "");
     formData.append("twitter", updatedProfile.twitter || "");
-    formData.append("linkedin", updatedProfile.linkedin || "");
+    formData.append("website", updatedProfile.website || "");
     if (updatedProfile.avatar instanceof File) {
       formData.append("avatar", updatedProfile.avatar);
     } else {
@@ -354,7 +354,7 @@ export function ProfileDashboard({
           Hello, {currentUserData?.username || "You!"}!
         </h1>
         <p className="text-muted-foreground text-pretty">
-          Manage your profile, track transactions, and monitor your products
+          Manage your profile, track transactions, and monitor your books
         </p>
       </div>
 
