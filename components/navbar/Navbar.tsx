@@ -22,7 +22,7 @@ import { InfoMenu } from "@/components/navbar/InfoMenu";
 import { NotificationMenu } from "@/components/navbar/NotificationMenu";
 import { UserMenu } from "@/components/navbar/UserMenu";
 import { useSession } from "next-auth/react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Sun, Moon } from "lucide-react";
 
@@ -77,6 +77,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
     const [userData, setUserData] = useState(null);
     const pathname = usePathname();
     const { theme, setTheme } = useTheme();
+    const router = useRouter();
 
     useEffect(() => {
       if (session) {
@@ -153,10 +154,12 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                       {navigationLinks.map((link, index) => (
                         <NavigationMenuItem key={index} className="w-full">
                           <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              if (onNavItemClick && link.href)
-                                onNavItemClick(link.href);
+                            onClick={() => {
+                              if (onNavItemClick) {
+                                onNavItemClick(link.href!);
+                              } else {
+                                router.push(link.href!);
+                              }
                             }}
                             className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer no-underline"
                           >
@@ -188,10 +191,12 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                       <NavigationMenuItem key={index}>
                         <NavigationMenuLink
                           href={link.href}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            if (onNavItemClick && link.href)
-                              onNavItemClick(link.href);
+                          onClick={() => {
+                            if (onNavItemClick) {
+                              onNavItemClick(link.href!);
+                            } else {
+                              router.push(link.href!);
+                            }
                           }}
                           className="text-muted-foreground hover:text-primary py-1.5 font-medium transition-colors cursor-pointer group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
                         >
