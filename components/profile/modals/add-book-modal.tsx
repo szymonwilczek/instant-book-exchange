@@ -50,6 +50,7 @@ interface AddBookModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: () => void; // tylko odswiezenie = bez parametrow
+  type?: "offered" | "wishlist";
 }
 
 interface BookBase {
@@ -65,6 +66,7 @@ export function AddBookModal({
   open,
   onOpenChange,
   onSave,
+  type = "offered",
 }: AddBookModalProps) {
   const [isCreating, setIsCreating] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -89,7 +91,7 @@ export function AddBookModal({
   }, [searchQuery]);
 
   // wyszukiwanie ksiazek (local kolekcja + Google Books)
-   useEffect(() => {
+  useEffect(() => {
     const updateResults = async () => {
       if (debouncedQuery.length <= 2) {
         setSearchResults([]);
@@ -125,8 +127,14 @@ export function AddBookModal({
 
         // polaczenie wynikow
         const combined = [
-          ...localBooks.map((b: BookBase) => ({ ...b, source: "local" as const })),
-          ...googleBooks.map((b: BookBase) => ({ ...b, source: "google" as const })),
+          ...localBooks.map((b: BookBase) => ({
+            ...b,
+            source: "local" as const,
+          })),
+          ...googleBooks.map((b: BookBase) => ({
+            ...b,
+            source: "google" as const,
+          })),
         ];
         setSearchResults(combined);
       } catch (error) {
@@ -153,8 +161,10 @@ export function AddBookModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const endpoint =
+        type === "wishlist" ? "/api/user/wishlist" : "/api/user/offered-books";
       if (isCreating || (selectedBook && selectedBook.source === "google")) {
-        await fetch("/api/user/offered-books", {
+        await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -166,7 +176,7 @@ export function AddBookModal({
           }),
         });
       } else if (selectedBook && selectedBook.source === "local") {
-        await fetch("/api/user/offered-books", {
+        await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ bookId: selectedBook.id }),

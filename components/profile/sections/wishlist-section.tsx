@@ -7,6 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -28,18 +30,28 @@ interface BookBase {
 interface WishlistSectionProps {
   wishlistBooks: BookBase[];
   onDeleteWishlistBook: (bookId: string) => void;
+  onAddBook: () => void;
 }
 
 export function WishlistSection({
   wishlistBooks,
   onDeleteWishlistBook,
+  onAddBook,
 }: WishlistSectionProps) {
   const needsCarousel = wishlistBooks.length > 4;
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Wishlist</CardTitle>
+        <div className="flex items-center justify-between">
+          {" "}
+          <CardTitle>Wishlist</CardTitle>
+          <Button variant="outline" size="sm" onClick={onAddBook}>
+            {" "}
+            <Plus className="h-4 w-4 mr-2" />
+            Add Book
+          </Button>
+        </div>
         <CardDescription>Books you want to receive</CardDescription>
       </CardHeader>
       <CardContent>

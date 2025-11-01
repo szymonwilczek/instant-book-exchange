@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react"; // Dodano useMemo
+import { useState, useEffect, useMemo } from "react";
 import { EditProfileModal } from "@/components/profile/modals/edit-profile-modal";
 import { EditProductModal } from "@/components/profile/modals/edit-product-modal";
 import { AddBookModal } from "@/components/profile/modals/add-book-modal";
@@ -96,6 +96,7 @@ export function ProfileDashboard({
     null
   );
   const [isAddBookOpen, setIsAddBookOpen] = useState(false);
+  const [modalType, setModalType] = useState<"offered" | "wishlist">("offered");
 
   const {
     userData: fetchedUserData,
@@ -382,7 +383,10 @@ export function ProfileDashboard({
 
       <OfferedBooksSection
         books={books}
-        onAddBook={() => setIsAddBookModalOpen(true)}
+        onAddBook={() => {
+          setModalType("offered");
+          setIsAddBookModalOpen(true);
+        }}
         onEditBook={handleEditBook}
         onDeleteBook={handleDeleteBook}
       />
@@ -390,6 +394,10 @@ export function ProfileDashboard({
       <WishlistSection
         wishlistBooks={wishlistBooks}
         onDeleteWishlistBook={handleDeleteWishlistBook}
+        onAddBook={() => {
+          setModalType("wishlist");
+          setIsAddBookModalOpen(true);
+        }}
       />
 
       <EditProfileModal
@@ -410,6 +418,7 @@ export function ProfileDashboard({
         open={isAddBookModalOpen}
         onOpenChange={setIsAddBookModalOpen}
         onSave={fetchData}
+        type={modalType}
       />
       <EditBookModal
         book={selectedBook}
