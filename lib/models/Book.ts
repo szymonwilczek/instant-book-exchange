@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema } from "mongoose";
 
 export interface IBook extends Document {
   title: string;
@@ -6,19 +6,38 @@ export interface IBook extends Document {
   isbn?: string;
   description?: string;
   imageUrl?: string;
-  owner: mongoose.Types.ObjectId; // ID wlasciciela (User)
-  status: 'available' | 'exchanged'; // status ksiazki
+  owner: mongoose.Types.ObjectId;
+  status: "available" | "exchanged";
+  condition: "new" | "used" | "damaged";
+  genres: string[];
+  viewCount: number;
   createdAt: Date;
+  updatedAt: Date;
 }
 
-const BookSchema: Schema = new Schema({
-  title: { type: String, required: true },
-  author: { type: String, required: true },
-  isbn: { type: String },
-  description: { type: String },
-  imageUrl: { type: String },
-  owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  status: { type: String, enum: ['available', 'exchanged'], default: 'available' },
-}, { timestamps: true });
+const BookSchema: Schema = new Schema(
+  {
+    title: { type: String, required: true },
+    author: { type: String, required: true },
+    isbn: { type: String },
+    description: { type: String },
+    imageUrl: { type: String },
+    owner: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    status: {
+      type: String,
+      enum: ["available", "exchanged"],
+      default: "available",
+    },
+    condition: {
+      type: String,
+      enum: ["new", "used", "damaged"],
+      default: "used",
+    },
+    genres: [{ type: String }],
+    viewCount: { type: Number, default: 0 },
+  },
+  { timestamps: true }
+);
 
-export default mongoose.models.Book || mongoose.model<IBook>('Book', BookSchema);
+export default mongoose.models.Book ||
+  mongoose.model<IBook>("Book", BookSchema);
