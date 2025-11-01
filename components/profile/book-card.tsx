@@ -26,7 +26,7 @@ export function BookCard({
   const formatDate = (date: string) => new Date(date).toLocaleDateString();
 
   return (
-    <Card className="overflow-hidden min-w-[200px] h-auto">
+    <Card className="overflow-hidden min-w-[200px] h-full">
       <div className="aspect-square relative max-h-36">
         <img
           src={book.image || "/placeholder.svg"}
