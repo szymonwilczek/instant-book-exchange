@@ -14,6 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 import { HamburgerIcon } from "@/components/navbar/HamburgerIcon";
@@ -25,7 +26,7 @@ import { CartSheet } from "@/components/navbar/CartSheet";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { Sun, Moon } from "lucide-react";
+import { Sun, Moon, MessageCircle } from "lucide-react";
 
 export interface NavbarNavItem {
   href?: string;
@@ -76,6 +77,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
     const containerRef = useRef<HTMLElement>(null);
     const { data: session } = useSession();
     const [userData, setUserData] = useState(null);
+    const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
     const pathname = usePathname();
     const { theme, setTheme } = useTheme();
     const router = useRouter();
@@ -87,6 +89,29 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
           .then(setUserData);
       }
     }, [session]);
+
+    // unread messages count
+    useEffect(() => {
+      if (session?.user?.id) {
+        const fetchUnreadCount = async () => {
+          try {
+            const res = await fetch("/api/messages/unread-count");
+            if (res.ok) {
+              const data = await res.json();
+              setUnreadMessagesCount(data.count || 0);
+            }
+          } catch (error) {
+            console.error("Error fetching unread count:", error);
+          }
+        };
+
+        fetchUnreadCount();
+
+        // poll co 30 sekund
+        const interval = setInterval(fetchUnreadCount, 30000);
+        return () => clearInterval(interval);
+      }
+    }, [session?.user?.id]);
 
     useEffect(() => {
       const checkWidth = () => {
@@ -215,6 +240,25 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
             <div className="flex items-center gap-2">
               {/* Info menu */}
               <InfoMenu onItemClick={onInfoItemClick} />
+              {/* Messages - tylko dla zalogowanych */}
+              {session && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => router.push("/messages")}
+                  className="relative h-9 w-9 cursor-pointer"
+                >
+                  <MessageCircle className="h-5 w-5" />
+                  {unreadMessagesCount > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -right-1 -top-1 h-5 min-w-5 rounded-full px-1 text-xs"
+                    >
+                      {unreadMessagesCount > 9 ? "9+" : unreadMessagesCount}
+                    </Badge>
+                  )}
+                </Button>
+              )}
               {/* Notification */}
               <NotificationMenu
                 notificationCount={notificationCount}
