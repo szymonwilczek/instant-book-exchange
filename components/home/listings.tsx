@@ -36,7 +36,7 @@ export function Listings({
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Ogłoszenia</h2>
+        <h2 className="text-xl font-bold">Ogłoszenia ({books.length})</h2>
         <Select value={sortBy} onValueChange={setSortBy}>
           <SelectTrigger className="w-48">
             <SelectValue />
@@ -47,37 +47,65 @@ export function Listings({
           </SelectContent>
         </Select>
       </div>
-      <div className="grid grid-cols-1 gap-4">
-        {books.map((book) => (
-          <ListingCard key={book.id} book={book} owner={book.owner} />
-        ))}
-      </div>
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
-            />
-          </PaginationItem>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <PaginationItem key={page}>
-              <PaginationLink
-                isActive={page === currentPage}
-                onClick={() => setCurrentPage(page)}
-              >
-                {page}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
-          <PaginationItem>
-            <PaginationNext
-              onClick={() =>
-                currentPage < totalPages && setCurrentPage(currentPage + 1)
-              }
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+
+      {books.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Brak dostępnych książek</p>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-4">
+            {books.map((book) => (
+              <ListingCard key={book._id} book={book} owner={book.owner} />
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <Pagination className="mt-6">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() =>
+                      currentPage > 1 && setCurrentPage(currentPage - 1)
+                    }
+                    className={
+                      currentPage === 1
+                        ? "pointer-events-none opacity-50"
+                        : "cursor-pointer"
+                    }
+                  />
+                </PaginationItem>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        isActive={page === currentPage}
+                        onClick={() => setCurrentPage(page)}
+                        className="cursor-pointer"
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )
+                )}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() =>
+                      currentPage < totalPages &&
+                      setCurrentPage(currentPage + 1)
+                    }
+                    className={
+                      currentPage === totalPages
+                        ? "pointer-events-none opacity-50"
+                        : "cursor-pointer"
+                    }
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          )}
+        </>
+      )}
     </div>
   );
 }

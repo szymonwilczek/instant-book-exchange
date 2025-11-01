@@ -19,86 +19,133 @@ import {
 interface FiltersProps {
   filters: {
     genres: string[];
-    status: string[];
-    location: string[];
+    conditions: string[];
+    locations: string[];
     dateRange: string;
   };
   setFilters: (filters: any) => void;
 }
 
-const genres = ["Fantasy", "Sci-Fi", "Romance", "Thriller"];
-const statuses = ["new", "used", "damaged"];
-const locations = ["Warszawa", "Kraków", "Gdańsk"];
+const genres = [
+  "Fantasy",
+  "Sci-Fi",
+  "Romance",
+  "Thriller",
+  "Mystery",
+  "Horror",
+  "Non-Fiction",
+];
+const conditions = ["new", "used", "damaged"];
+const locations = ["Warszawa", "Kraków", "Gdańsk", "Wrocław", "Poznań"];
 
 export function Filters({ filters, setFilters }: FiltersProps) {
-  const handleApply = () => {
-    // TODO: filtry do api
+  const handleReset = () => {
+    setFilters({
+      genres: [],
+      conditions: [],
+      locations: [],
+      dateRange: "",
+    });
   };
 
   return (
     <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="font-semibold">Filtry</h3>
+        <Button variant="ghost" size="sm" onClick={handleReset}>
+          Wyczyść
+        </Button>
+      </div>
       <Accordion type="single" collapsible>
         <AccordionItem value="genres">
           <AccordionTrigger>Gatunki</AccordionTrigger>
           <AccordionContent>
-            {genres.map((g) => (
-              <div key={g} className="flex items-center space-x-2">
-                <Checkbox
-                  checked={filters.genres.includes(g)}
-                  onCheckedChange={(checked) => {
-                    setFilters({
-                      ...filters,
-                      genres: checked
-                        ? [...filters.genres, g]
-                        : filters.genres.filter((x) => x !== g),
-                    });
-                  }}
-                />
-                <label>{g}</label>
-              </div>
-            ))}
+            <div className="space-y-2">
+              {genres.map((g) => (
+                <div key={g} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`genre-${g}`}
+                    checked={filters.genres.includes(g)}
+                    onCheckedChange={(checked) => {
+                      setFilters({
+                        ...filters,
+                        genres: checked
+                          ? [...filters.genres, g]
+                          : filters.genres.filter((x) => x !== g),
+                      });
+                    }}
+                  />
+                  <label
+                    htmlFor={`genre-${g}`}
+                    className="text-sm cursor-pointer"
+                  >
+                    {g}
+                  </label>
+                </div>
+              ))}
+            </div>
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem value="status">
+        <AccordionItem value="condition">
           <AccordionTrigger>Stan książki</AccordionTrigger>
           <AccordionContent>
-            {statuses.map((s) => (
-              <div key={s} className="flex items-center space-x-2">
-                <Checkbox
-                  checked={filters.status.includes(s)}
-                  onCheckedChange={(checked) => {
-                    setFilters({
-                      ...filters,
-                      status: checked
-                        ? [...filters.status, s]
-                        : filters.status.filter((x) => x !== s),
-                    });
-                  }}
-                />
-                <label>{s}</label>
-              </div>
-            ))}
+            <div className="space-y-2">
+              {conditions.map((c) => (
+                <div key={c} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`condition-${c}`}
+                    checked={filters.conditions.includes(c)}
+                    onCheckedChange={(checked) => {
+                      setFilters({
+                        ...filters,
+                        conditions: checked
+                          ? [...filters.conditions, c]
+                          : filters.conditions.filter((x) => x !== c),
+                      });
+                    }}
+                  />
+                  <label
+                    htmlFor={`condition-${c}`}
+                    className="text-sm cursor-pointer"
+                  >
+                    {c === "new"
+                      ? "Nowy"
+                      : c === "used"
+                        ? "Używany"
+                        : "Uszkodzony"}
+                  </label>
+                </div>
+              ))}
+            </div>
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="location">
           <AccordionTrigger>Lokalizacja</AccordionTrigger>
           <AccordionContent>
-            {locations.map((l) => (
-              <div key={l} className="flex items-center space-x-2">
-                <Checkbox
-                  checked={filters.location.includes(l)}
-                  onCheckedChange={(checked) => {
-                    setFilters({
-                      ...filters,
-                      location: checked
-                        ? [...filters.location, l]
-                        : filters.location.filter((x) => x !== l),
-                    });
-                  }}
-                />
-                <label>{l}</label>
-              </div>
-            ))}
+            <div className="space-y-2">
+              {locations.map((l) => (
+                <div key={l} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`location-${l}`}
+                    checked={filters.locations.includes(l)}
+                    onCheckedChange={(checked) => {
+                      setFilters({
+                        ...filters,
+                        locations: checked
+                          ? [...filters.locations, l]
+                          : filters.locations.filter((x) => x !== l),
+                      });
+                    }}
+                  />
+                  <label
+                    htmlFor={`location-${l}`}
+                    className="text-sm cursor-pointer"
+                  >
+                    {l}
+                  </label>
+                </div>
+              ))}
+            </div>
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="date">
@@ -120,9 +167,6 @@ export function Filters({ filters, setFilters }: FiltersProps) {
           </AccordionContent>
         </AccordionItem>
       </Accordion>
-      <Button onClick={handleApply} className="w-full">
-        Zastosuj filtry
-      </Button>
     </div>
   );
 }
