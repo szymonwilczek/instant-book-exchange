@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, Eye, MapPin } from "lucide-react";
+import { Heart, MessageCircle, Eye, MapPin, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { ListingModal } from "./listing-modal";
 
@@ -61,9 +61,6 @@ export function ListingCard({ book, owner }: ListingCardProps) {
               </Badge>
               <div className="flex gap-2">
                 <Button size="sm" variant="outline">
-                  <Heart className="h-4 w-4" />
-                </Button>
-                <Button size="sm" variant="outline">
                   <MessageCircle className="h-4 w-4" />
                 </Button>
                 <Button
@@ -72,6 +69,9 @@ export function ListingCard({ book, owner }: ListingCardProps) {
                   onClick={() => setIsModalOpen(true)}
                 >
                   <Eye className="h-4 w-4" />
+                </Button>
+                <Button size="sm" variant="default" onClick={() => {}}>
+                  <ShoppingCart className="h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -110,9 +110,6 @@ export function ListingCard({ book, owner }: ListingCardProps) {
 
           <div className="flex gap-2 justify-center">
             <Button size="sm" variant="outline">
-              <Heart className="h-4 w-4" />
-            </Button>
-            <Button size="sm" variant="outline">
               <MessageCircle className="h-4 w-4" />
             </Button>
             <Button
@@ -121,6 +118,9 @@ export function ListingCard({ book, owner }: ListingCardProps) {
               onClick={() => setIsModalOpen(true)}
             >
               <Eye className="h-4 w-4" />
+            </Button>
+            <Button size="sm" variant="default" onClick={() => {}}>
+              <ShoppingCart className="h-4 w-4" />
             </Button>
           </div>
         </div>
