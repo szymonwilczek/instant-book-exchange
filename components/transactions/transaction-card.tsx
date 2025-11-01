@@ -20,6 +20,9 @@ import {
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
 import { ReviewModal } from "./review-modal";
+import { StartConversationModal } from "@/components/messages/start-conversation-modal";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface TransactionCardProps {
@@ -34,6 +37,9 @@ export function TransactionCard({
   onStatusUpdate,
 }: TransactionCardProps) {
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [messageModalOpen, setMessageModalOpen] = useState(false);
+  const { data: session } = useSession();
+  const router = useRouter();
 
   const isReceiver = transaction.receiver.email === userEmail;
   const otherUser = isReceiver ? transaction.initiator : transaction.receiver;
@@ -73,6 +79,14 @@ export function TransactionCard({
       transaction.deliveryMethod as keyof typeof deliveryMethodLabels
     ] || deliveryMethodLabels.personal;
   const DeliveryIcon = deliveryInfo.icon;
+
+  const handleSendMessage = () => {
+    if (!session) {
+      router.push("/login");
+      return;
+    }
+    setMessageModalOpen(true);
+  };
 
   const handleReview = async (rating: number, comment: string) => {
     try {
@@ -256,7 +270,7 @@ export function TransactionCard({
                 </Button>
               )}
 
-              <Button size="sm" variant="ghost">
+              <Button size="sm" variant="ghost" onClick={handleSendMessage}>
                 <MessageCircle className="mr-2 h-4 w-4" />
                 Send message
               </Button>
@@ -270,6 +284,19 @@ export function TransactionCard({
         onOpenChange={setReviewModalOpen}
         transaction={transaction}
         onSubmit={handleReviewSubmit}
+      />
+
+      <StartConversationModal
+        open={messageModalOpen}
+        onOpenChange={setMessageModalOpen}
+        book={{
+          _id: transaction.requestedBook._id,
+          title: transaction.requestedBook.title,
+          author: transaction.requestedBook.author,
+          coverImage: transaction.requestedBook.imageUrl,
+        }}
+        recipientId={otherUser._id}
+        recipientName={otherUser.username || otherUser.name}
       />
     </>
   );

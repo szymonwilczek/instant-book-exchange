@@ -6,8 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { MessageCircle, Eye, MapPin, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { ListingModal } from "./listing-modal";
+import { StartConversationModal } from "@/components/messages/start-conversation-modal";
 import { useCart } from "@/lib/context/cart-context";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ListingCardProps {
@@ -17,8 +19,10 @@ interface ListingCardProps {
 
 export function ListingCard({ book, owner }: ListingCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const { addToCart, loading } = useCart();
   const { data: session } = useSession();
+  const router = useRouter();
 
   const handleViewBook = async () => {
     setIsModalOpen(true);
@@ -31,6 +35,20 @@ export function ListingCard({ book, owner }: ListingCardProps) {
     } catch (error) {
       console.error("Error incrementing view count:", error);
     }
+  };
+
+  const handleSendMessage = () => {
+    if (!session) {
+      router.push("/login");
+      return;
+    }
+
+    if (owner._id === session.user?.id) {
+      alert("Nie możesz wysłać wiadomości do siebie");
+      return;
+    }
+
+    setIsMessageModalOpen(true);
   };
 
   const handleAddToCart = async () => {
@@ -109,7 +127,12 @@ export function ListingCard({ book, owner }: ListingCardProps) {
                 </Badge>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" variant="outline">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleSendMessage}
+                  title="Wyślij wiadomość"
+                >
                   <MessageCircle className="h-4 w-4" />
                 </Button>
                 <Button size="sm" variant="outline" onClick={handleViewBook}>
@@ -165,7 +188,7 @@ export function ListingCard({ book, owner }: ListingCardProps) {
           </div>
 
           <div className="flex gap-2 justify-center">
-            <Button size="sm" variant="outline">
+            <Button size="sm" variant="outline" onClick={handleSendMessage}>
               <MessageCircle className="h-4 w-4" />
             </Button>
             <Button size="sm" variant="outline" onClick={handleViewBook}>
@@ -188,6 +211,19 @@ export function ListingCard({ book, owner }: ListingCardProps) {
         owner={owner}
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
+      />
+
+      <StartConversationModal
+        open={isMessageModalOpen}
+        onOpenChange={setIsMessageModalOpen}
+        book={{
+          _id: book._id,
+          title: book.title,
+          author: book.author,
+          coverImage: book.imageUrl,
+        }}
+        recipientId={owner._id}
+        recipientName={owner.username || owner.name}
       />
     </>
   );
