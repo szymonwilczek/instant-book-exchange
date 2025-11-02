@@ -177,7 +177,6 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
         console.log("Adding message to list, current count:", prev.length);
         return [...prev, message];
       });
-      scrollToBottom();
       markMessagesAsRead();
 
       if (message.sender.email !== session?.user?.email) {
@@ -287,9 +286,21 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
   };
 
   const scrollToBottom = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: "smooth" });
-    }
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        if (scrollRef.current) {
+          const viewport = scrollRef.current.closest(
+            "[data-radix-scroll-area-viewport]"
+          ) as HTMLElement;
+          if (viewport) {
+            viewport.scrollTo({
+              top: viewport.scrollHeight,
+              behavior: "smooth",
+            });
+          }
+        }
+      }, 50);
+    });
   };
 
   const handleSendMessage = async (
@@ -569,6 +580,7 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
       <div className="flex-shrink-0">
         <MessageInput
           conversationId={conversation._id}
+          userName={session?.user?.name || session?.user?.email || "User"}
           onSendMessage={handleSendMessage}
         />
       </div>
