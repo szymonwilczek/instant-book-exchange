@@ -15,9 +15,14 @@ import { useRouter } from "next/navigation";
 interface ListingCardProps {
   book: any;
   owner: any;
+  isMatch?: boolean;
 }
 
-export function ListingCard({ book, owner }: ListingCardProps) {
+export function ListingCard({
+  book,
+  owner,
+  isMatch = false,
+}: ListingCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const { addToCart, loading } = useCart();
@@ -72,7 +77,9 @@ export function ListingCard({ book, owner }: ListingCardProps) {
 
   return (
     <>
-      <Card className="h-full -p-2">
+      <Card
+        className={`h-full -p-2 ${isMatch ? "border-2 border-orange-500" : ""}`}
+      >
         <div className="hidden md:flex h-full gap-4 p-5">
           <img
             src={book.imageUrl || "/placeholder-book.png"}
@@ -152,7 +159,9 @@ export function ListingCard({ book, owner }: ListingCardProps) {
         </div>
 
         {/* mobile layout - pionowy */}
-        <div className="md:hidden flex flex-col p-4">
+        <div
+          className={`md:hidden flex flex-col p-4 ${isMatch ? "border-2 border-orange-500" : ""}`}
+        >
           <img
             src={book.imageUrl || "/placeholder-book.png"}
             alt={book.title}
