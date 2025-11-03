@@ -95,7 +95,7 @@ export function ListingCard({
                     {book.title}
                   </h3>
                   <p className="text-sm text-muted-foreground whitespace-nowrap">
-                    by {book.author}
+                    by <span className="font-medium">{book.author}</span>
                   </p>
                 </div>
               </div>
@@ -173,7 +173,7 @@ export function ListingCard({
               {book.title}
             </h3>
             <p className="text-xs text-muted-foreground whitespace-nowrap">
-              by {book.author}
+              by <span className="font-medium">{book.author}</span>
             </p>
           </div>
 
