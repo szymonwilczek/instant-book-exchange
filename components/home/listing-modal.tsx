@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, MapPin, Eye } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { MessageCircle, MapPin, Eye, User } from "lucide-react";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
 import { StartConversationModal } from "@/components/messages/start-conversation-modal";
 import { useSession } from "next-auth/react";
@@ -60,6 +61,11 @@ export function ListingModal({
     setMessageModalOpen(true);
   };
 
+  const handleViewProfile = () => {
+    router.push(`/users/${owner._id}`);
+    onOpenChange(false);
+  };
+
   const content = (
     <div className="space-y-4">
       <img
@@ -71,7 +77,7 @@ export function ListingModal({
       <div className="space-y-3">
         <div>
           <h4 className="text-sm font-medium text-muted-foreground mb-1">
-            Author
+            Autor
           </h4>
           <p className="text-base">{book.author}</p>
         </div>
@@ -79,7 +85,7 @@ export function ListingModal({
         {book.description && (
           <div>
             <h4 className="text-sm font-medium text-muted-foreground mb-1">
-              Book description
+              Opis książki
             </h4>
             <p className="text-sm">{book.description}</p>
           </div>
@@ -88,7 +94,7 @@ export function ListingModal({
         {book.ownerNote && (
           <div>
             <h4 className="text-sm font-medium text-muted-foreground mb-1">
-              Owner&apos; note
+              Notatka właściciela
             </h4>
             <p className="text-sm italic">{book.ownerNote}</p>
           </div>
@@ -100,29 +106,45 @@ export function ListingModal({
           </Badge>
           <Badge variant="outline">
             <Eye className="w-3 h-3 mr-1" />
-            {book.viewCount || 0} views
+            {book.viewCount || 0} wyświetleń
           </Badge>
         </div>
 
         <div className="pt-2 border-t">
           <h4 className="text-sm font-medium text-muted-foreground mb-2">
-            Owner
+            Właściciel
           </h4>
-          <div className="flex items-center justify-between">
-            <div>
+          <div
+            onClick={handleViewProfile}
+            className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors"
+          >
+            <Avatar className="h-12 w-12">
+              <AvatarImage src={owner.profileImage} />
+              <AvatarFallback>
+                {(owner.username || owner.name)?.substring(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
               <p className="font-medium">{owner.username || owner.name}</p>
               <div className="flex items-center gap-1 text-sm text-muted-foreground">
                 <MapPin className="w-3.5 h-3.5" />
-                {owner.location || "No location"}
+                {owner.location || "Brak lokalizacji"}
               </div>
             </div>
+            <User className="h-5 w-5 text-muted-foreground" />
           </div>
         </div>
 
-        <Button className="w-full" onClick={handleSendMessage}>
-          <MessageCircle className="mr-2 h-4 w-4" />
-          Send message
-        </Button>
+        <div className="flex gap-2">
+          <Button className="flex-1" onClick={handleSendMessage}>
+            <MessageCircle className="mr-2 h-4 w-4" />
+            Wyślij wiadomość
+          </Button>
+          <Button variant="outline" onClick={handleViewProfile}>
+            <User className="mr-2 h-4 w-4" />
+            Profil
+          </Button>
+        </div>
       </div>
     </div>
   );
