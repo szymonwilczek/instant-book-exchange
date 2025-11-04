@@ -63,9 +63,9 @@ export function OfferedBooksSection({
             plugins={[Autoplay({ delay: 7500 })]}
           >
             <CarouselContent>
-              {books.map((book) => (
+              {books.map((book, index) => (
                 <CarouselItem
-                  key={book.id}
+                  key={index}
                   className="basis-1/2 md:basis-1/3 lg:basis-1/4"
                 >
                   <BookCard
@@ -82,8 +82,8 @@ export function OfferedBooksSection({
           </Carousel>
         ) : (
           <div className="flex gap-4 overflow-x-auto">
-            {books.map((book) => (
-              <div key={book.id} className="flex-shrink-0 w-xs max-w-xs">
+            {books.map((book, index) => (
+              <div key={index} className="flex-shrink-0 w-xs max-w-xs">
                 <BookCard
                   isReadOnly={false}
                   book={book}
