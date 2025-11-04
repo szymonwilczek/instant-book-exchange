@@ -1,5 +1,3 @@
-// /home/wolfie/Dokumenty/GitHub/bookstore/app/api/transactions/[id]/route.ts
-
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/api/auth/[...nextauth]/auth";
 import connectToDB from "@/lib/db/connect";
@@ -8,6 +6,7 @@ import Book from "@/lib/models/Book";
 import BookSnapshot from "@/lib/models/BookSnapshot";
 import User from "@/lib/models/User";
 import mongoose from "mongoose";
+import { checkAchievements } from "@/lib/achievements/checker";
 
 interface PopulatedTransaction {
   _id: mongoose.Types.ObjectId;
@@ -167,6 +166,9 @@ export async function PUT(
     transaction.receiver.points += 10;
     await transaction.initiator.save();
     await transaction.receiver.save();
+
+    await checkAchievements(transaction.initiator._id.toString());
+    await checkAchievements(transaction.receiver._id.toString());
   }
 
   await transaction.save();
