@@ -16,6 +16,15 @@ import { DeleteConfirmModal } from "./modals/delete-confirm-modal";
 import { useProfileData } from "./hooks/useProfileData";
 import { useOnboarding } from "./hooks/useOnboarding";
 import { Package, DollarSign, User, TrendingUp, Edit } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { Button } from "../ui/button";
 
 interface BookBase {
   id: string;
@@ -115,6 +124,7 @@ export function ProfileDashboard({
   );
   const [isAddBookOpen, setIsAddBookOpen] = useState(false);
   const [modalType, setModalType] = useState<"offered" | "wishlist">("offered");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const {
     userData: fetchedUserData,
@@ -339,14 +349,32 @@ export function ProfileDashboard({
       const endpoint = isOffered
         ? "/api/user/offered-books"
         : "/api/user/wishlist";
-      await fetch(endpoint, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bookId: selectedBookToDelete.id }),
-      });
-      fetchData();
-      setIsDeleteConfirmOpen(false);
-      setSelectedBookToDelete(null);
+
+      try {
+        const response = await fetch(endpoint, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bookId: selectedBookToDelete.id }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setErrorMessage(data.error || "Failed to delete book");
+          setIsDeleteConfirmOpen(false);
+          setSelectedBookToDelete(null);
+          return;
+        }
+
+        fetchData();
+        setIsDeleteConfirmOpen(false);
+        setSelectedBookToDelete(null);
+      } catch (error) {
+        console.error("Error deleting book:", error);
+        setErrorMessage("An unexpected error occurred. Please try again.");
+        setIsDeleteConfirmOpen(false);
+        setSelectedBookToDelete(null);
+      }
     }
   };
 
@@ -465,6 +493,25 @@ export function ProfileDashboard({
         onOpenChange={setIsAddBookOpen}
         onSelectBook={handleAddBook}
       />
+
+      {errorMessage && (
+        <Dialog
+          open={!!errorMessage}
+          onOpenChange={() => setErrorMessage(null)}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Cannot Delete Book</DialogTitle>
+              <DialogDescription className="text-destructive">
+                {errorMessage}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button onClick={() => setErrorMessage(null)}>OK</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
