@@ -44,6 +44,15 @@ export function TransactionCard({
   const isReceiver = transaction.receiver.email === userEmail;
   const otherUser = isReceiver ? transaction.initiator : transaction.receiver;
 
+  const requestedBook = transaction.requestedBook || {
+    _id: "deleted",
+    title: "Deleted Book",
+    author: "Unknown",
+    imageUrl: "/placeholder-book.png",
+  };
+
+  const offeredBooks = transaction.offeredBooks || [];
+
   const statusConfig = {
     pending: {
       label: "Pending",
@@ -158,19 +167,16 @@ export function TransactionCard({
                 </p>
                 <div className="flex gap-3 p-3 bg-muted/50 rounded-lg">
                   <img
-                    src={
-                      transaction.requestedBook.imageUrl ||
-                      "/placeholder-book.png"
-                    }
-                    alt={transaction.requestedBook.title}
-                    className="w-16 h-20 object-cover rounded"
+                    src={requestedBook.imageUrl || "/placeholder-book.png"}
+                    alt={requestedBook.title}
+                    className="w-16 h-24 object-cover rounded"
                   />
                   <div className="flex-1 min-w-0">
                     <h4 className="font-semibold text-sm line-clamp-2">
-                      {transaction.requestedBook.title}
+                      {requestedBook.title}
                     </h4>
                     <p className="text-xs text-muted-foreground">
-                      {transaction.requestedBook.author}
+                      {requestedBook.author}
                     </p>
                   </div>
                 </div>
@@ -181,21 +187,21 @@ export function TransactionCard({
                 <p className="text-sm font-medium text-muted-foreground">
                   {isReceiver ? "In exchange for" : "Your offer"}
                 </p>
-                {transaction.offeredBooks.length === 0 ? (
+                {offeredBooks.length === 0 ? (
                   <div className="flex items-center justify-center h-28 bg-muted/30 rounded-lg text-sm text-muted-foreground">
                     No exchange
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    {transaction.offeredBooks.map((book: any) => (
+                    {offeredBooks.map((book: any) => (
                       <div
                         key={book._id}
-                        className="flex gap-3 p-2 bg-muted/50 rounded-lg"
+                        className="flex gap-3 p-3 bg-muted/50 rounded-lg"
                       >
                         <img
                           src={book.imageUrl || "/placeholder-book.png"}
                           alt={book.title}
-                          className="w-12 h-16 object-cover rounded"
+                          className="w-16 h-24 object-cover rounded"
                         />
                         <div className="flex-1 min-w-0">
                           <h4 className="font-medium text-xs line-clamp-2">
@@ -253,10 +259,23 @@ export function TransactionCard({
               )}
 
               {transaction.status === "accepted" && (
-                <Button size="sm" variant="outline" onClick={handleComplete}>
-                  <CheckCircle2 className="mr-2 h-4 w-4" />
-                  Mark as completed
-                </Button>
+                <>
+                  {!isReceiver ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleComplete}
+                    >
+                      <CheckCircle2 className="mr-2 h-4 w-4" />
+                      Mark as completed
+                    </Button>
+                  ) : (
+                    <Button size="sm" variant="outline" disabled>
+                      <Clock className="mr-2 h-4 w-4" />
+                      Waiting for {otherUser.username} to complete
+                    </Button>
+                  )}
+                </>
               )}
 
               {transaction.status === "completed" && (
@@ -266,7 +285,7 @@ export function TransactionCard({
                   onClick={() => setReviewModalOpen(true)}
                 >
                   <Star className="mr-2 h-4 w-4" />
-                  See reviews
+                  Review exchange
                 </Button>
               )}
 
@@ -290,10 +309,10 @@ export function TransactionCard({
         open={messageModalOpen}
         onOpenChange={setMessageModalOpen}
         book={{
-          _id: transaction.requestedBook._id,
-          title: transaction.requestedBook.title,
-          author: transaction.requestedBook.author,
-          coverImage: transaction.requestedBook.imageUrl,
+          _id: requestedBook._id,
+          title: requestedBook.title,
+          author: requestedBook.author,
+          coverImage: requestedBook.imageUrl,
         }}
         recipientId={otherUser._id}
         recipientName={otherUser.username || otherUser.name}

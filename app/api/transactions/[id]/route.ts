@@ -1,8 +1,11 @@
+// /home/wolfie/Dokumenty/GitHub/bookstore/app/api/transactions/[id]/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/api/auth/[...nextauth]/auth";
 import connectToDB from "@/lib/db/connect";
 import Transaction from "@/lib/models/Transaction";
 import Book from "@/lib/models/Book";
+import BookSnapshot from "@/lib/models/BookSnapshot";
 import User from "@/lib/models/User";
 import mongoose from "mongoose";
 
@@ -25,8 +28,33 @@ interface PopulatedTransaction {
     _id: mongoose.Types.ObjectId;
   }>;
   status: string;
+  requestedBookSnapshot?: {
+    _id: string;
+    title: string;
+    author: string;
+    imageUrl?: string;
+    condition?: string;
+    ownerNote?: string;
+  };
+  offeredBooksSnapshots?: Array<{
+    _id: string;
+    title: string;
+    author: string;
+    imageUrl?: string;
+    condition?: string;
+    ownerNote?: string;
+  }>;
   save: () => Promise<void>;
   populate: (fields: string) => Promise<PopulatedTransaction>;
+}
+
+interface BookDocument {
+  _id: mongoose.Types.ObjectId;
+  title: string;
+  author: string;
+  imageUrl?: string;
+  condition?: string;
+  ownerNote?: string;
 }
 
 export async function PUT(
@@ -58,7 +86,6 @@ export async function PUT(
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  // sprawdzenie uprawnien
   const isInitiator = transaction.initiator._id.equals(user._id);
   const isReceiver = transaction.receiver._id.equals(user._id);
 
@@ -66,7 +93,6 @@ export async function PUT(
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
-  // tylko receiver moze zaakceptowac lub odrzucic
   if ((status === "accepted" || status === "rejected") && !isReceiver) {
     return NextResponse.json(
       { error: "Only receiver can accept or reject" },
@@ -74,32 +100,77 @@ export async function PUT(
     );
   }
 
-  // tylko initiator lub receiver moze oznaczyc jako completed
   if (status === "completed" && !isInitiator && !isReceiver) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
   const oldStatus = transaction.status;
   transaction.status = status;
-  await transaction.save();
 
-  // zmiana statusu ksiazek
-  if (status === "accepted" && oldStatus === "pending") {
-    // oznaczenie requestedBook jako exchanged
-    await Book.findByIdAndUpdate(transaction.requestedBook._id, {
-      status: "exchanged",
-    });
+  // snapshots
+  if (status === "completed" && oldStatus === "accepted") {
+    const rawTransaction = await Transaction.findById(id).lean();
 
-    // oznaczenie wszystkich offeredBooks jako exchanged
-    if (transaction.offeredBooks && transaction.offeredBooks.length > 0) {
-      await Book.updateMany(
-        { _id: { $in: transaction.offeredBooks.map((b) => b._id) } },
-        { status: "exchanged" }
+    if (!rawTransaction) {
+      return NextResponse.json(
+        { error: "Transaction not found" },
+        { status: 404 }
       );
     }
+
+    // snapshot dla requestedBook
+    const requestedBookSnapshot = await BookSnapshot.findOne({
+      originalBookId: rawTransaction.requestedBook,
+    });
+
+    if (!requestedBookSnapshot) {
+      const requestedBook = await Book.findById(rawTransaction.requestedBook);
+      if (requestedBook) {
+        await BookSnapshot.create({
+          originalBookId: requestedBook._id,
+          title: requestedBook.title,
+          author: requestedBook.author,
+          isbn: requestedBook.isbn,
+          description: requestedBook.description,
+          imageUrl: requestedBook.imageUrl,
+          condition: requestedBook.condition,
+          ownerNote: requestedBook.ownerNote,
+        });
+      }
+    }
+
+    // snapshoty dla offeredBooks
+    for (const bookId of rawTransaction.offeredBooks) {
+      const existingSnapshot = await BookSnapshot.findOne({
+        originalBookId: bookId,
+      });
+
+      if (!existingSnapshot) {
+        const offeredBook = await Book.findById(bookId);
+        if (offeredBook) {
+          await BookSnapshot.create({
+            originalBookId: offeredBook._id,
+            title: offeredBook.title,
+            author: offeredBook.author,
+            isbn: offeredBook.isbn,
+            description: offeredBook.description,
+            imageUrl: offeredBook.imageUrl,
+            condition: offeredBook.condition,
+            ownerNote: offeredBook.ownerNote,
+          });
+        }
+      }
+    }
+
+    // punkty
+    transaction.initiator.points += 10;
+    transaction.receiver.points += 10;
+    await transaction.initiator.save();
+    await transaction.receiver.save();
   }
 
-  // przywrocenie statusu jesli odrzucono
+  await transaction.save();
+
   if (status === "rejected" && oldStatus === "pending") {
     await Book.findByIdAndUpdate(transaction.requestedBook._id, {
       status: "available",
@@ -111,14 +182,6 @@ export async function PUT(
         { status: "available" }
       );
     }
-  }
-
-  // przyznanie punktow po zakonczeniu transakcji
-  if (status === "completed" && oldStatus === "accepted") {
-    transaction.initiator.points += 10;
-    transaction.receiver.points += 10;
-    await transaction.initiator.save();
-    await transaction.receiver.save();
   }
 
   await transaction.populate("initiator receiver requestedBook offeredBooks");
@@ -138,11 +201,9 @@ export async function GET(
 
   const { id } = await params;
 
-  const transaction = await Transaction.findById(id).populate(
-    "requestedBook offeredBooks initiator receiver"
-  );
+  const rawTransaction = await Transaction.findById(id).lean();
 
-  if (!transaction) {
+  if (!rawTransaction) {
     return NextResponse.json(
       { error: "Transaction not found" },
       { status: 404 }
@@ -154,17 +215,76 @@ export async function GET(
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  const transactionDoc = transaction as unknown as {
-    initiator: mongoose.Types.ObjectId;
-    receiver: mongoose.Types.ObjectId;
-  };
-
   if (
-    !transactionDoc.initiator.equals(user._id) &&
-    !transactionDoc.receiver.equals(user._id)
+    !rawTransaction.initiator.equals(user._id) &&
+    !rawTransaction.receiver.equals(user._id)
   ) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
-  return NextResponse.json(transaction);
+  // populate
+  const initiator = await User.findById(rawTransaction.initiator)
+    .select("email username profileImage")
+    .lean();
+  const receiver = await User.findById(rawTransaction.receiver)
+    .select("email username profileImage")
+    .lean();
+
+  // populate lub fallback requestedBook
+  let requestedBook: BookDocument | null = await Book.findById(
+    rawTransaction.requestedBook
+  ).lean();
+
+  if (!requestedBook) {
+    const snapshot = await BookSnapshot.findOne({
+      originalBookId: rawTransaction.requestedBook,
+    }).lean();
+
+    if (snapshot) {
+      requestedBook = {
+        _id: snapshot.originalBookId as mongoose.Types.ObjectId,
+        title: snapshot.title,
+        author: snapshot.author,
+        imageUrl: snapshot.imageUrl,
+        condition: snapshot.condition,
+        ownerNote: snapshot.ownerNote,
+      };
+    }
+  }
+
+  // populate lub fallback offeredBooks
+  const offeredBooks = await Promise.all(
+    rawTransaction.offeredBooks.map(async (bookId: mongoose.Types.ObjectId) => {
+      let book: BookDocument | null = await Book.findById(bookId).lean();
+
+      if (!book) {
+        const snapshot = await BookSnapshot.findOne({
+          originalBookId: bookId,
+        }).lean();
+
+        if (snapshot) {
+          book = {
+            _id: snapshot.originalBookId as mongoose.Types.ObjectId,
+            title: snapshot.title,
+            author: snapshot.author,
+            imageUrl: snapshot.imageUrl,
+            condition: snapshot.condition,
+            ownerNote: snapshot.ownerNote,
+          };
+        }
+      }
+
+      return book;
+    })
+  );
+
+  const validOfferedBooks = offeredBooks.filter(Boolean);
+
+  return NextResponse.json({
+    ...rawTransaction,
+    initiator,
+    receiver,
+    requestedBook,
+    offeredBooks: validOfferedBooks,
+  });
 }
