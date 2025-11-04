@@ -28,49 +28,88 @@ interface BookBase {
 }
 
 interface WishlistSectionProps {
-  wishlistBooks: BookBase[];
-  onDeleteWishlistBook: (bookId: string) => void;
-  onAddBook: () => void;
+  wishlist?: BookBase[];
+  onRemoveFromWishlist: (bookId: string) => void;
+  onAddToWishlist: () => void;
+  isPublicView?: boolean;
 }
 
 export function WishlistSection({
-  wishlistBooks,
-  onDeleteWishlistBook,
-  onAddBook,
+  wishlist,
+  onRemoveFromWishlist,
+  onAddToWishlist,
+  isPublicView = false,
 }: WishlistSectionProps) {
-  const needsCarousel = wishlistBooks.length > 4;
+
+  if (!wishlist) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Wishlist</CardTitle>
+          <CardDescription>Books you want to receive</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">Ładowanie listy życzeń...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const needsCarousel = wishlist.length > 4;
 
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          {" "}
           <CardTitle>Wishlist</CardTitle>
-          <Button variant="outline" size="sm" onClick={onAddBook}>
-            {" "}
-            <Plus className="h-4 w-4 mr-2" />
-            Add Book
-          </Button>
+          {!isPublicView && (
+            <Button variant="outline" size="sm" onClick={onAddToWishlist}>
+              <Plus className="h-4 w-4 mr-2" />
+              Dodaj książkę
+            </Button>
+          )}
         </div>
-        <CardDescription>Books you want to receive</CardDescription>
+        <CardDescription>
+          {isPublicView
+            ? "Książki, które chce otrzymać"
+            : "Książki, które chcesz otrzymać"}
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        {needsCarousel ? (
+        {wishlist.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <p>
+              {isPublicView
+                ? "Ta lista życzeń jest pusta"
+                : "Twoja lista życzeń jest pusta"}
+            </p>
+            {!isPublicView && (
+              <Button
+                variant="outline"
+                className="mt-4"
+                onClick={onAddToWishlist}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Dodaj pierwszą książkę
+              </Button>
+            )}
+          </div>
+        ) : needsCarousel ? (
           <Carousel
             className="w-full"
             opts={{ loop: false }}
             plugins={[Autoplay({ delay: 7500 })]}
           >
             <CarouselContent>
-              {wishlistBooks.map((book) => (
+              {wishlist.map((book) => (
                 <CarouselItem
                   key={book.id}
                   className="basis-1/2 md:basis-1/3 lg:basis-1/4"
                 >
                   <BookCard
                     book={book}
-                    isReadOnly={false}
-                    onDelete={onDeleteWishlistBook}
+                    isReadOnly={isPublicView}
+                    onDelete={isPublicView ? undefined : onRemoveFromWishlist}
                   />
                 </CarouselItem>
               ))}
@@ -79,13 +118,13 @@ export function WishlistSection({
             <CarouselNext className="right-2" />
           </Carousel>
         ) : (
-          <div className="flex gap-4">
-            {wishlistBooks.map((book) => (
-              <div key={book.id} className="flex-shrink-0 w-xs max-w-xs">
+          <div className="flex gap-4 overflow-x-auto">
+            {wishlist.map((book, index) => (
+              <div key={index} className="flex-shrink-0 w-xs max-w-xs">
                 <BookCard
                   book={book}
-                  isReadOnly={false}
-                  onDelete={onDeleteWishlistBook}
+                  isReadOnly={isPublicView}
+                  onDelete={isPublicView ? undefined : onRemoveFromWishlist}
                 />
               </div>
             ))}
