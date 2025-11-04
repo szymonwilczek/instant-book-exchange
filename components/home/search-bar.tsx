@@ -19,7 +19,7 @@ export function SearchBar({ searchQuery, setSearchQuery }: SearchBarProps) {
         <PopoverTrigger asChild>
           <div className="relative flex-1">
             <Input
-              placeholder="Szukaj po tytule, autorze książki lub autorze ogłoszenia..."
+              placeholder="Search by title or book author..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pr-10"

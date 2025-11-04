@@ -36,21 +36,23 @@ export function Listings({
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Ogłoszenia ({books.length})</h2>
+        <h2 className="text-xl font-bold">Listings ({books.length})</h2>
         <Select value={sortBy} onValueChange={setSortBy}>
           <SelectTrigger className="w-48">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="date">Data dodania</SelectItem>
-            <SelectItem value="popularity">Popularność</SelectItem>
+            <SelectItem value="date">Date</SelectItem>
+            <SelectItem value="popularity">Popularity</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {books.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Brak dostępnych książek</p>
+          <p className="text-muted-foreground">
+            No books available at this moment... Check later!
+          </p>
         </div>
       ) : (
         <>

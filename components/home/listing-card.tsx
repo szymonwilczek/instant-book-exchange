@@ -49,7 +49,7 @@ export function ListingCard({
     }
 
     if (owner._id === session.user?.id) {
-      alert("Nie możesz wysłać wiadomości do siebie");
+      alert("You cannot send message to yourself... Come on...");
       return;
     }
 
@@ -58,7 +58,7 @@ export function ListingCard({
 
   const handleAddToCart = async () => {
     if (!session) {
-      alert("Musisz być zalogowany, aby dodać książkę do koszyka");
+      alert("You have to be logged in to add the book to the cart.");
       return;
     }
 
@@ -70,9 +70,9 @@ export function ListingCard({
   };
 
   const conditionLabel = {
-    new: "Nowy",
-    used: "Używany",
-    damaged: "Uszkodzony",
+    new: "New",
+    used: "Used",
+    damaged: "Damaged",
   };
 
   return (
@@ -106,7 +106,7 @@ export function ListingCard({
                 </p>
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   <MapPin className="w-3.5 h-3.5" />
-                  {owner.location || "Brak lokalizacji"}
+                  {owner.location || "No location"}
                 </div>
               </div>
             </div>
@@ -138,7 +138,7 @@ export function ListingCard({
                   size="sm"
                   variant="outline"
                   onClick={handleSendMessage}
-                  title="Wyślij wiadomość"
+                  title="Send message"
                 >
                   <MessageCircle className="h-4 w-4" />
                 </Button>
@@ -192,7 +192,7 @@ export function ListingCard({
             </div>
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <MapPin className="w-3 h-3" />
-              {owner.location || "Brak"}
+              {owner.location || "No location"}
             </div>
           </div>
 

@@ -78,10 +78,10 @@ export function TransactionHistory({ userEmail }: TransactionHistoryProps) {
 
   const getStatusLabel = (status: string) => {
     const labels: Record<string, string> = {
-      pending: "Oczekuje",
-      accepted: "Zaakceptowana",
-      rejected: "Odrzucona",
-      completed: "Zakończona",
+      pending: "Pending",
+      accepted: "Accepted",
+      rejected: "Rejected",
+      completed: "Completed",
     };
     return labels[status] || status;
   };
@@ -90,12 +90,12 @@ export function TransactionHistory({ userEmail }: TransactionHistoryProps) {
     return (
       <Card className="lg:col-span-2">
         <CardHeader>
-          <CardTitle>Historia transakcji</CardTitle>
-          <CardDescription>Ostatnie wymiany książek</CardDescription>
+          <CardTitle>Transaction history</CardTitle>
+          <CardDescription>Recent book exchanges</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex justify-center py-8">
-            <p className="text-muted-foreground">Ładowanie...</p>
+            <p className="text-muted-foreground">Loading...</p>
           </div>
         </CardContent>
       </Card>
@@ -105,15 +105,13 @@ export function TransactionHistory({ userEmail }: TransactionHistoryProps) {
   return (
     <Card className="lg:col-span-2">
       <CardHeader>
-        <CardTitle>Historia transakcji</CardTitle>
-        <CardDescription>
-          Ostatnie {transactions.length} wymian książek
-        </CardDescription>
+        <CardTitle>Transaction history</CardTitle>
+        <CardDescription>Recent book exchanges</CardDescription>
       </CardHeader>
       <CardContent>
         {transactions.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-muted-foreground">Brak transakcji</p>
+            <p className="text-muted-foreground">No transactions found</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -143,7 +141,7 @@ export function TransactionHistory({ userEmail }: TransactionHistoryProps) {
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <ArrowRightLeft className="h-3 w-3" />
-                        {isInitiator ? "Wysłana do" : "Otrzymana od"}
+                        {isInitiator ? "Sent to" : "Received from"}
                       </span>
                       <span className="flex items-center gap-1">
                         <User className="h-3 w-3" />
@@ -163,10 +161,10 @@ export function TransactionHistory({ userEmail }: TransactionHistoryProps) {
                     transaction.offeredBooks.length > 0
                       ? `${transaction.offeredBooks.length} ${
                           transaction.offeredBooks.length === 1
-                            ? "książka"
-                            : "książki"
+                            ? "book"
+                            : "books"
                         }`
-                      : "Bez wymiany"}
+                      : "No exchange"}
                   </div>
                 </div>
               );

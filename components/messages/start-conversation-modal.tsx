@@ -114,7 +114,7 @@ export function StartConversationModal({
             <Label htmlFor="message">Message</Label>
             <Textarea
               id="message"
-              placeholder="Napisz wiadomość..."
+              placeholder="Type here..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               className="min-h-[120px]"

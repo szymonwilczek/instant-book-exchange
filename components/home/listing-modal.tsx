@@ -71,7 +71,7 @@ export function ListingModal({
       <div className="space-y-3">
         <div>
           <h4 className="text-sm font-medium text-muted-foreground mb-1">
-            Autor
+            Author
           </h4>
           <p className="text-base">{book.author}</p>
         </div>
@@ -79,7 +79,7 @@ export function ListingModal({
         {book.description && (
           <div>
             <h4 className="text-sm font-medium text-muted-foreground mb-1">
-              Opis książki
+              Book description
             </h4>
             <p className="text-sm">{book.description}</p>
           </div>
@@ -88,7 +88,7 @@ export function ListingModal({
         {book.ownerNote && (
           <div>
             <h4 className="text-sm font-medium text-muted-foreground mb-1">
-              Notatka właściciela
+              Owner&apos; note
             </h4>
             <p className="text-sm italic">{book.ownerNote}</p>
           </div>
@@ -100,20 +100,20 @@ export function ListingModal({
           </Badge>
           <Badge variant="outline">
             <Eye className="w-3 h-3 mr-1" />
-            {book.viewCount || 0} wyświetleń
+            {book.viewCount || 0} views
           </Badge>
         </div>
 
         <div className="pt-2 border-t">
           <h4 className="text-sm font-medium text-muted-foreground mb-2">
-            Właściciel
+            Owner
           </h4>
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{owner.username || owner.name}</p>
               <div className="flex items-center gap-1 text-sm text-muted-foreground">
                 <MapPin className="w-3.5 h-3.5" />
-                {owner.location || "Brak lokalizacji"}
+                {owner.location || "No location"}
               </div>
             </div>
           </div>
@@ -121,7 +121,7 @@ export function ListingModal({
 
         <Button className="w-full" onClick={handleSendMessage}>
           <MessageCircle className="mr-2 h-4 w-4" />
-          Wyślij wiadomość
+          Send message
         </Button>
       </div>
     </div>
