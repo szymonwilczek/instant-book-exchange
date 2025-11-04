@@ -81,7 +81,7 @@ export function WishlistSection({
         ) : (
           <div className="flex gap-4">
             {wishlistBooks.map((book) => (
-              <div key={book.id} className="flex-1">
+              <div key={book.id} className="flex-shrink-0 w-xs max-w-xs">
                 <BookCard
                   book={book}
                   isReadOnly={false}
