@@ -35,11 +35,7 @@ export interface NavbarNavItem {
 
 export interface NavbarProps extends React.HTMLAttributes<HTMLElement> {
   logo?: React.ReactNode;
-  logoHref?: string;
   navigationLinks?: NavbarNavItem[];
-  userName?: string;
-  userEmail?: string;
-  userAvatar?: string;
   notificationCount?: number;
   onNavItemClick?: (href: string) => void;
   onInfoItemClick?: (item: string) => void;
@@ -58,11 +54,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
     {
       className,
       logo = <Logo />,
-      logoHref = "#",
       navigationLinks = defaultNavigationLinks,
-      userName = "John Doe",
-      userEmail = "john@example.com",
-      userAvatar,
       notificationCount = 3,
       onNavItemClick,
       onInfoItemClick,
