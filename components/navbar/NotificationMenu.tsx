@@ -55,26 +55,25 @@ export const NotificationMenu = ({
     });
   }, []);
 
-  const fetchNotifications = async () => {
-    try {
-      const res = await fetch("/api/notifications?limit=10");
-      if (res.ok) {
-        const data = await res.json();
-        setNotifications(data.notifications || []);
-        setUnreadCount(
-          data.notifications?.filter((n: Notification) => !n.read).length || 0
-        );
-      }
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
-    }
-  };
-
   useEffect(() => {
-    if (session?.user?.id) {
-      fetchNotifications();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!session?.user?.id) return;
+
+    const loadNotifications = async () => {
+      try {
+        const res = await fetch("/api/notifications?limit=10");
+        if (res.ok) {
+          const data = await res.json();
+          setNotifications(data.notifications || []);
+          setUnreadCount(
+            data.notifications?.filter((n: Notification) => !n.read).length || 0
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      }
+    };
+
+    loadNotifications();
   }, [session?.user?.id]);
 
   useEffect(() => {
