@@ -112,7 +112,7 @@ export function ListingCard({
             </div>
 
             <div className="flex-1 mb-3">
-              <p className="text-sm line-clamp-2 text-muted-foreground">
+              <p className="text-sm line-clamp-2 max-w-2xl text-muted-foreground">
                 {book.ownerNote || book.description || "Brak opisu"}
               </p>
             </div>
