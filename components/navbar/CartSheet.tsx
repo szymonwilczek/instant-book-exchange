@@ -14,6 +14,7 @@ import { ShoppingCart, X, MapPin, ArrowRight } from "lucide-react";
 import { useCart } from "@/lib/context/cart-context";
 import { useRouter } from "next/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import Image from "next/image";
 
 interface CartItemBook {
   _id: string;
@@ -132,7 +133,7 @@ export function CartSheet() {
                           key={item.book._id}
                           className="flex gap-3 items-start"
                         >
-                          <img
+                          <Image
                             src={item.book.imageUrl || "/placeholder-book.png"}
                             alt={item.book.title}
                             className="w-16 h-20 object-cover rounded"

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
@@ -34,6 +33,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import Image from "next/image";
 
 interface SearchBook {
   id: string;
@@ -208,7 +208,7 @@ export function OnboardingBookSearch({
                             )}
                           />
                           <div className="flex items-center gap-2">
-                            <img
+                            <Image
                               src={book.image || "/placeholder.svg"}
                               alt={book.title}
                               className="w-8 h-8 object-cover"

@@ -4,6 +4,7 @@ import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface BookInventoryProps {
@@ -36,7 +37,7 @@ function DraggableBook({ book, isOffered }: { book: any; isOffered: boolean }) {
       }`}
     >
       <div className="flex gap-3">
-        <img
+        <Image
           src={book.imageUrl || "/placeholder-book.png"}
           alt={book.title}
           className="w-12 h-16 object-cover rounded"

@@ -3,8 +3,9 @@
 import { useState, useRef, KeyboardEvent, ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Paperclip, Send, X, Loader2, Image as ImageIcon } from "lucide-react";
+import { Paperclip, Send, X, Loader2 } from "lucide-react";
 import { useSocket } from "@/lib/context/socket-context";
+import Image from "next/image";
 
 interface Attachment {
   url: string;
@@ -140,7 +141,7 @@ export function MessageInput({
         <div className="mb-3 flex flex-wrap gap-2">
           {attachments.map((attachment, index) => (
             <div key={index} className="relative group">
-              <img
+              <Image
                 src={attachment.url}
                 alt={attachment.name}
                 className="h-20 w-20 rounded-lg object-cover border"

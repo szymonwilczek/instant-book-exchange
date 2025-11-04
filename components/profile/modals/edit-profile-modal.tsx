@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import Image from "next/image";
 
 interface UserProfile {
   username: string;
@@ -86,7 +87,7 @@ export function EditProfileModal({
               {typeof formData.avatar === "string" &&
                 formData.avatar &&
                 formData.avatar.startsWith("data:") && (
-                  <img
+                  <Image
                     src={formData.avatar}
                     alt="Current avatar"
                     className="w-16 h-16 mt-2 rounded"

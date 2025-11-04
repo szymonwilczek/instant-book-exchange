@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface ImageViewerModalProps {
   images: string[];
@@ -67,7 +68,7 @@ export function ImageViewerModal({
 
         {/* Main image */}
         <div className="relative flex items-center justify-center w-full h-[95vh] p-12">
-          <img
+          <Image
             src={images[currentIndex]}
             alt={`Image ${currentIndex + 1}`}
             className="max-w-full max-h-full object-contain"
@@ -111,7 +112,7 @@ export function ImageViewerModal({
                     : "border-transparent opacity-60 hover:opacity-100"
                 )}
               >
-                <img
+                <Image
                   src={image}
                   alt={`Thumbnail ${index + 1}`}
                   className="h-full w-full object-cover"

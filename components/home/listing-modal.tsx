@@ -21,6 +21,7 @@ import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
 import { StartConversationModal } from "@/components/messages/start-conversation-modal";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ListingModalProps {
@@ -68,8 +69,10 @@ export function ListingModal({
 
   const content = (
     <div className="space-y-4">
-      <img
+      <Image
         src={book.imageUrl || "/placeholder-book.png"}
+        width={400}
+        height={600}
         alt={book.title}
         className="w-full h-64 object-cover rounded-lg"
       />

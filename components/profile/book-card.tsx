@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 interface BookBase {
   id: string;
@@ -28,7 +29,9 @@ export function BookCard({
   return (
     <Card className="overflow-hidden min-w-[200px] h-full">
       <div className="aspect-square relative max-h-36">
-        <img
+        <Image
+          width={200}
+          height={200}
           src={book.image || "/placeholder.svg"}
           alt={book.title}
           className="object-contain w-full h-full"

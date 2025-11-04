@@ -10,6 +10,7 @@ import { StartConversationModal } from "@/components/messages/start-conversation
 import { useCart } from "@/lib/context/cart-context";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ListingCardProps {
@@ -66,6 +67,7 @@ export function ListingCard({
       await addToCart(book._id);
     } catch (error) {
       // juz obsluzony w useCart
+      console.error("Error adding book to cart:", error);
     }
   };
 
@@ -81,7 +83,9 @@ export function ListingCard({
         className={`h-full -p-2 ${isMatch ? "border-2 border-orange-500" : ""}`}
       >
         <div className="hidden md:flex h-full gap-4 p-5">
-          <img
+          <Image
+            width={80}
+            height={112}
             src={book.imageUrl || "/placeholder-book.png"}
             alt={book.title}
             className="w-20 h-28 object-cover flex-shrink-0 rounded-sm"
@@ -162,8 +166,10 @@ export function ListingCard({
         <div
           className={`md:hidden flex flex-col p-4 ${isMatch ? "border-2 border-orange-500" : ""}`}
         >
-          <img
+          <Image
             src={book.imageUrl || "/placeholder-book.png"}
+            width={160}
+            height={200}
             alt={book.title}
             className="w-full h-40 object-contain rounded-sm mb-4"
           />

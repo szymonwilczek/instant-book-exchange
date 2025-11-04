@@ -1,11 +1,12 @@
 import { Card } from "@/components/ui/card";
+import Image from "next/image";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export function BookDragItem({ book }: { book: any }) {
   return (
     <Card className="p-3 opacity-80 shadow-lg rotate-3 cursor-grabbing">
       <div className="flex gap-3">
-        <img
+        <Image
           src={book.imageUrl || "/placeholder-book.png"}
           alt={book.title}
           className="w-12 h-16 object-cover rounded"

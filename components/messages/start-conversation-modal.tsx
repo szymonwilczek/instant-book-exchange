@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface Book {
   _id: string;
@@ -97,7 +98,7 @@ export function StartConversationModal({
           {/* Book Info */}
           <div className="flex items-center gap-3 rounded-lg border p-3">
             {book.coverImage && (
-              <img
+              <Image
                 src={book.coverImage}
                 alt={book.title}
                 className="h-16 w-12 rounded object-cover"

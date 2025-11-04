@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRightLeft, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ExchangeZoneProps {
@@ -65,7 +66,7 @@ export function ExchangeZone({
                   <X className="h-4 w-4" />
                 </Button>
                 <div className="flex gap-3">
-                  <img
+                  <Image
                     src={book.imageUrl || "/placeholder-book.png"}
                     alt={book.title}
                     className="w-12 h-16 object-cover rounded"
@@ -91,7 +92,7 @@ export function ExchangeZone({
           <Badge variant="default">You&apos;ll receive</Badge>
         </div>
         <div className="flex gap-3">
-          <img
+          <Image
             src={requestedBook.imageUrl || "/placeholder-book.png"}
             alt={requestedBook.title}
             className="w-20 h-28 object-cover rounded"

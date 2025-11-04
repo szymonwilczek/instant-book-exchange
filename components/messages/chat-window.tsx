@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MessageInput } from "./message-input";
 import { useSocket } from "@/lib/context/socket-context";
@@ -13,6 +12,7 @@ import { pl } from "date-fns/locale";
 import { Check, CheckCheck, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ImageViewerModal } from "./image-viewer-modal";
+import Image from "next/image";
 
 interface Attachment {
   type: "image" | "document";
@@ -149,6 +149,8 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
       fetchMessages();
       markMessagesAsRead();
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversation._id]);
 
   // dolaczanie do pokoju
@@ -230,6 +232,7 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
       socket.off("typing-start");
       socket.off("typing-stop");
     };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     socket,
     isConnected,
@@ -397,7 +400,7 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
           <p className="font-semibold">{otherParticipantName}</p>
           <div className="flex items-center gap-2">
             {conversation.book.imageUrl && (
-              <img
+              <Image
                 src={conversation.book.imageUrl}
                 alt={conversation.book.title}
                 className="h-4 w-3 object-cover rounded"
@@ -512,7 +515,7 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
                                     {message.attachments
                                       .filter((a) => a.type === "image")
                                       .map((attachment, idx) => (
-                                        <img
+                                        <Image
                                           key={idx}
                                           src={attachment.url}
                                           alt={attachment.name}

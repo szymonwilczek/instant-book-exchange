@@ -35,6 +35,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import Image from "next/image";
 
 interface SearchBook {
   id: string;
@@ -292,7 +293,7 @@ export function AddBookModal({
                                   )}
                                 />
                                 <div className="flex items-center gap-2">
-                                  <img
+                                  <Image
                                     src={book.image || "/placeholder.svg"}
                                     alt={book.title}
                                     className="w-8 h-8 object-cover"

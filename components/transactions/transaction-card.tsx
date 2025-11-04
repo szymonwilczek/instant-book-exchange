@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  ArrowRightLeft,
   MapPin,
   Clock,
   CheckCircle2,
@@ -23,6 +22,7 @@ import { ReviewModal } from "./review-modal";
 import { StartConversationModal } from "@/components/messages/start-conversation-modal";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface TransactionCardProps {
@@ -166,7 +166,7 @@ export function TransactionCard({
                   {isReceiver ? "Your book" : "You want to receive"}
                 </p>
                 <div className="flex gap-3 p-3 bg-muted/50 rounded-lg">
-                  <img
+                  <Image
                     src={requestedBook.imageUrl || "/placeholder-book.png"}
                     alt={requestedBook.title}
                     className="w-16 h-24 object-cover rounded"
@@ -198,7 +198,7 @@ export function TransactionCard({
                         key={book._id}
                         className="flex gap-3 p-3 bg-muted/50 rounded-lg"
                       >
-                        <img
+                        <Image
                           src={book.imageUrl || "/placeholder-book.png"}
                           alt={book.title}
                           className="w-16 h-24 object-cover rounded"
