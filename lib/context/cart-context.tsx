@@ -59,6 +59,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     refreshCart();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
   const addToCart = async (bookId: string) => {

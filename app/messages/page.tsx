@@ -122,7 +122,7 @@ export default function MessagesPage() {
     return () => {
       socket.off("new-message");
     };
-  }, [socket, isConnected, session?.user?.email]);
+  }, [socket, isConnected, session?.user?.email, conversations]);
 
   const fetchConversations = async () => {
     try {
