@@ -134,6 +134,8 @@ export function CartSheet() {
                           className="flex gap-3 items-start"
                         >
                           <Image
+                            width={150}
+                            height={200}
                             src={item.book.imageUrl || "/placeholder-book.png"}
                             alt={item.book.title}
                             className="w-16 h-20 object-cover rounded"

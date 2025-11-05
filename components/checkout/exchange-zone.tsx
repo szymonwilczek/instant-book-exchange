@@ -68,6 +68,8 @@ export function ExchangeZone({
                 <div className="flex gap-3">
                   <Image
                     src={book.imageUrl || "/placeholder-book.png"}
+                    height={150}
+                    width={100}
                     alt={book.title}
                     className="w-12 h-16 object-cover rounded"
                   />
@@ -93,6 +95,8 @@ export function ExchangeZone({
         </div>
         <div className="flex gap-3">
           <Image
+            width={200}
+            height={350}
             src={requestedBook.imageUrl || "/placeholder-book.png"}
             alt={requestedBook.title}
             className="w-20 h-28 object-cover rounded"

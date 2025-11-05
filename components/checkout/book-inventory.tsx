@@ -38,6 +38,8 @@ function DraggableBook({ book, isOffered }: { book: any; isOffered: boolean }) {
     >
       <div className="flex gap-3">
         <Image
+          width={150}
+          height={200}
           src={book.imageUrl || "/placeholder-book.png"}
           alt={book.title}
           className="w-12 h-16 object-cover rounded"
