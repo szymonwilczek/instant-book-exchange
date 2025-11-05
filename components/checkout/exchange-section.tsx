@@ -12,6 +12,7 @@ import { OwnerInfo } from "@/components/checkout/owner-info";
 import { BookDragItem } from "@/components/checkout/book-drag-item";
 import { DndContext, DragEndEvent, DragOverlay } from "@dnd-kit/core";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ExchangeSectionProps {
@@ -36,6 +37,7 @@ export function ExchangeSection({
   onDeliveryMethodChange,
 }: ExchangeSectionProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const t = useTranslations("cart");
 
   const handleDragStart = (event: any) => {
     setActiveId(event.active.id);
@@ -77,7 +79,7 @@ export function ExchangeSection({
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <Package className="h-5 w-5" />
-              <h3 className="font-semibold">Your books</h3>
+              <h3 className="font-semibold">{t('yourBooks')}</h3>
               <Badge variant="secondary">{userBooks.length}</Badge>
             </div>
             <BookInventory books={userBooks} offeredBooks={offeredBooks} />
@@ -85,7 +87,7 @@ export function ExchangeSection({
 
           {/* Środkowy panel - Wymiana */}
           <div className="lg:col-span-1">
-            <h3 className="font-semibold mb-4 text-center">Exchange</h3>
+            <h3 className="font-semibold mb-4 text-center">{t('exchange')}</h3>
             <ExchangeZone
               requestedBook={requestedBook}
               offeredBooks={offeredBooks}
@@ -94,7 +96,7 @@ export function ExchangeSection({
 
             {/* Metoda dostawy */}
             <div className="mt-4">
-              <Label>Delivery method *</Label>
+              <Label>{t('deliveryMethod')}*</Label>
               <RadioGroup
                 value={deliveryMethod}
                 onValueChange={onDeliveryMethodChange}
@@ -110,7 +112,7 @@ export function ExchangeSection({
                     className="font-normal cursor-pointer flex items-center gap-2"
                   >
                     <User className="h-4 w-4" />
-                    Personal pickup
+                    {t('personalPickup')}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -123,7 +125,7 @@ export function ExchangeSection({
                     className="font-normal cursor-pointer flex items-center gap-2"
                   >
                     <Package className="h-4 w-4" />
-                    Książkomat Parcel
+                    {t('parcelLocker')} 
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -136,7 +138,7 @@ export function ExchangeSection({
                     className="font-normal cursor-pointer flex items-center gap-2"
                   >
                     <Truck className="h-4 w-4" />
-                    Courier
+                    {t('courier')} 
                   </Label>
                 </div>
               </RadioGroup>
@@ -146,10 +148,10 @@ export function ExchangeSection({
             <div className="mt-4">
               <Label htmlFor={`location-${requestedBook._id}`}>
                 {deliveryMethod === "personal"
-                  ? "Pickup location *"
+                  ? t('pickupLocation')
                   : deliveryMethod === "paczkomat"
-                    ? "Parcel number *"
-                    : "Delivery address *"}
+                    ? t('parcelNumber')
+                    : t('deliveryAddress')}*
               </Label>
               <Input
                 id={`location-${requestedBook._id}`}
@@ -169,7 +171,7 @@ export function ExchangeSection({
 
           {/* Prawy panel - Informacje o oferującym */}
           <div className="lg:col-span-1">
-            <h3 className="font-semibold mb-4">Offering user</h3>
+            <h3 className="font-semibold mb-4">{t('offeringUser')}</h3>
             <OwnerInfo owner={requestedBook.owner} />
           </div>
         </div>

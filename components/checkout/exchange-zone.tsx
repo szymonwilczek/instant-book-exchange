@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRightLeft, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ExchangeZoneProps {
@@ -20,6 +21,7 @@ export function ExchangeZone({
   offeredBooks,
   onRemoveBook,
 }: ExchangeZoneProps) {
+  const t = useTranslations("cart");
   const { setNodeRef, isOver } = useDroppable({
     id: "exchange-zone",
   });
@@ -42,16 +44,16 @@ export function ExchangeZone({
       >
         <div className="flex items-center gap-2 mb-3">
           <Badge variant="outline">
-            You&apos;re offering{" "}
+            {t('offering')}{" "}
             {offeredBooks.length > 0 ? `(${offeredBooks.length})` : ""}
           </Badge>
         </div>
 
         {offeredBooks.length === 0 ? (
           <div className="flex items-center justify-center h-32 text-sm text-muted-foreground text-center">
-            Drag your books here
+            {t('dragBooksHere')}
             <br />
-            or leave empty
+            {t('leaveEmpty')}
           </div>
         ) : (
           <div className="space-y-2">
@@ -91,7 +93,7 @@ export function ExchangeZone({
       {/* Książka którą chcesz otrzymać */}
       <Card className="p-4 bg-primary/5 border-primary/20">
         <div className="flex items-center gap-2 mb-3">
-          <Badge variant="default">You&apos;ll receive</Badge>
+          <Badge variant="default">{t('willReceive')}</Badge>
         </div>
         <div className="flex gap-3">
           <Image
@@ -110,10 +112,10 @@ export function ExchangeZone({
             </p>
             <Badge variant="secondary" className="mt-2">
               {requestedBook.condition === "new"
-                ? "New"
+                ? t("new")
                 : requestedBook.condition === "used"
-                  ? "Used"
-                  : "Damaged"}
+                  ? t("used") 
+                  : t("damaged")} 
             </Badge>
           </div>
         </div>

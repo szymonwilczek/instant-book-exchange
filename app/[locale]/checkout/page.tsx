@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { ExchangeSection } from "@/components/checkout/exchange-section";
+import { useTranslations } from "next-intl";
 
 interface BookData {
   _id: string;
@@ -41,6 +42,7 @@ export default function CheckoutPage() {
   const [globalLocation, setGlobalLocation] = useState("");
   const [loading, setLoading] = useState(false);
   const [userLocation, setUserLocation] = useState("");
+  const t = useTranslations("cart");
 
   useEffect(() => {
     if (!session) {
@@ -101,7 +103,7 @@ export default function CheckoutPage() {
   const handleSubmit = async () => {
     const invalid = exchanges.find((ex) => !ex.exchangeLocation);
     if (invalid) {
-      alert("Please fill in the exchange location for all books");
+      alert(t("locationError"));
       return;
     }
 
@@ -114,14 +116,14 @@ export default function CheckoutPage() {
       });
 
       if (!res.ok) {
-        throw new Error("Failed to create transactions");
+        throw new Error(t("failedToCreateTransaction"));
       }
 
       clearCart();
       router.push("/transactions?success=true");
     } catch (error) {
       console.error("Checkout error:", error);
-      alert("An error occurred while submitting offers");
+      alert(t("errorOccured"));
     } finally {
       setLoading(false);
     }
@@ -136,31 +138,28 @@ export default function CheckoutPage() {
       <div className="mb-6">
         <Button variant="ghost" onClick={() => router.back()} className="mb-4">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
+          {t("back")}
         </Button>
-        <h1 className="text-3xl font-bold mb-2">Books Exchange</h1>
-        <p className="text-muted-foreground">
-          Drag your books to the exchange area or leave it blank if you
-          don&apos;t want to offer books in exchange.
-        </p>
+        <h1 className="text-3xl font-bold mb-2">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <Card className="p-4 mb-6">
         <div className="flex flex-col md:flex-row gap-4 items-end">
           <div className="flex-1">
             <Label htmlFor="globalLocation" className="mb-1">
-              Exchange location (apply to all)
+              {t("locationAll")}
             </Label>
             <Input
               id="globalLocation"
               value={globalLocation}
               onChange={(e) => setGlobalLocation(e.target.value)}
-              placeholder={userLocation || "np. Warszawa, Kraków..."}
+              placeholder={userLocation || "Warsaw, Radzionkow..."}
               className="mt-1"
             />
           </div>
           <Button onClick={applyGlobalLocation} variant="outline">
-            Apply to all
+            {t("applyToAll")}
           </Button>
         </div>
       </Card>
@@ -190,11 +189,13 @@ export default function CheckoutPage() {
       <Card className="p-6 mt-6 sticky bottom-4 bg-background/95 backdrop-blur">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h3 className="font-semibold text-lg mb-2">Summary</h3>
+            <h3 className="font-semibold text-lg mb-2">{t("summary")}</h3>
             <div className="space-y-1 text-sm text-muted-foreground">
-              <p>Exchange offers: {exchanges.length}</p>
               <p>
-                Offered books:{" "}
+                {t("offers")}: {exchanges.length}
+              </p>
+              <p>
+                {t("offeredBooks")}:{" "}
                 {exchanges.reduce((acc, ex) => acc + ex.offeredBooks.length, 0)}
               </p>
             </div>
@@ -208,10 +209,10 @@ export default function CheckoutPage() {
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Submitting offers...
+                {t("submittingOffers")}
               </>
             ) : (
-              "Submit offers"
+              t("submitOffers")
             )}
           </Button>
         </div>

@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface BookInventoryProps {
@@ -13,6 +14,7 @@ interface BookInventoryProps {
 }
 
 function DraggableBook({ book, isOffered }: { book: any; isOffered: boolean }) {
+  const t = useTranslations("cart");
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: book._id,
@@ -51,10 +53,10 @@ function DraggableBook({ book, isOffered }: { book: any; isOffered: boolean }) {
           </p>
           <Badge variant="outline" className="text-xs mt-1">
             {book.condition === "new"
-              ? "New"
+              ? t('new') 
               : book.condition === "used"
-                ? "Used"
-                : "Damaged"}
+                ? t('used') 
+                : t('damaged')} 
           </Badge>
         </div>
       </div>
@@ -66,12 +68,12 @@ export function BookInventory({ books, offeredBooks }: BookInventoryProps) {
   const { setNodeRef } = useDroppable({
     id: "inventory",
   });
+  const t = useTranslations("cart");
 
   if (books.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground text-sm">
-        You don&apos;t have any books to offer yet. Add them through profile
-        dashboard.
+        {t('dontHaveAnyOffers')}
       </div>
     );
   }
