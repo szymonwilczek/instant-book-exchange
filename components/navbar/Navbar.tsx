@@ -26,6 +26,7 @@ import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Sun, Moon, MessageCircle, LogIn } from "lucide-react";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export interface NavbarNavItem {
   href?: string;
@@ -257,6 +258,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                 <span className="sr-only">Toggle theme</span>
               </Button>
             </div>
+            <LanguageSwitcher />
             {session ? (
               <UserMenu
                 userName={session?.user?.name || userData?.name || "User"}
