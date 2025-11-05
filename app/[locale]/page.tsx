@@ -5,6 +5,7 @@ import { SearchBar } from "@/components/home/search-bar";
 import { Filters } from "@/components/home/filters";
 import { MatchSection } from "@/components/home/match-section";
 import { Listings } from "@/components/home/listings";
+import { useTranslations } from "next-intl";
 
 export default function HomePage() {
   const { data: session } = useSession();
@@ -21,6 +22,7 @@ export default function HomePage() {
   const [books, setBooks] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
+  const t = useTranslations();
 
   const itemsPerPage = 10;
 
@@ -71,6 +73,7 @@ export default function HomePage() {
 
   return (
     <div className="container mx-auto p-4">
+      <p>{t("test")}</p>
       <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-6">
         <div className="lg:col-span-1">
