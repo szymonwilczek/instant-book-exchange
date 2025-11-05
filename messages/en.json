@@ -78,6 +78,43 @@
     "submitOffers": "Submit offers"
   },
 
+  "transactions": {
+    "failedToUpdate": "Failed to update transaction. Please report this error.",
+    "loading": "Loading...",
+    "title": "My Transactions",
+    "subtitle": "Manage your book exchange offers",
+    "successSubmit": "The exchange offers have been successfully submitted!",
+    "received": "Received",
+    "sent": "Sent",
+    "completed": "Completed",
+    "notReceivedAnyOffers": "You have not received any offers yet.",
+    "haventSentAnyOffers": "You haven't sent any offers yet.",
+    "dontHaveAnyCompleted": "You don't have any completed transactions yet.",
+    "deletedBook": "Deleted Book",
+    "authorUnkown": "Unknown",
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "rejected": "Rejected",
+    "personalPickup": "Personal pickup",
+    "parcelLocker": "Książkomat Parcel Locker",
+    "courier": "Courier",
+    "thanksForReview": "Thanks for your review! You are helping in growing our community!",
+    "failedToSubmitReview": "Failed to submit review. Please report this error.",
+    "from": "From",
+    "to": "To",
+    "yourBooks": "Your books",
+    "wantToReceive": "You want to receive",
+    "inExchangeFor": "In exchange for",
+    "yourOffer": "Your offer",
+    "noExchange": "No exchange",
+    "acceptButton": "Accept",
+    "rejectButton": "Reject",
+    "markAsCompleted": "Mark as completed",
+    "waitingForUser": "Waiting for {username} to complete",
+    "reviewExchange": "Review exchange",
+    "sendMessage": "Send message"
+  },
+
   "nav": {
     "home": "Home",
     "profile": "Profile",
@@ -151,18 +188,6 @@
     "noMessages": "No messages yet",
     "sendMessage": "Send message",
     "typePlaceholder": "Type a message..."
-  },
-
-  "transactions": {
-    "title": "Transactions",
-    "status": {
-      "pending": "Pending",
-      "accepted": "Accepted",
-      "rejected": "Rejected",
-      "completed": "Completed"
-    },
-    "offeredBook": "Offered book",
-    "requestedBook": "Requested book"
   },
 
   "auth": {

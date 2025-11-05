@@ -23,6 +23,7 @@ import { StartConversationModal } from "@/components/messages/start-conversation
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface TransactionCardProps {
@@ -40,13 +41,14 @@ export function TransactionCard({
   const [messageModalOpen, setMessageModalOpen] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
+  const t = useTranslations("transactions");
 
   const isReceiver = transaction.receiver.email === userEmail;
   const otherUser = isReceiver ? transaction.initiator : transaction.receiver;
 
   const requestedBook = transaction.requestedBook || {
     _id: "deleted",
-    title: "Deleted Book",
+    title: t("deletedBook"),
     author: "Unknown",
     imageUrl: "/placeholder-book.png",
   };
@@ -55,31 +57,31 @@ export function TransactionCard({
 
   const statusConfig = {
     pending: {
-      label: "Pending",
+      label: t("pending"),
       color: "bg-yellow-500",
       variant: "secondary" as const,
     },
     accepted: {
-      label: "Accepted",
+      label: t("accepted"),
       color: "bg-green-500",
       variant: "default" as const,
     },
     rejected: {
-      label: "Rejected",
+      label: t("rejected"),
       color: "bg-red-500",
       variant: "destructive" as const,
     },
     completed: {
-      label: "Completed",
+      label: t("completed"),
       color: "bg-blue-500",
       variant: "outline" as const,
     },
   };
 
   const deliveryMethodLabels = {
-    personal: { label: "Personal pickup", icon: User },
-    paczkomat: { label: "Książkomat Parcel", icon: Package },
-    courier: { label: "Courier", icon: Truck },
+    personal: { label: t("personalPickup"), icon: User },
+    paczkomat: { label: t("parcelLocker"), icon: Package },
+    courier: { label: t("courier"), icon: Truck },
   };
 
   const status = statusConfig[transaction.status as keyof typeof statusConfig];
@@ -111,13 +113,13 @@ export function TransactionCard({
       });
 
       if (!res.ok) {
-        throw new Error("Failed to submit review");
+        throw new Error(t("failedToSubmitReview"));
       }
 
-      alert("Dziękujemy za opinię!");
+      alert(t("thanksForReview"));
     } catch (error) {
       console.error("Error submitting review:", error);
-      alert("Failed to submit review");
+      alert(t("failedToSubmitReview"));
     }
   };
 
@@ -147,7 +149,7 @@ export function TransactionCard({
                 </Avatar>
                 <div>
                   <p className="font-semibold">
-                    {isReceiver ? "Od: " : "Do: "}
+                    {isReceiver ? t("from") : t("to")}
                     {otherUser.username}
                   </p>
                   <p className="text-sm text-muted-foreground">
@@ -163,7 +165,7 @@ export function TransactionCard({
               {/* Książka requestowana */}
               <div className="space-y-2">
                 <p className="text-sm font-medium text-muted-foreground">
-                  {isReceiver ? "Your book" : "You want to receive"}
+                  {isReceiver ? t("yourBooks") : t("wantToReceive")}
                 </p>
                 <div className="flex gap-3 p-3 bg-muted/50 rounded-lg">
                   <Image
@@ -187,11 +189,11 @@ export function TransactionCard({
               {/* Książki oferowane */}
               <div className="space-y-2">
                 <p className="text-sm font-medium text-muted-foreground">
-                  {isReceiver ? "In exchange for" : "Your offer"}
+                  {isReceiver ? t("inExchangeFor") : t("yourOffer")}
                 </p>
                 {offeredBooks.length === 0 ? (
                   <div className="flex items-center justify-center h-28 bg-muted/30 rounded-lg text-sm text-muted-foreground">
-                    No exchange
+                    {t("noExchange")}
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -249,7 +251,7 @@ export function TransactionCard({
                     onClick={() => onStatusUpdate(transaction._id, "accepted")}
                   >
                     <CheckCircle2 className="mr-2 h-4 w-4" />
-                    Accept
+                    {t("acceptButton")}
                   </Button>
                   <Button
                     size="sm"
@@ -257,7 +259,7 @@ export function TransactionCard({
                     onClick={() => onStatusUpdate(transaction._id, "rejected")}
                   >
                     <XCircle className="mr-2 h-4 w-4" />
-                    Reject
+                    {t("rejectButton")}
                   </Button>
                 </>
               )}
@@ -271,12 +273,12 @@ export function TransactionCard({
                       onClick={handleComplete}
                     >
                       <CheckCircle2 className="mr-2 h-4 w-4" />
-                      Mark as completed
+                      {t("markAsCompleted")}
                     </Button>
                   ) : (
                     <Button size="sm" variant="outline" disabled>
                       <Clock className="mr-2 h-4 w-4" />
-                      Waiting for {otherUser.username} to complete
+                      {t("waitingForUser", { username: otherUser.username })}
                     </Button>
                   )}
                 </>
@@ -289,13 +291,13 @@ export function TransactionCard({
                   onClick={() => setReviewModalOpen(true)}
                 >
                   <Star className="mr-2 h-4 w-4" />
-                  Review exchange
+                  {t("reviewExchange")}
                 </Button>
               )}
 
               <Button size="sm" variant="ghost" onClick={handleSendMessage}>
                 <MessageCircle className="mr-2 h-4 w-4" />
-                Send message
+                {t("sendMessage")}
               </Button>
             </div>
           </div>
