@@ -22,6 +22,7 @@ import {
   Globe,
   Trophy,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface UserProfile {
   username: string;
@@ -64,6 +65,7 @@ export function ProfileInfoSection({
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [loadingAchievements, setLoadingAchievements] = useState(true);
   const [mongoUserId, setMongoUserId] = useState<string | null>(null);
+  const t = useTranslations("profile");
 
   // MongoDB user ID
   useEffect(() => {
@@ -129,7 +131,7 @@ export function ProfileInfoSection({
     return (
       <Card className="lg:col-span-1">
         <CardContent className="p-6">
-          <p className="text-muted-foreground">Ładowanie profilu...</p>
+          <p className="text-muted-foreground">{t("loading")}</p>
         </CardContent>
       </Card>
     );
@@ -139,16 +141,16 @@ export function ProfileInfoSection({
     <Card className="lg:col-span-1">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Informacje o profilu</CardTitle>
+          <CardTitle>{t("informations")}</CardTitle>
           {!isPublicView && (
             <Button variant="ghost" size="icon" onClick={onEditProfile}>
               <Edit className="h-4 w-4" />
-              <span className="sr-only">Edytuj profil</span>
+              <span className="sr-only">{t("editProfile")}</span>
             </Button>
           )}
         </div>
         <CardDescription>
-          {isPublicView ? "Profil publiczny" : "Szczegóły Twojego konta"}
+          {isPublicView ? t("publicProfile") : t("accountDetails")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -176,14 +178,14 @@ export function ProfileInfoSection({
             <div className="flex items-center justify-between">
               <h4 className="text-sm font-medium flex items-center gap-2">
                 <Trophy className="h-4 w-4 text-yellow-500" />
-                Osiągnięcia ({achievements.length})
+                {t("achievements")} ({achievements.length})
               </h4>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => router.push("/achievements")}
               >
-                Zobacz wszystkie
+                {t("showAll")}
               </Button>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -201,7 +203,7 @@ export function ProfileInfoSection({
         <div className="space-y-3 pt-4 border-t">
           {profileData.bio && (
             <div>
-              <p className="text-sm text-muted-foreground">Bio</p>
+              <p className="text-sm text-muted-foreground">{t("bio")}</p>
               <p className="text-sm">{profileData.bio}</p>
             </div>
           )}

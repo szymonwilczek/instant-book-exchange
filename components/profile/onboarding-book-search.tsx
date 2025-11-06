@@ -34,6 +34,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 interface SearchBook {
   id: string;
@@ -74,6 +75,7 @@ export function OnboardingBookSearch({
     "general"
   );
   const [debouncedQuery, setDebouncedQuery] = useState("");
+  const t = useTranslations("profile");
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(searchQuery), 300);
@@ -143,15 +145,15 @@ export function OnboardingBookSearch({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Add Book to Wishlist</DialogTitle>
+          <DialogTitle>{t("addBookToWishlist")}</DialogTitle>
           <DialogDescription>
-            Search for a book you want to receive.
+            {t("addBookToWishlistSubtitle")}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="searchType" className="text-right">
-              Search by
+              {t("searchBy")}
             </Label>
             <Select
               value={searchType}
@@ -163,15 +165,15 @@ export function OnboardingBookSearch({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="general">General</SelectItem>
-                <SelectItem value="title">Title</SelectItem>
-                <SelectItem value="author">Author</SelectItem>
+                <SelectItem value="general">{t("general")}</SelectItem>
+                <SelectItem value="title">{t("title")}</SelectItem>
+                <SelectItem value="author">{t("author")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="search" className="text-right">
-              Search Book
+              {t("searchBook")}
             </Label>
             <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
               <PopoverTrigger asChild>
@@ -181,19 +183,19 @@ export function OnboardingBookSearch({
                   aria-expanded={openCombobox}
                   className="col-span-3 justify-between"
                 >
-                  {selectedBook ? selectedBook.title : "Select book..."}
+                  {selectedBook ? selectedBook.title : t("selectBook")}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-[400px] p-0">
                 <Command>
                   <CommandInput
-                    placeholder="Search books..."
+                    placeholder={t("searchBook")}
                     value={searchQuery}
                     onValueChange={setSearchQuery}
                   />
                   <CommandList>
-                    <CommandEmpty>No books found.</CommandEmpty>
+                    <CommandEmpty>{t("noBooksFound")}</CommandEmpty>
                     <CommandGroup>
                       {searchResults.map((book) => (
                         <CommandItem
@@ -220,7 +222,7 @@ export function OnboardingBookSearch({
                               <p className="text-sm text-muted-foreground">
                                 {book.author} •{" "}
                                 {book.source === "local"
-                                  ? "Our Collection"
+                                  ? t("ourCollection")
                                   : "Google Books"}
                               </p>
                             </div>
@@ -235,7 +237,9 @@ export function OnboardingBookSearch({
           </div>
         </div>
         <DialogFooter>
-          <Button onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button onClick={() => onOpenChange(false)}>
+            {t("cancelButton")}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

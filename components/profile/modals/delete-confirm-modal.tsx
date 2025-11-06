@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface DeleteConfirmModalProps {
   open: boolean;
@@ -23,22 +24,20 @@ export function DeleteConfirmModal({
   bookTitle,
   onConfirm,
 }: DeleteConfirmModalProps) {
+  const t = useTranslations("profile");
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Confirm Deletion</DialogTitle>
-          <DialogDescription>
-            Are you sure you want to delete &quot;{bookTitle}&quot;? This action
-            cannot be undone.
-          </DialogDescription>
+          <DialogTitle>{t("confirmDeletion")}</DialogTitle>
+          <DialogDescription>{t("confirmDeletionSubtitle")}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t("cancelButton")}
           </Button>
           <Button variant="destructive" onClick={onConfirm}>
-            Delete
+            {t("bookDelete")}
           </Button>
         </DialogFooter>
       </DialogContent>

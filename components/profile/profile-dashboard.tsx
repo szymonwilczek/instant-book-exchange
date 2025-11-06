@@ -24,6 +24,7 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { Button } from "../ui/button";
+import { useTranslations } from "next-intl";
 
 interface BookBase {
   id: string;
@@ -107,9 +108,7 @@ interface ProfileDashboardProps {
   userData: UserData;
 }
 
-export function ProfileDashboard({
-  userData,
-}: ProfileDashboardProps) {
+export function ProfileDashboard({ userData }: ProfileDashboardProps) {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isAddBookModalOpen, setIsAddBookModalOpen] = useState(false);
   const [isEditBookModalOpen, setIsEditBookModalOpen] = useState(false);
@@ -121,6 +120,7 @@ export function ProfileDashboard({
   const [isAddBookOpen, setIsAddBookOpen] = useState(false);
   const [modalType, setModalType] = useState<"offered" | "wishlist">("offered");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const t = useTranslations("profile");
 
   const {
     userData: fetchedUserData,
@@ -142,19 +142,19 @@ export function ProfileDashboard({
   const genres = [
     "Fantasy",
     "Science Fiction",
-    "Crime",
+    t("crime"),
     "Thriller",
     "Horror",
-    "Romance",
-    "Contemporary Fiction",
-    "Historical Fiction",
-    "Adventure",
-    "Biography",
-    "Non-fiction",
-    "Essay",
-    "Memoir",
-    "Young Adult",
-    "Journalism",
+    t("romance"),
+    t("contemporaryFiction"),
+    t("historicalFiction"),
+    t("adventure"),
+    t("biography"),
+    t("nonFiction"),
+    t("essay"),
+    t("memoir"),
+    t("youngAdult"),
+    t("journalism"),
   ];
 
   // Użyj useMemo dla derived state zamiast efektów
@@ -187,16 +187,19 @@ export function ProfileDashboard({
         const data: TransactionFromAPI[] = await res.json();
 
         // mapowanie transakcji z API na uzywany format
-        const mappedTransactions = data.map((t) => {
-          const isInitiator = t.initiator.email === currentUserData?.email;
-          const otherUser = isInitiator ? t.receiver : t.initiator;
+        const mappedTransactions = data.map((transaction) => {
+          const isInitiator =
+            transaction.initiator.email === currentUserData?.email;
+          const otherUser = isInitiator
+            ? transaction.receiver
+            : transaction.initiator;
 
           return {
-            id: t._id,
-            product: t.requestedBook?.title || "Unknown Book",
-            amount: t.offeredBooks?.length || 0,
-            date: new Date(t.createdAt).toLocaleDateString("pl-PL"),
-            status: t.status,
+            id: transaction._id,
+            product: transaction.requestedBook?.title || t("unknownBook"),
+            amount: transaction.offeredBooks?.length || 0,
+            date: new Date(transaction.createdAt).toLocaleDateString("pl-PL"),
+            status: transaction.status,
             buyer: otherUser.username || otherUser.email,
           };
         });
@@ -227,29 +230,29 @@ export function ProfileDashboard({
   const wishlistMatches = 8;
 
   const platformStats = [
-    { title: "Total Books Offered", value: totalBooksOffered, icon: Package },
-    { title: "Total Exchanges", value: totalExchanges, icon: DollarSign },
-    { title: "New Users This Month", value: newUsersThisMonth, icon: User },
+    { title: t("totalBooksOffered"), value: totalBooksOffered, icon: Package },
+    { title: t("totalExchanges"), value: totalExchanges, icon: DollarSign },
+    { title: t("newUsersThisMonth"), value: newUsersThisMonth, icon: User },
   ];
 
   const userStats = [
-    { title: "Books Exchanged", value: booksExchangedUser, icon: Package },
+    { title: t("booksExchanged"), value: booksExchangedUser, icon: Package },
     {
-      title: "Average Rating",
+      title: t("averageRating"),
       value: `${averageRatingUser}/5`,
       icon: TrendingUp,
     },
-    { title: "Books in Wishlist", value: booksInWishlistUser, icon: Edit },
+    { title: t("booksInWishlist"), value: booksInWishlistUser, icon: Edit },
   ];
 
   const activityStats = [
-    { title: "Pending Exchanges", value: pendingExchanges, icon: DollarSign },
+    { title: t("pendingExchanges"), value: pendingExchanges, icon: DollarSign },
     {
-      title: "Average Exchange Time",
+      title: t("averageExchangeTime"),
       value: averageExchangeTime,
       icon: TrendingUp,
     },
-    { title: "Wishlist Matches", value: wishlistMatches, icon: Edit },
+    { title: t("wishlistMatches"), value: wishlistMatches, icon: Edit },
   ];
 
   const handleProfileUpdate = async (updatedProfile: UserProfile) => {
@@ -317,7 +320,7 @@ export function ProfileDashboard({
         const data = await response.json();
 
         if (!response.ok) {
-          setErrorMessage(data.error || "Failed to delete book");
+          setErrorMessage(data.error || t("failedToDeleteBook"));
           setIsDeleteConfirmOpen(false);
           setSelectedBookToDelete(null);
           return;
@@ -328,7 +331,7 @@ export function ProfileDashboard({
         setSelectedBookToDelete(null);
       } catch (error) {
         console.error("Error deleting book:", error);
-        setErrorMessage("An unexpected error occurred. Please try again.");
+        setErrorMessage(t("unexpectedErrorOccurred"));
         setIsDeleteConfirmOpen(false);
         setSelectedBookToDelete(null);
       }
@@ -339,11 +342,9 @@ export function ProfileDashboard({
     <div className="container mx-auto p-4 md:p-6 lg:p-8 space-y-6">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-balance">
-          Hello, {currentUserData?.username || "You!"}!
+          {t("hello")}, {currentUserData?.username || t("you")}!
         </h1>
-        <p className="text-muted-foreground text-pretty">
-          Manage your profile, track transactions, and monitor your books
-        </p>
+        <p className="text-muted-foreground text-pretty">{t("subtitle")}</p>
       </div>
 
       <StatsSection
@@ -433,7 +434,7 @@ export function ProfileDashboard({
         >
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Cannot Delete Book</DialogTitle>
+              <DialogTitle>{t("cannotDeleteBook")}</DialogTitle>
               <DialogDescription className="text-destructive">
                 {errorMessage}
               </DialogDescription>

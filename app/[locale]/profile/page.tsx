@@ -2,10 +2,12 @@
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { ProfileDashboard } from "@/components/profile/profile-dashboard";
+import { useTranslations } from "next-intl";
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
   const [userData, setUserData] = useState(null);
+  const t = useTranslations("profile");
 
   const updateProfile = async () => {
     const res = await fetch("/api/user/profile");
@@ -24,7 +26,7 @@ export default function ProfilePage() {
     }
   }, [session]);
 
-  if (status === "loading") return <div>Loading...</div>;
+  if (status === "loading") return <div>{t("loading")}</div>;
 
   return (
     <div>

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Star } from "lucide-react";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
+import { useTranslations } from "next-intl";
 
 interface Review {
   _id: string;
@@ -25,14 +26,17 @@ interface ReviewsSectionProps {
 }
 
 export function ReviewsSection({ reviews }: ReviewsSectionProps) {
+  const t = useTranslations("reviews");
   if (reviews.length === 0) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Opinie</CardTitle>
+          <CardTitle>{t("reviewsTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground text-center py-8">Brak opinii</p>
+          <p className="text-muted-foreground text-center py-8">
+            {t("noReviews")}
+          </p>
         </CardContent>
       </Card>
     );
@@ -41,7 +45,9 @@ export function ReviewsSection({ reviews }: ReviewsSectionProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Opinie ({reviews.length})</CardTitle>
+        <CardTitle>
+          {t("reviewsTitle")} ({reviews.length})
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {reviews.map((review) => (

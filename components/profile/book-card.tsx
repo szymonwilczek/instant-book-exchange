@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 interface BookBase {
   id: string;
@@ -8,7 +9,7 @@ interface BookBase {
   author?: string;
   image?: string;
   createdAt?: string;
-  status?: "active" | "inactive";
+  status?: t | "inactive";
 }
 
 interface BookCardProps {
@@ -25,6 +26,7 @@ export function BookCard({
   onDelete,
 }: BookCardProps) {
   const formatDate = (date: string) => new Date(date).toLocaleDateString();
+  const t = useTranslations("profile");
 
   return (
     <Card className="overflow-hidden min-w-[200px] h-full">
@@ -42,7 +44,7 @@ export function BookCard({
               book.status === "active" ? "bg-green-500" : "bg-gray-500"
             }`}
           >
-            {book.status}
+            {t(book.status === "active" ? "bookActive" : "bookInactive")}
           </div>
         )}
       </div>
@@ -51,7 +53,9 @@ export function BookCard({
           {book.title}
         </CardTitle>
         <div className="flex justify-center">
-          <p className="text-xs text-muted-foreground font-normal">by</p>
+          <p className="text-xs text-muted-foreground font-normal">
+            {t("bookBy")}
+          </p>
           <p className="ml-1 text-xs font-semibold">
             {book.author || "Unknown"}
           </p>
@@ -59,7 +63,9 @@ export function BookCard({
         <br />
         {book.createdAt && (
           <div className="flex justify-center">
-            <p className="text-xs text-muted-foreground font-normal">Added:</p>
+            <p className="text-xs text-muted-foreground font-normal">
+              {t("bookAdded")}:
+            </p>
             <p className="ml-1 text-xs font-semibold">
               {formatDate(book.createdAt)}
             </p>
@@ -76,7 +82,7 @@ export function BookCard({
                 className="flex-1 cursor-pointer hover:bg-accent hover:text-accent-foreground"
                 onClick={() => onEdit(book)}
               >
-                Edit
+                {t("bookEdit")}
               </Button>
             )}
             {onDelete && (
@@ -86,7 +92,7 @@ export function BookCard({
                 className="flex-1 cursor-pointer hover:bg-red-500"
                 onClick={() => onDelete(book.id)}
               >
-                Delete
+                {t("bookDelete")}
               </Button>
             )}
           </div>

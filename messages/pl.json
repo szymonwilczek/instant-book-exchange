@@ -116,6 +116,17 @@
   },
 
   "profile": {
+    "crime": "Kryminał",
+    "romance": "Romans",
+    "contemporaryFiction": "Literatura współczesna",
+    "historicalFiction": "Historyczne",
+    "adventure": "Przygodowe",
+    "biography": "Biografia",
+    "nonFiction": "Literatura faktu",
+    "essay": "Esej",
+    "memoir": "Pamiętnik",
+    "youngAdult": "Literatura młodzieżowa",
+    "journalism": "Dziennik / Reportaż",
     "unknownBook": "Nieznana Książka",
     "totalBooksOffered": "Zaoferowanych książek",
     "totalExchanges": "Dokonanych wymian",
@@ -129,6 +140,7 @@
     "failedToDeleteBook": "Nie udało się usunąć książki. Prosimy - zgłoś ten błąd.",
     "unexpectedErrorOcccurred": "Wystąpił nieoczekiwany błąd. Prosimy - spróbuj ponownie.",
     "hello": "Cześć",
+    "you": "Nieznajomy",
     "subtitle": "Zarządzaj swoim profilem, śledź transakcje i monitoruj swoje książki",
     "platformStats": "Statystyki Platformy",
     "yourStats": "Twoje Statystyki",
@@ -221,26 +233,31 @@
     "cannotDeleteBook": "Nie można usunąć książki",
     "publicProfileView": "Widok profilu publicznego",
     "usersProfile": "Profil użytkownika: {username}",
+    "emailHidden": "Ukryty",
     "userPoints": "Punkty",
     "userMemberSince": "Członek od",
+    "userMemberDays": "dni",
     "userCompletedExchanges": "Dokonanych wymian",
     "userAverageRating": "Średnia ocena",
     "userBooksOffered": "Zaoferowanych książek",
     "userWishlistItems": "Książek na liście życzeń",
-    "userReviews": "Opinie",
-    "failedToSendMessage": "Nie udało się wysłać wiadomości. Spróbuj ponownie..",
-    "sendMessageTo": "Wyślij wiadomość do ",
-    "startConversationAbout": "Rozpocznij rozmowę na temat książki",
-    "message": "Wiadomość",
-    "messageHint": "Pisz tutaj...",
-    "characters": "znaków",
-    "sending": "Wysyłanie...",
-    "sendMessage": "Wyślij wiadomość"
+    "userReviews": "Opinie"
   },
 
   "reviews": {
     "reviewsTitle": "Opinie",
     "noReviews": "Brak opinii na ten moment."
+  },
+
+  "conversations": {
+    "failedToSendMessage": "Failed to send message. Please try again.",
+    "startConversationAbout": "Start a conversation about the book",
+    "message": "Message",
+    "messageHint": "Type here...",
+    "characters": "characters",
+    "sending": "Sending...",
+    "sendMessage": "Send message",
+    "sendMessageTo": "Send message to "
   },
 
   "nav": {

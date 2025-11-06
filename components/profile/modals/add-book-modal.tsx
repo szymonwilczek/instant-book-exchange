@@ -36,6 +36,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 interface SearchBook {
   id: string;
@@ -90,6 +91,7 @@ export function AddBookModal({
     "general"
   );
   const [debouncedQuery, setDebouncedQuery] = useState("");
+  const t = useTranslations("profile");
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(searchQuery), 300);
@@ -226,12 +228,10 @@ export function AddBookModal({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
-            {isCreating ? "Create New Book" : "Add Book"}
+            {isCreating ? t("createNewBook") : t("addBook")}
           </DialogTitle>
           <DialogDescription>
-            {isCreating
-              ? "Create a new book entry that will be added to our database."
-              : "Search for a book to add to your offered list."}
+            {isCreating ? t("creatingBookSubtitle") : t("addBookSubtitle")}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -240,7 +240,7 @@ export function AddBookModal({
               <>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="searchType" className="text-right">
-                    Search by
+                    {t("searchBy")}
                   </Label>
                   <Select
                     value={searchType}
@@ -252,15 +252,15 @@ export function AddBookModal({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="general">General</SelectItem>
-                      <SelectItem value="title">Title</SelectItem>
-                      <SelectItem value="author">Author</SelectItem>
+                      <SelectItem value="general">{t("general")}</SelectItem>
+                      <SelectItem value="title">{t("title")}</SelectItem>
+                      <SelectItem value="author">{t("author")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="search" className="text-right">
-                    Search Book
+                    {t("searchBook")}
                   </Label>
                   <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
                     <PopoverTrigger asChild>
@@ -270,19 +270,19 @@ export function AddBookModal({
                         aria-expanded={openCombobox}
                         className="col-span-3 justify-between"
                       >
-                        {selectedBook ? selectedBook.title : "Select book..."}
+                        {selectedBook ? selectedBook.title : t("selectBook")}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[400px] p-0">
                       <Command>
                         <CommandInput
-                          placeholder="Search books..."
+                          placeholder={t("searchBook")}
                           value={searchQuery}
                           onValueChange={setSearchQuery}
                         />
                         <CommandList>
-                          <CommandEmpty>No books found.</CommandEmpty>
+                          <CommandEmpty>{t("noBooksFound")}</CommandEmpty>
                           <CommandGroup>
                             {searchResults.map((book) => (
                               <CommandItem
@@ -311,7 +311,7 @@ export function AddBookModal({
                                     <p className="text-sm text-muted-foreground">
                                       {book.author} •{" "}
                                       {book.source === "local"
-                                        ? "Our Collection"
+                                        ? t("ourCollection")
                                         : "Google Books"}
                                     </p>
                                   </div>
@@ -330,7 +330,7 @@ export function AddBookModal({
                     variant="link"
                     onClick={() => setIsCreating(true)}
                   >
-                    I don&apos;t see my book here
+                    {t("dontSeeMyBook")}
                   </Button>
                 </div>
               </>
@@ -338,7 +338,7 @@ export function AddBookModal({
               <>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="title" className="text-right">
-                    Title
+                    {t("title")}
                   </Label>
                   <Input
                     id="title"
@@ -352,7 +352,7 @@ export function AddBookModal({
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="author" className="text-right">
-                    Author
+                    {t("author")}
                   </Label>
                   <Input
                     id="author"
@@ -379,7 +379,7 @@ export function AddBookModal({
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="description" className="text-right">
-                    Description
+                    {t("bookDescription")}
                   </Label>
                   <Textarea
                     id="description"
@@ -392,7 +392,7 @@ export function AddBookModal({
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="image" className="text-right">
-                    Image URL
+                    {t("bookImageUrl")}
                   </Label>
                   <Input
                     id="image"
@@ -408,7 +408,7 @@ export function AddBookModal({
 
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="condition" className="text-right">
-                Condition
+                {t("bookCondition")}
               </Label>
               <Select
                 value={formData.condition}
@@ -420,15 +420,15 @@ export function AddBookModal({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="new">Nowy</SelectItem>
-                  <SelectItem value="used">Używany</SelectItem>
-                  <SelectItem value="damaged">Uszkodzony</SelectItem>
+                  <SelectItem value="new">{t("new")}</SelectItem>
+                  <SelectItem value="used">{t("used")}</SelectItem>
+                  <SelectItem value="damaged">{t("damaged")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="ownerNote" className="text-right">
-                Notatka
+                {t("ownerNote")}
               </Label>
               <Textarea
                 id="ownerNote"
@@ -436,7 +436,7 @@ export function AddBookModal({
                 onChange={(e) =>
                   setFormData({ ...formData, ownerNote: e.target.value })
                 }
-                placeholder="np. okładka uszkodzona, oddaję bo mama kazała..."
+                placeholder={t("ownerNotePlaceholder")}
                 className="col-span-3"
               />
             </div>
@@ -448,11 +448,11 @@ export function AddBookModal({
                 variant="outline"
                 onClick={() => setIsCreating(false)}
               >
-                Back to Search
+                {t("backToSearch")}
               </Button>
             )}
             <Button type="submit" disabled={!selectedBook && !isCreating}>
-              {isCreating ? "Create & Add Book" : "Add Book"}
+              {isCreating ? t("createAndAddBook") : t("addBook")}
             </Button>
           </DialogFooter>
         </form>

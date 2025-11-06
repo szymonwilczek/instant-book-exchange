@@ -8,16 +8,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { BookCard } from "../book-card";
+import { useTranslations } from "next-intl";
 
 interface BookBase {
   id: string;
@@ -50,19 +46,18 @@ export function OnboardingModal({
   onSubmit,
   onSkip,
 }: OnboardingModalProps) {
+  const t = useTranslations("profile");
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Witaj! Uzupełnij swój profil</DialogTitle>
-          <DialogDescription>
-            Wybierz ulubione gatunki i książki, które chcesz otrzymać.
-          </DialogDescription>
+          <DialogTitle>{t("onBoardingTitle")}</DialogTitle>
+          <DialogDescription>{t("onBoardingSubtitle")}</DialogDescription>
         </DialogHeader>
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Ulubione gatunki</CardTitle>
+              <CardTitle>{t("favouriteGenres")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
@@ -83,7 +78,7 @@ export function OnboardingModal({
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Książki, które chcesz otrzymać (opcjonalne)</CardTitle>
+              <CardTitle>{t("booksYouWantToReceive")}</CardTitle>
             </CardHeader>
             <CardContent>
               <Button onClick={onAddBook}>Dodaj książkę</Button>
@@ -97,7 +92,7 @@ export function OnboardingModal({
         </div>
         <DialogFooter>
           <Button variant="link" onClick={onSkip}>
-            Pomiń
+            {t("skipButton")}
           </Button>
           <Button onClick={onSubmit} disabled={selectedGenres.length === 0}>
             OK

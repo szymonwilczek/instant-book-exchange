@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { BookCard } from "../book-card";
+import { useTranslations } from "next-intl";
 
 interface Book {
   id: string;
@@ -42,18 +43,19 @@ export function OfferedBooksSection({
   onDeleteBook,
 }: OfferedBooksSectionProps) {
   const needsCarousel = books.length > 4;
+  const t = useTranslations("profile");
 
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Offered Books</CardTitle>
+          <CardTitle>{t("offeredBooks")}</CardTitle>
           <Button variant="outline" size="sm" onClick={onAddBook}>
             <Plus className="h-4 w-4 mr-2" />
-            Add Book
+            {t("addBookButton")}
           </Button>
         </div>
-        <CardDescription>Manage your offered books</CardDescription>
+        <CardDescription>{t("offeredBooksSubtitle")}</CardDescription>
       </CardHeader>
       <CardContent>
         {needsCarousel ? (

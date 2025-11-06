@@ -18,6 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 interface PublicProfileDashboardProps {
   profileData: {
@@ -58,6 +59,7 @@ export function PublicProfileDashboard({
   const [messageModalOpen, setMessageModalOpen] = useState(false);
   const [blockModalOpen, setBlockModalOpen] = useState(false);
   const [blocking, setBlocking] = useState(false);
+  const t = useTranslations("profile");
 
   const { user, offeredBooks, wishlist, reviews, stats } = profileData;
 
@@ -89,7 +91,9 @@ export function PublicProfileDashboard({
     <div className="container mx-auto p-4 space-y-6 max-w-7xl">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">{user.username}&apos;s Profile</h1>
+          <h1 className="text-3xl font-bold">
+            {t("usersProfile", { username: user.username })}
+          </h1>
           <p className="text-muted-foreground">Public profile view</p>
         </div>
 
@@ -106,7 +110,7 @@ export function PublicProfileDashboard({
       <ProfileInfoSection
         profileData={{
           username: user.username,
-          email: user.email || "Hidden",
+          email: user.email || t("emailHidden"),
           phone: "",
           location: user.location || "",
           avatar: user.profileImage || "",
@@ -123,41 +127,41 @@ export function PublicProfileDashboard({
       <StatsSection
         platformStats={[
           {
-            title: "Points",
+            title: t("userPoints"),
             value: user.points,
             icon: TrendingUp,
           },
           {
-            title: "Member Since",
-            value: `${stats.joinedDaysAgo} days`,
+            title: t("userMemberSince"),
+            value: `${stats.joinedDaysAgo} ${t("userMemberDays")}`,
             icon: User,
           },
         ]}
         userStats={[
           {
-            title: "Completed Exchanges",
+            title: t("userCompletedExchanges"),
             value: stats.completedTransactions,
             icon: TrendingUp,
           },
           {
-            title: "Average Rating",
+            title: t("userAverageRating"),
             value: user.averageRating.toFixed(1),
             icon: Star,
           },
         ]}
         activityStats={[
           {
-            title: "Books Offered",
+            title: t("userBooksOffered"),
             value: stats.offeredBooksCount,
             icon: User,
           },
           {
-            title: "Wishlist Items",
+            title: t("userWishlistItems"),
             value: stats.wishlistCount,
             icon: Star,
           },
           {
-            title: "Reviews",
+            title: t("userReviews"),
             value: stats.reviewsCount,
             icon: Star,
           },

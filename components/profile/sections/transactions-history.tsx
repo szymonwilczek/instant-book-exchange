@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { User, ArrowRightLeft, Calendar } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface TransactionUser {
   _id: string;
@@ -39,6 +40,7 @@ interface TransactionHistoryProps {
 export function TransactionHistory({ userEmail }: TransactionHistoryProps) {
   const [transactions, setTransactions] = useState<TransactionItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const t = useTranslations("profile");
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -78,10 +80,10 @@ export function TransactionHistory({ userEmail }: TransactionHistoryProps) {
 
   const getStatusLabel = (status: string) => {
     const labels: Record<string, string> = {
-      pending: "Pending",
-      accepted: "Accepted",
-      rejected: "Rejected",
-      completed: "Completed",
+      pending: t("pending"),
+      accepted: t("accepted"),
+      rejected: t("rejected"),
+      completed: t("comleted"),
     };
     return labels[status] || status;
   };
@@ -90,12 +92,12 @@ export function TransactionHistory({ userEmail }: TransactionHistoryProps) {
     return (
       <Card className="lg:col-span-2">
         <CardHeader>
-          <CardTitle>Transaction history</CardTitle>
-          <CardDescription>Recent book exchanges</CardDescription>
+          <CardTitle>{t("transactionHistory")}</CardTitle>
+          <CardDescription>{t("transactionSubtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex justify-center py-8">
-            <p className="text-muted-foreground">Loading...</p>
+            <p className="text-muted-foreground">{t("loading")}</p>
           </div>
         </CardContent>
       </Card>
@@ -105,13 +107,13 @@ export function TransactionHistory({ userEmail }: TransactionHistoryProps) {
   return (
     <Card className="lg:col-span-2">
       <CardHeader>
-        <CardTitle>Transaction history</CardTitle>
-        <CardDescription>Recent book exchanges</CardDescription>
+        <CardTitle>{t("transactionHistory")}</CardTitle>
+        <CardDescription>{t("transactioNSubtitle")}</CardDescription>
       </CardHeader>
       <CardContent>
         {transactions.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-muted-foreground">No transactions found</p>
+            <p className="text-muted-foreground">{t("noTransactionsFound")}</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -129,7 +131,7 @@ export function TransactionHistory({ userEmail }: TransactionHistoryProps) {
                   <div className="space-y-2 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="font-medium line-clamp-1">
-                        {transaction.requestedBook?.title || "Nieznana książka"}
+                        {transaction.requestedBook?.title || t("unknownBook")}
                       </p>
                       <Badge
                         className={getStatusColor(transaction.status)}
@@ -141,7 +143,7 @@ export function TransactionHistory({ userEmail }: TransactionHistoryProps) {
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <ArrowRightLeft className="h-3 w-3" />
-                        {isInitiator ? "Sent to" : "Received from"}
+                        {isInitiator ? t("sentTo") : t("receivedFrom")}
                       </span>
                       <span className="flex items-center gap-1">
                         <User className="h-3 w-3" />
@@ -161,10 +163,10 @@ export function TransactionHistory({ userEmail }: TransactionHistoryProps) {
                     transaction.offeredBooks.length > 0
                       ? `${transaction.offeredBooks.length} ${
                           transaction.offeredBooks.length === 1
-                            ? "book"
-                            : "books"
+                            ? t("book")
+                            : t("books")
                         }`
-                      : "No exchange"}
+                      : t("noExchange")}
                   </div>
                 </div>
               );

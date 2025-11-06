@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslations } from "next-intl";
 
 interface Book {
   id: string;
@@ -51,6 +52,7 @@ export function EditBookModal({
     book?.condition || "used"
   );
   const [ownerNote, setOwnerNote] = useState(book?.ownerNote || "");
+  const t = useTranslations("profile");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,9 +76,9 @@ export function EditBookModal({
     <Dialog open={open} onOpenChange={onOpenChange} key={book?.id || "empty"}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit Book</DialogTitle>
+          <DialogTitle>{t("editBook")}</DialogTitle>
           <DialogDescription>
-            Update details for &quot;{book?.title}&quot;.
+            {t("editBookSubtitle", { bookTitle: book?.title })}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -95,15 +97,15 @@ export function EditBookModal({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="active">{t("bookActive")}</SelectItem>
+                  <SelectItem value="inactive">{t("bookInactive")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="condition" className="text-right">
-                Condition
+                {t("bookCondition")}
               </Label>
               <Select
                 value={condition}
@@ -115,28 +117,28 @@ export function EditBookModal({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="new">Nowy</SelectItem>
-                  <SelectItem value="used">Używany</SelectItem>
-                  <SelectItem value="damaged">Uszkodzony</SelectItem>
+                  <SelectItem value="new">{t("new")}</SelectItem>
+                  <SelectItem value="used">{t("used")}</SelectItem>
+                  <SelectItem value="damaged">{t("damaged")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="ownerNote" className="text-right">
-                Notatka
+                {t("ownerNote")}
               </Label>
               <Textarea
                 id="ownerNote"
                 value={ownerNote}
                 onChange={(e) => setOwnerNote(e.target.value)}
-                placeholder="np. okładka uszkodzona..."
+                placeholder={t("ownerNotePlaceholder")}
                 className="col-span-3"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">Save</Button>
+            <Button type="submit">{t("saveButton")}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

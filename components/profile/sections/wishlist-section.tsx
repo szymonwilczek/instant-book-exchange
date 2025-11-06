@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { BookCard } from "../book-card";
+import { useTranslations } from "next-intl";
 
 interface BookBase {
   id: string;
@@ -40,16 +41,17 @@ export function WishlistSection({
   onAddToWishlist,
   isPublicView = false,
 }: WishlistSectionProps) {
+  const t = useTranslations("profile");
 
   if (!wishlist) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Wishlist</CardTitle>
-          <CardDescription>Books you want to receive</CardDescription>
+          <CardTitle>{t("wishlistTitle")}</CardTitle>
+          <CardDescription>{t("wishlistSubtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">Ładowanie listy życzeń...</p>
+          <p className="text-muted-foreground">{t("wishlistLoading")}</p>
         </CardContent>
       </Card>
     );
@@ -61,27 +63,23 @@ export function WishlistSection({
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Wishlist</CardTitle>
+          <CardTitle>{t("wishlistTitle")}</CardTitle>
           {!isPublicView && (
             <Button variant="outline" size="sm" onClick={onAddToWishlist}>
               <Plus className="h-4 w-4 mr-2" />
-              Dodaj książkę
+              {t("addBook")}
             </Button>
           )}
         </div>
         <CardDescription>
-          {isPublicView
-            ? "Książki, które chce otrzymać"
-            : "Książki, które chcesz otrzymać"}
+          {isPublicView ? t("userWantToReceive") : t("youWantToReceive")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         {wishlist.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <p>
-              {isPublicView
-                ? "Ta lista życzeń jest pusta"
-                : "Twoja lista życzeń jest pusta"}
+              {isPublicView ? t("userEmptyWishlist") : t("yourEmptyWishlist")}
             </p>
             {!isPublicView && (
               <Button
@@ -90,7 +88,7 @@ export function WishlistSection({
                 onClick={onAddToWishlist}
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Dodaj pierwszą książkę
+                {t("addFirstBook")}
               </Button>
             )}
           </div>

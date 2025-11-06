@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 interface UserProfile {
   username: string;
@@ -43,6 +44,7 @@ export function EditProfileModal({
   onSave,
 }: EditProfileModalProps) {
   const [formData, setFormData] = useState<UserProfile>(profile);
+  const t = useTranslations("profile");
 
   useEffect(() => {
     setFormData(profile);
@@ -69,15 +71,13 @@ export function EditProfileModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
-          <DialogDescription>
-            Update your profile information. Click save when you&apos;re done.
-          </DialogDescription>
+          <DialogTitle>{t("editProfile")}</DialogTitle>
+          <DialogDescription>{t("editProfileSubtitle")}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="avatar">Avatar</Label>
+              <Label htmlFor="avatar">{t("userAvatar")}</Label>
               <Input
                 id="avatar"
                 type="file"
@@ -95,12 +95,12 @@ export function EditProfileModal({
                 )}
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username">{t("userUsername")}</Label>
               <Input
                 id="username"
                 value={formData.username}
                 onChange={(e) => handleChange("username", e.target.value)}
-                placeholder="Enter your username"
+                placeholder={t("userUsernamePlaceholder")}
               />
             </div>
             <div className="grid gap-2">
@@ -110,11 +110,11 @@ export function EditProfileModal({
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleChange("email", e.target.value)}
-                placeholder="your.email@example.com"
+                placeholder={t("userEmailPlaceholder")}
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="phone">Phone Number</Label>
+              <Label htmlFor="phone">{t("userPhoneNumber")}</Label>
               <Input
                 id="phone"
                 type="tel"
@@ -124,12 +124,12 @@ export function EditProfileModal({
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="location">Location</Label>
+              <Label htmlFor="location">{t("userLocation")}</Label>
               <Input
                 id="location"
                 value={formData.location}
                 onChange={(e) => handleChange("location", e.target.value)}
-                placeholder="City, State"
+                placeholder={t("userLocationPlaceholder")}
               />
             </div>
             <div className="grid gap-2">
@@ -138,7 +138,7 @@ export function EditProfileModal({
                 id="bio"
                 value={formData.bio}
                 onChange={(e) => handleChange("bio", e.target.value)}
-                placeholder="Tell us about yourself"
+                placeholder={t("userBioPlaceholder")}
                 rows={3}
               />
             </div>
@@ -162,12 +162,12 @@ export function EditProfileModal({
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="website">Website</Label>
+              <Label htmlFor="website">{t("userWebsite")}</Label>
               <Input
                 id="website"
                 value={formData.website || ""}
                 onChange={(e) => handleChange("website", e.target.value)}
-                placeholder="https://your.website.com"
+                placeholder={t("userWebsitePlaceholder")}
               />
             </div>
           </div>
@@ -178,9 +178,9 @@ export function EditProfileModal({
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t("cancelButton")}
             </Button>
-            <Button type="submit">Save Changes</Button>
+            <Button type="submit">{t("saveButton")}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

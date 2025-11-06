@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { LucideIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface Stat {
   title: string;
@@ -35,11 +36,14 @@ export function StatsSection({
   onUserApiChange,
   onActivityApiChange,
 }: StatsSectionProps) {
+  const t = useTranslations("profile");
   return (
     <div className="grid gap-4 md:grid-cols-3">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Platform Stats</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            {t("platformStats")}
+          </CardTitle>
           {(() => {
             const IconComponent = platformStats[0].icon;
             return <IconComponent className="h-4 w-4 text-muted-foreground" />;
@@ -72,7 +76,9 @@ export function StatsSection({
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Your Stats</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            {t("yourStats")}
+          </CardTitle>
           {(() => {
             const IconComponent = userStats[0].icon;
             return <IconComponent className="h-4 w-4 text-muted-foreground" />;
@@ -105,7 +111,9 @@ export function StatsSection({
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Activity Stats</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            {t("activityStats")}
+          </CardTitle>
           {(() => {
             const IconComponent = activityStats[0].icon;
             return <IconComponent className="h-4 w-4 text-muted-foreground" />;
