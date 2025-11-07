@@ -64,9 +64,11 @@ export function useProfileData() {
     if (userData?.offeredBooks) {
       return userData.offeredBooks.map((book) => ({
         id: book._id,
+        _id: book._id,
         title: book.title,
         author: book.author,
         image: book.imageUrl,
+        imageUrl: book.imageUrl,
         createdAt: new Date(book.createdAt).toISOString(),
         status: (book.isActive !== undefined
           ? book.isActive
