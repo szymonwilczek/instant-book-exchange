@@ -25,6 +25,9 @@ import {
 } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { useTranslations } from "next-intl";
+import { PromotedBooksSection } from "./sections/promoted-books-section";
+import { PointsHistorySection } from "./sections/points-history-section";
+import { HistorySection } from "./sections/history-section";
 
 interface BookBase {
   id: string;
@@ -63,6 +66,7 @@ interface UserData {
   github?: string;
   twitter?: string;
   linkedin?: string;
+  points?: number;
 }
 
 interface UserProfile {
@@ -86,6 +90,21 @@ interface Transaction {
   buyer: string;
 }
 
+interface PromotedBook {
+  _id: string;
+  title: string;
+  author?: string;
+  imageUrl?: string;
+  condition: string;
+  owner: {
+    username: string;
+    email: string;
+    location?: string;
+    profileImage?: string;
+  };
+  promotedUntil: string;
+}
+
 interface TransactionFromAPI {
   _id: string;
   initiator: {
@@ -106,9 +125,13 @@ interface TransactionFromAPI {
 
 interface ProfileDashboardProps {
   userData: UserData;
+  promotedBooks: PromotedBook[];
 }
 
-export function ProfileDashboard({ userData }: ProfileDashboardProps) {
+export function ProfileDashboard({
+  userData,
+  promotedBooks,
+}: ProfileDashboardProps) {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isAddBookModalOpen, setIsAddBookModalOpen] = useState(false);
   const [isEditBookModalOpen, setIsEditBookModalOpen] = useState(false);
@@ -138,6 +161,7 @@ export function ProfileDashboard({ userData }: ProfileDashboardProps) {
   } = useOnboarding(fetchedUserData, fetchData);
 
   const currentUserData = fetchedUserData || userData;
+  const userPoints = currentUserData?.points || 0;
 
   const genres = [
     "Fantasy",
@@ -157,7 +181,6 @@ export function ProfileDashboard({ userData }: ProfileDashboardProps) {
     t("journalism"),
   ];
 
-  // Użyj useMemo dla derived state zamiast efektów
   const profile = useMemo(
     () => ({
       username: currentUserData?.username || "",
@@ -212,6 +235,23 @@ export function ProfileDashboard({ userData }: ProfileDashboardProps) {
 
     if (currentUserData?.email) {
       fetchTransactions();
+    }
+  }, [currentUserData?.email]);
+
+  useEffect(() => {
+    const fetchPromotedBooks = async () => {
+      try {
+        const res = await fetch("/api/user/promoted-books");
+        const data = await res.json();
+        if (data.active) {
+        }
+      } catch (error) {
+        console.error("Error fetching promoted books:", error);
+      }
+    };
+
+    if (currentUserData?.email) {
+      fetchPromotedBooks();
     }
   }, [currentUserData?.email]);
 
@@ -338,6 +378,82 @@ export function ProfileDashboard({ userData }: ProfileDashboardProps) {
     }
   };
 
+  const handlePromoteBook = async (bookId: string) => {
+    try {
+      const res = await fetch("/api/books/promote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookId }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Failed to promote book");
+        return;
+      }
+
+      alert("Book promoted successfully!");
+      // Refresh data
+      window.location.reload();
+    } catch (error) {
+      console.error("Error promoting book:", error);
+      alert("Failed to promote book");
+    }
+  };
+
+  const handleExtendPromotion = async (bookId: string) => {
+    try {
+      const res = await fetch("/api/books/extend-promotion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookId }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Failed to extend promotion");
+        return;
+      }
+
+      alert("Promotion extended successfully!");
+      window.location.reload();
+    } catch (error) {
+      console.error("Error extending promotion:", error);
+      alert("Failed to extend promotion");
+    }
+  };
+
+  const handleCancelPromotion = async (bookId: string) => {
+    if (
+      !confirm("Cancel promotion? You'll get a refund only if cancelled today.")
+    ) {
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/books/cancel-promotion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookId }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Failed to cancel promotion");
+        return;
+      }
+
+      alert(`Promotion cancelled! Refunded ${data.refundedPoints} points.`);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error cancelling promotion:", error);
+      alert("Failed to cancel promotion");
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 md:p-6 lg:p-8 space-y-6">
       <div className="flex flex-col gap-2">
@@ -360,17 +476,26 @@ export function ProfileDashboard({ userData }: ProfileDashboardProps) {
           isPublicView={false}
         />
 
-        <TransactionHistory userEmail={currentUserData?.email} />
+        <HistorySection userEmail={currentUserData?.email} />
       </div>
 
       <OfferedBooksSection
-        books={books}
+        books={books as never[]}
         onAddBook={() => {
           setModalType("offered");
           setIsAddBookModalOpen(true);
         }}
         onEditBook={handleEditBook}
         onDeleteBook={handleDeleteBook}
+        onPromote={handlePromoteBook}
+        userPoints={userPoints}
+      />
+
+      <PromotedBooksSection
+        books={promotedBooks as never[]}
+        userPoints={userPoints}
+        onExtend={handleExtendPromotion}
+        onCancel={handleCancelPromotion}
       />
 
       <WishlistSection
