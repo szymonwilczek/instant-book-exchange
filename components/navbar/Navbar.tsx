@@ -24,9 +24,7 @@ import { UserMenu } from "@/components/navbar/UserMenu";
 import { CartSheet } from "@/components/navbar/CartSheet";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
-import { Sun, Moon, MessageCircle, LogIn } from "lucide-react";
-import { LanguageSwitcher } from "./LanguageSwitcher";
+import { MessageCircle, LogIn } from "lucide-react";
 import { PointsDisplay } from "./PointsDisplay";
 import { IUser } from "@/lib/models/User";
 
@@ -68,7 +66,6 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
     const [userData, setUserData] = useState<IUser | null>(null);
     const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
     const pathname = usePathname();
-    const { theme, setTheme } = useTheme();
     const router = useRouter();
 
     useEffect(() => {
@@ -227,8 +224,6 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
           {/* Right side */}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              {/* Info menu */}
-              <InfoMenu onItemClick={onInfoItemClick} />
               {/* Messages - tylko dla zalogowanych */}
               {session && (
                 <Button
@@ -249,19 +244,8 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                 </Button>
               )}
               {session && <CartSheet />}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="h-9 w-9 cursor-pointer"
-              >
-                <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                <span className="sr-only">Toggle theme</span>
-              </Button>
             </div>
             <PointsDisplay />
-            <LanguageSwitcher />
             {session ? (
               <UserMenu
                 userName={session?.user?.name || userData?.username || "User"}

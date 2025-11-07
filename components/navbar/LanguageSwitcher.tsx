@@ -26,10 +26,15 @@ export function LanguageSwitcher() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" disabled={isPending}>
-          <Languages className="h-5 w-5" />
-        </Button>
+      <DropdownMenuTrigger
+        asChild
+        className="flex flex-row items-center cursor-pointer"
+        disabled={isPending}
+      >
+        <div className="justify-center items-center">
+          <Languages className="mr-4 h-4 w-4" />
+          <span>Language</span>
+        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem
