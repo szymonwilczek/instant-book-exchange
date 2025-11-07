@@ -42,7 +42,7 @@ interface OfferedBooksSectionProps {
     promotedAt?: string;
   }>;
   onAddBook: () => void;
-  onEditBook: (book: unknown) => void;
+  onEditBook: (book: OfferedBooksSectionProps["books"][0]) => void;
   onDeleteBook: (bookId: string) => void;
   onPromote?: (bookId: string) => void;
   userPoints?: number;
