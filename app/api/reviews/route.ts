@@ -26,7 +26,15 @@ export async function GET(req: NextRequest) {
 
   await connectToDB();
 
-  const reviewer = await User.findOne({ email: session.user.email });
+  const userEmail = session.user?.email;
+  if (!userEmail) {
+    return NextResponse.json(
+      { error: "User email not found" },
+      { status: 401 }
+    );
+  }
+
+  const reviewer = await User.findOne({ email: userEmail });
   if (!reviewer) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
@@ -50,7 +58,16 @@ export async function POST(req: NextRequest) {
 
   const transaction =
     await Transaction.findById(transactionId).populate("initiator receiver");
-  const reviewer = await User.findOne({ email: session.user.email });
+
+  const userEmail = session.user?.email;
+  if (!userEmail) {
+    return NextResponse.json(
+      { error: "User email not found" },
+      { status: 401 }
+    );
+  }
+
+  const reviewer = await User.findOne({ email: userEmail });
 
   if (!reviewer) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });

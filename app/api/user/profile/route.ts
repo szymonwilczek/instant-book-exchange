@@ -9,7 +9,15 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   await connectToDB();
-  const user = await User.findOne({ email: session.user.email }).populate(
+  const userEmail = session.user?.email;
+  if (!userEmail) {
+    return NextResponse.json(
+      { error: "User email not found" },
+      { status: 401 }
+    );
+  }
+
+  const user = await User.findOne({ email: userEmail }).populate(
     "wishlist offeredBooks"
   );
   return NextResponse.json(user);
@@ -44,8 +52,16 @@ export async function PUT(req: NextRequest) {
     profileImage = avatarFile;
   }
 
+  const userEmail = session.user?.email;
+  if (!userEmail) {
+    return NextResponse.json(
+      { error: "User email not found" },
+      { status: 401 }
+    );
+  }
+
   await User.findOneAndUpdate(
-    { email: session.user.email },
+    { email: userEmail },
     {
       username,
       email,

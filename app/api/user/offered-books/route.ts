@@ -7,6 +7,7 @@ import Transaction from "@/lib/models/Transaction";
 import Conversation from "@/lib/models/Conversation";
 import Message from "@/lib/models/Message";
 import BookSnapshot from "@/lib/models/BookSnapshot";
+import mongoose from "mongoose";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -25,7 +26,15 @@ export async function POST(req: NextRequest) {
   } = await req.json();
   await connectToDB();
 
-  const user = await User.findOne({ email: session.user.email });
+  const userEmail = session.user?.email;
+  if (!userEmail) {
+    return NextResponse.json(
+      { error: "User email not found" },
+      { status: 401 }
+    );
+  }
+
+  const user = await User.findOne({ email: userEmail });
   if (!user)
     return NextResponse.json({ error: "User not found" }, { status: 404 });
 
@@ -54,7 +63,15 @@ export async function DELETE(req: NextRequest) {
   const { bookId } = await req.json();
   await connectToDB();
 
-  const user = await User.findOne({ email: session.user.email });
+  const userEmail = session.user?.email;
+  if (!userEmail) {
+    return NextResponse.json(
+      { error: "User email not found" },
+      { status: 401 }
+    );
+  }
+
+  const user = await User.findOne({ email: userEmail });
   if (!user)
     return NextResponse.json({ error: "User not found" }, { status: 404 });
 
@@ -106,7 +123,7 @@ export async function DELETE(req: NextRequest) {
 
   // usuwanie z oferowanych ksiazek uzytkownika
   user.offeredBooks = user.offeredBooks.filter(
-    (id) => id.toString() !== bookId
+    (id: mongoose.Types.ObjectId) => id.toString() !== bookId
   );
   await user.save();
 

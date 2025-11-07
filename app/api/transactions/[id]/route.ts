@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/api/auth/[...nextauth]/auth";
 import connectToDB from "@/lib/db/connect";
-import Transaction from "@/lib/models/Transaction";
+import Transaction, { ITransaction } from "@/lib/models/Transaction";
 import Book from "@/lib/models/Book";
-import BookSnapshot from "@/lib/models/BookSnapshot";
+import BookSnapshot, { IBookSnapshot } from "@/lib/models/BookSnapshot";
 import User from "@/lib/models/User";
 import mongoose from "mongoose";
 import { checkAchievements } from "@/lib/achievements/checker";
@@ -80,7 +80,15 @@ export async function PUT(
     );
   }
 
-  const user = await User.findOne({ email: session.user.email });
+  const userEmail = session.user?.email;
+  if (!userEmail) {
+    return NextResponse.json(
+      { error: "User email not found" },
+      { status: 401 }
+    );
+  }
+
+  const user = await User.findOne({ email: userEmail });
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
@@ -108,7 +116,9 @@ export async function PUT(
 
   // snapshots
   if (status === "completed" && oldStatus === "accepted") {
-    const rawTransaction = await Transaction.findById(id).lean();
+    const rawTransaction = (await Transaction.findById(
+      id
+    ).lean()) as ITransaction;
 
     if (!rawTransaction) {
       return NextResponse.json(
@@ -203,7 +213,9 @@ export async function GET(
 
   const { id } = await params;
 
-  const rawTransaction = await Transaction.findById(id).lean();
+  const rawTransaction = (await Transaction.findById(
+    id
+  ).lean()) as ITransaction;
 
   if (!rawTransaction) {
     return NextResponse.json(
@@ -212,7 +224,15 @@ export async function GET(
     );
   }
 
-  const user = await User.findOne({ email: session.user.email });
+  const userEmail = session.user?.email;
+  if (!userEmail) {
+    return NextResponse.json(
+      { error: "User email not found" },
+      { status: 401 }
+    );
+  }
+
+  const user = await User.findOne({ email: userEmail });
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
@@ -238,9 +258,9 @@ export async function GET(
   ).lean();
 
   if (!requestedBook) {
-    const snapshot = await BookSnapshot.findOne({
+    const snapshot = (await BookSnapshot.findOne({
       originalBookId: rawTransaction.requestedBook,
-    }).lean();
+    }).lean()) as IBookSnapshot | null;
 
     if (snapshot) {
       requestedBook = {
@@ -260,9 +280,9 @@ export async function GET(
       let book: BookDocument | null = await Book.findById(bookId).lean();
 
       if (!book) {
-        const snapshot = await BookSnapshot.findOne({
+        const snapshot = (await BookSnapshot.findOne({
           originalBookId: bookId,
-        }).lean();
+        }).lean()) as IBookSnapshot | null;
 
         if (snapshot) {
           book = {

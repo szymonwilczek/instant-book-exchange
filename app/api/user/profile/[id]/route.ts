@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/api/auth/[...nextauth]/auth";
 import connectToDB from "@/lib/db/connect";
-import User from "@/lib/models/User";
-import Book from "@/lib/models/Book";
+import User, { IUser } from "@/lib/models/User";
+import Book, { IBook } from "@/lib/models/Book";
 import Review from "@/lib/models/Review";
 import Transaction from "@/lib/models/Transaction";
 import mongoose from "mongoose";
@@ -20,7 +20,9 @@ export async function GET(
     return NextResponse.json({ error: "Invalid user ID" }, { status: 400 });
   }
 
-  const user = await User.findById(id).select("-password -googleId").lean();
+  const user = (await User.findById(id)
+    .select("-password -googleId")
+    .lean()) as IUser;
 
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -30,11 +32,19 @@ export async function GET(
 
   // sprawdzanie blokad jesli nie jest to wlasny profil
   if (!isOwnProfile && session) {
-    const currentUser = await User.findOne({ email: session.user.email });
+    const userEmail = session.user?.email;
+    if (!userEmail) {
+      return NextResponse.json(
+        { error: "User email not found" },
+        { status: 401 }
+      );
+    }
+
+    const currentUser = await User.findOne({ email: userEmail });
     if (currentUser) {
       // przegladany uzytkownik zablokowal current usera
       if (
-        user.blockedUsers?.some((blockedId) =>
+        user.blockedUsers?.some((blockedId: mongoose.Types.ObjectId) =>
           blockedId.equals(currentUser._id)
         )
       ) {
@@ -45,7 +55,7 @@ export async function GET(
       }
       // current user zablokowal przegladanego uzytkownika
       if (
-        currentUser.blockedUsers?.some((blockedId) =>
+        currentUser.blockedUsers?.some((blockedId: mongoose.Types.ObjectId) =>
           blockedId.equals(user._id)
         )
       ) {
@@ -81,14 +91,14 @@ export async function GET(
   }).lean();
 
   // wishlist jesli publiczna
-  let wishlist = [];
+  let wishlist: IBook[] = [];
   if (isOwnProfile || !user.settings?.hideWishlist) {
-    wishlist = await Book.find({
+    wishlist = (await Book.find({
       _id: { $in: user.wishlist },
-    }).lean();
+    }).lean()) as IBook[];
   }
 
-  // recenzje 
+  // recenzje
   const reviews = await Review.find({ reviewedUser: user._id })
     .populate("reviewer", "username profileImage")
     .populate("transactionId", "createdAt")

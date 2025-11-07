@@ -18,7 +18,15 @@ export async function POST(req: NextRequest) {
 
   await connectToDB();
 
-  const currentUser = await User.findOne({ email: session.user.email });
+  const userEmail = session.user?.email;
+  if (!userEmail) {
+    return NextResponse.json(
+      { error: "User email not found" },
+      { status: 401 }
+    );
+  }
+
+  const currentUser = await User.findOne({ email: userEmail });
   if (!currentUser) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
@@ -32,7 +40,11 @@ export async function POST(req: NextRequest) {
   }
 
   // uzytkownik juz jest zablokowany
-  if (currentUser.blockedUsers.some((id) => id.toString() === userId)) {
+  if (
+    currentUser.blockedUsers.some(
+      (id: mongoose.Types.ObjectId) => id.toString() === userId
+    )
+  ) {
     return NextResponse.json(
       { error: "User already blocked" },
       { status: 400 }
@@ -60,14 +72,22 @@ export async function DELETE(req: NextRequest) {
 
   await connectToDB();
 
-  const currentUser = await User.findOne({ email: session.user.email });
+  const userEmail = session.user?.email;
+  if (!userEmail) {
+    return NextResponse.json(
+      { error: "User email not found" },
+      { status: 401 }
+    );
+  }
+
+  const currentUser = await User.findOne({ email: userEmail });
   if (!currentUser) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
   // usun z listy zablokowanych
   currentUser.blockedUsers = currentUser.blockedUsers.filter(
-    (id) => id.toString() !== userId
+    (id: mongoose.Types.ObjectId) => id.toString() !== userId
   );
   await currentUser.save();
 

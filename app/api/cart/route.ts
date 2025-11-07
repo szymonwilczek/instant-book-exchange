@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/api/auth/[...nextauth]/auth";
 import connectToDB from "@/lib/db/connect";
-import Cart from "@/lib/models/Cart";
+import Cart, { ICartItem } from "@/lib/models/Cart";
 import User from "@/lib/models/User";
 
 export async function GET() {
@@ -13,7 +13,15 @@ export async function GET() {
 
     await connectToDB();
 
-    const user = await User.findOne({ email: session.user.email });
+    const userEmail = session.user?.email;
+    if (!userEmail) {
+      return NextResponse.json(
+        { error: "User email not found" },
+        { status: 401 }
+      );
+    }
+
+    const user = await User.findOne({ email: userEmail });
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
@@ -54,7 +62,15 @@ export async function POST(req: NextRequest) {
 
     await connectToDB();
 
-    const user = await User.findOne({ email: session.user.email });
+    const userEmail = session.user?.email;
+    if (!userEmail) {
+      return NextResponse.json(
+        { error: "User email not found" },
+        { status: 401 }
+      );
+    }
+
+    const user = await User.findOne({ email: userEmail });
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
@@ -90,7 +106,7 @@ export async function POST(req: NextRequest) {
 
     // sprawdzenie czy ksiazka jest juz w koszyku
     const bookExists = cart.items.some(
-      (item) => item.book.toString() === bookId
+      (item: ICartItem) => item.book.toString() === bookId
     );
     if (bookExists) {
       return NextResponse.json(

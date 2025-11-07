@@ -26,7 +26,15 @@ export async function PUT(
     console.log("Book owner:", book.owner.toString());
 
     // ownership
-    const user = await User.findOne({ email: session.user.email });
+    const userEmail = session.user?.email;
+    if (!userEmail) {
+      return NextResponse.json(
+        { error: "User email not found" },
+        { status: 401 }
+      );
+    }
+
+    const user = await User.findOne({ email: userEmail });
     if (!user)
       return NextResponse.json({ error: "User not found" }, { status: 404 });
 

@@ -15,7 +15,15 @@ export async function POST(req: NextRequest) {
 
   await connectToDB();
 
-  const user = await User.findOne({ email: session.user.email });
+  const userEmail = session.user?.email;
+  if (!userEmail) {
+    return NextResponse.json(
+      { error: "User email not found" },
+      { status: 401 }
+    );
+  }
+
+  const user = await User.findOne({ email: userEmail });
   if (!user)
     return NextResponse.json({ error: "User not found" }, { status: 404 });
 
@@ -81,7 +89,15 @@ export async function DELETE(req: NextRequest) {
   const { bookId } = await req.json();
   await connectToDB();
 
-  const user = await User.findOne({ email: session.user.email });
+  const userEmail = session.user?.email;
+  if (!userEmail) {
+    return NextResponse.json(
+      { error: "User email not found" },
+      { status: 401 }
+    );
+  }
+
+  const user = await User.findOne({ email: userEmail });
   if (!user)
     return NextResponse.json({ error: "User not found" }, { status: 404 });
 
