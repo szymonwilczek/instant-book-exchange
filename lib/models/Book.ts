@@ -13,6 +13,8 @@ export interface IBook extends Document {
   viewCount: number;
   isActive: boolean;
   ownerNote?: string;
+  promotedUntil?: Date;
+  promotedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -39,6 +41,8 @@ const BookSchema: Schema = new Schema(
     viewCount: { type: Number, default: 0 },
     ownerNote: { type: String },
     isActive: { type: Boolean, default: true },
+    promotedUntil: { type: Date },
+    promotedAt: { type: Date },
   },
   { timestamps: true }
 );
