@@ -9,6 +9,7 @@ import { SocketProvider } from "@/lib/context/socket-context";
 import { Navbar } from "@/components/navbar/Navbar";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
+import { DailyLoginTracker } from "@/components/DailyLoginTracker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -47,6 +48,7 @@ export default async function LocaleLayout({
       >
         <NextIntlClientProvider messages={messages}>
           <SessionProvider>
+            <DailyLoginTracker />
             <ThemeProvider
               attribute="class"
               defaultTheme="system"
