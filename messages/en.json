@@ -241,7 +241,10 @@
     "userAverageRating": "Average Rating",
     "userBooksOffered": "Books Offered",
     "userWishlistItems": "Wishlist items",
-    "userReviews": "Reviews"
+    "userReviews": "Reviews",
+    "history": "Historia",
+    "transactions": "Transakcje",
+    "points": "Punkty"
   },
 
   "reviews": {

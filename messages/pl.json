@@ -241,7 +241,10 @@
     "userAverageRating": "Średnia ocena",
     "userBooksOffered": "Zaoferowanych książek",
     "userWishlistItems": "Książek na liście życzeń",
-    "userReviews": "Opinie"
+    "userReviews": "Opinie",
+    "history": "Historia",
+    "transactions": "Transakcje",
+    "points": "Punkty"
   },
 
   "reviews": {
