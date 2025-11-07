@@ -27,6 +27,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Sun, Moon, MessageCircle, LogIn } from "lucide-react";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { PointsDisplay } from "./PointsDisplay";
 
 export interface NavbarNavItem {
   href?: string;
@@ -258,6 +259,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                 <span className="sr-only">Toggle theme</span>
               </Button>
             </div>
+            <PointsDisplay />
             <LanguageSwitcher />
             {session ? (
               <UserMenu
