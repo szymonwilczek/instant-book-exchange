@@ -1,53 +1,56 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-import '@/lib/models/User';
-import '@/lib/models/Book';
-import '@/lib/models/Transaction';
-import '@/lib/models/Review';
+import "@/lib/models/User";
+import "@/lib/models/Book";
+import "@/lib/models/Transaction";
+import "@/lib/models/Review";
 
 declare global {
   var mongoose: {
     conn: typeof mongoose | null;
     promise: Promise<typeof mongoose> | null;
-  } | undefined;
+  };
 }
-
 
 const MONGODB_URI = process.env.MONGODB_URI!;
 
 if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+  throw new Error(
+    "Please define the MONGODB_URI environment variable inside .env.local"
+  );
 }
 
-let cached = globalThis.mongoose;
+let cached = globalThis.mongoose || { conn: null, promise: null };
+let cachedConn: typeof mongoose | null = null;
+let cachedPromise: Promise<typeof mongoose> | null = null;
 
 if (!cached) {
   cached = globalThis.mongoose = { conn: null, promise: null };
 }
 
 async function connectToDB() {
-  if (cached.conn) {
-    return cached.conn;
+  if (cachedConn) {
+    return cachedConn;
   }
 
-  if (!cached.promise) {
+  if (!cachedPromise) {
     const opts = {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+    cachedPromise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
       return mongoose;
     });
   }
 
   try {
-    cached.conn = await cached.promise;
+    cachedConn = await cachedPromise;
   } catch (e) {
-    cached.promise = null;
+    cachedPromise = null;
     throw e;
   }
 
-  return cached.conn;
+  return cachedConn;
 }
 
 export default connectToDB;
