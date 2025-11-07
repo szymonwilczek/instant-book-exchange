@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Eye, MapPin, ShoppingCart } from "lucide-react";
+import { MessageCircle, Eye, MapPin, ShoppingCart, Star } from "lucide-react";
 import { useState } from "react";
 import { ListingModal } from "./listing-modal";
 import { StartConversationModal } from "@/components/messages/start-conversation-modal";
@@ -14,8 +14,23 @@ import Image from "next/image";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ListingCardProps {
-  book: any;
-  owner: any;
+  book: {
+    _id: string;
+    title: string;
+    author: string;
+    imageUrl?: string;
+    ownerNote?: string;
+    description?: string;
+    condition: "new" | "used" | "damaged";
+    viewCount?: number;
+    promotedUntil?: string;
+  };
+  owner: {
+    _id: string;
+    username?: string;
+    name?: string;
+    location?: string;
+  };
   isMatch?: boolean;
 }
 
@@ -29,6 +44,9 @@ export function ListingCard({
   const { addToCart, loading } = useCart();
   const { data: session } = useSession();
   const router = useRouter();
+
+  const isPromoted =
+    book.promotedUntil && new Date(book.promotedUntil) > new Date();
 
   const handleViewBook = async () => {
     setIsModalOpen(true);
@@ -80,9 +98,15 @@ export function ListingCard({
   return (
     <>
       <Card
-        className={`h-full -p-2 ${isMatch ? "border-2 border-orange-500" : ""}`}
+        className={`h-full -p-2 ${isMatch ? "border-2 border-orange-500" : ""} ${isPromoted ? "border-2 border-purple-500" : ""}`}
       >
         <div className="hidden md:flex h-full gap-4 p-5">
+          {isPromoted && (
+            <div className="absolute top-2 right-2 bg-purple-500 text-white px-2 py-1 rounded text-xs font-semibold">
+              ⭐ Promoted
+            </div>
+          )}
+
           <Image
             width={80}
             height={112}
@@ -136,6 +160,12 @@ export function ListingCard({
                   <Eye className="w-3 h-3 mr-1" />
                   {book.viewCount || 0}
                 </Badge>
+                {isPromoted && (
+                  <Badge className="bg-purple-500 text-white">
+                    <Star className="w-3 h-3 mr-1" />
+                    Promoted
+                  </Badge>
+                )}
               </div>
               <div className="flex gap-2">
                 <Button
@@ -164,8 +194,14 @@ export function ListingCard({
 
         {/* mobile layout - pionowy */}
         <div
-          className={`md:hidden flex flex-col p-4 ${isMatch ? "border-2 border-orange-500" : ""}`}
+          className={`md:hidden flex flex-col p-4 relative ${isMatch ? "border-2 border-orange-500" : ""} ${isPromoted ? "border-2 border-purple-500" : ""}`}
         >
+          {isPromoted && (
+            <div className="absolute top-2 right-2 bg-purple-500 text-white px-2 py-1 rounded text-xs font-semibold">
+              ⭐ Promoted
+            </div>
+          )}
+
           <Image
             src={book.imageUrl || "/placeholder-book.png"}
             width={160}
@@ -184,7 +220,7 @@ export function ListingCard({
           </div>
 
           <div className="flex justify-between items-start mb-2">
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <Badge
                 variant={book.condition === "new" ? "default" : "secondary"}
                 className="w-fit"
@@ -195,6 +231,12 @@ export function ListingCard({
                 <Eye className="w-3 h-3 mr-1" />
                 {book.viewCount || 0}
               </Badge>
+              {isPromoted && (
+                <Badge className="bg-purple-500 text-white w-fit">
+                  <Star className="w-3 h-3 mr-1" />
+                  Promoted
+                </Badge>
+              )}
             </div>
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <MapPin className="w-3 h-3" />
