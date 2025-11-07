@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { SearchBook } from "@/components/profile/onboarding-book-search";
 
 interface BookBase {
   id: string;
   title: string;
   author?: string;
   image?: string;
+  isbn?: string;
   createdAt: string;
 }
 
@@ -26,8 +28,18 @@ export function useOnboarding(userData: UserData | null, onUpdate: () => void) {
     }
   };
 
-  const handleAddBook = (book: BookBase) => {
-    setSelectedBooks([...selectedBooks, book]);
+  const handleAddBook = (book: SearchBook) => {
+    setSelectedBooks([
+      ...selectedBooks,
+      {
+        id: book.id,
+        title: book.title,
+        author: book.author,
+        image: book.image,
+        isbn: book.isbn,
+        createdAt: new Date().toISOString(),
+      },
+    ]);
   };
 
   const handleOnboardingSubmit = async () => {

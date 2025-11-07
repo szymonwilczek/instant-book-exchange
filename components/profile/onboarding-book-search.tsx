@@ -36,7 +36,7 @@ import {
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 
-interface SearchBook {
+export interface SearchBook {
   id: string;
   title: string;
   author?: string;
