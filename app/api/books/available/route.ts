@@ -77,22 +77,31 @@ export async function GET(req: NextRequest) {
     const allUsers = await User.find({}, "offeredBooks");
     const offeredBookIds = allUsers.flatMap((user) => user.offeredBooks);
 
-    const baseBooks = await Book.find(query)
+    const queryWithOffered = {
+      ...query,
+      _id: { $in: offeredBookIds },
+    };
+
+    const allOfferedBooks = await Book.find(queryWithOffered)
       .sort(sort)
       .populate("owner", "username email location profileImage");
 
-    // tylko ksiazki z offeredBooks
-    const booksInOffered = baseBooks.filter((book) =>
-      offeredBookIds.some((id) => id.toString() === book._id.toString())
+    // podzialka na promowane i zwykle
+    const now = new Date();
+    const promotedBooks = allOfferedBooks.filter(
+      (book) => book.promotedUntil && new Date(book.promotedUntil) > now
+    );
+    const regularBooks = allOfferedBooks.filter(
+      (book) => !book.promotedUntil || new Date(book.promotedUntil) <= now
     );
 
-    // paginacja po filtrowaniu
-    const paginatedBooks = booksInOffered.slice(
-      (page - 1) * limit,
-      page * limit
-    );
+    // Laczenie: promowane zawsze na gorze, potem zwykle (posortowane)
+    const sortedBooks = [...promotedBooks, ...regularBooks];
 
-    // filtrowanie po lokalizacji
+    // paginacja
+    const paginatedBooks = sortedBooks.slice((page - 1) * limit, page * limit);
+
+    // filtrowanie po lokalizacji (na paginowanych wynikach)
     let filteredBooks = paginatedBooks;
     if (locations.length > 0) {
       filteredBooks = paginatedBooks.filter((book) => {
@@ -104,10 +113,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       books: filteredBooks,
       pagination: {
-        total: booksInOffered.length,
+        total: sortedBooks.length, // total wszystkich oferowanych ksiazek (promowane + zwykle)
         page,
         limit,
-        totalPages: Math.ceil(booksInOffered.length / limit),
+        totalPages: Math.ceil(sortedBooks.length / limit),
       },
     });
   } catch (error) {

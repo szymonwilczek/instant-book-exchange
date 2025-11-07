@@ -6,6 +6,8 @@ import { Filters } from "@/components/home/filters";
 import { MatchSection } from "@/components/home/match-section";
 import { Listings } from "@/components/home/listings";
 import { useTranslations } from "next-intl";
+import { PromotedSection } from "@/components/home/promoted-section";
+import { ListingModal } from "@/components/home/listing-modal";
 
 export default function HomePage() {
   const { data: session } = useSession();
@@ -22,6 +24,10 @@ export default function HomePage() {
   const [books, setBooks] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [promotedBooks, setPromotedBooks] = useState([]);
+  const [promotedLoading, setPromotedLoading] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
   const t = useTranslations();
 
   const itemsPerPage = 10;
@@ -35,6 +41,24 @@ export default function HomePage() {
         .catch(console.error);
     }
   }, [session]);
+
+  // pobieranie promowanych ksiazek
+  useEffect(() => {
+    const fetchPromoted = async () => {
+      setPromotedLoading(true);
+      try {
+        const res = await fetch("/api/books/promoted?page=1&limit=20");
+        const data = await res.json();
+        setPromotedBooks(data.books || []);
+      } catch (error) {
+        console.error("Error fetching promoted books:", error);
+      } finally {
+        setPromotedLoading(false);
+      }
+    };
+
+    fetchPromoted();
+  }, []);
 
   // pobieranie ksiazek z api
   useEffect(() => {
@@ -71,6 +95,11 @@ export default function HomePage() {
     fetchBooks();
   }, [searchQuery, filters, sortBy, currentPage]);
 
+  const handleBookClick = (book: PromotedBook) => {
+    setSelectedBook(book);
+    setModalOpen(true);
+  };
+
   return (
     <div className="container mx-auto p-4">
       <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -80,6 +109,16 @@ export default function HomePage() {
         </div>
         <div className="lg:col-span-3">
           {session && matches.length > 0 && <MatchSection matches={matches} />}
+
+          {!promotedLoading && promotedBooks.length > 0 && (
+            <div className="mb-6">
+              <PromotedSection
+                books={promotedBooks}
+                onBookClick={handleBookClick}
+              />
+            </div>
+          )}
+
           {loading ? (
             <div className="flex justify-center items-center py-12">
               <p className="text-muted-foreground">Ładowanie...</p>
@@ -96,6 +135,13 @@ export default function HomePage() {
           )}
         </div>
       </div>
+      {selectedBook && (
+        <ListingModal
+          book={selectedBook}
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+        />
+      )}
     </div>
   );
 }
