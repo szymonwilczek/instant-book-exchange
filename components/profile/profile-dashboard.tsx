@@ -124,7 +124,7 @@ interface TransactionFromAPI {
 }
 
 interface ProfileDashboardProps {
-  userData: UserData;
+  userData: UserData | null;
   promotedBooks: PromotedBook[];
 }
 
