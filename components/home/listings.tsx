@@ -14,6 +14,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { ListingCard } from "./listing-card";
+import { Badge } from "../ui/badge";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ListingsProps {
@@ -36,7 +37,10 @@ export function Listings({
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Listings ({books.length})</h2>
+        <h2 className="text-xl font-bold flex items-center gap-2">
+          Listings
+          <Badge variant="secondary">{books.length}</Badge>
+        </h2>
         <Select value={sortBy} onValueChange={setSortBy}>
           <SelectTrigger className="w-48">
             <SelectValue />
