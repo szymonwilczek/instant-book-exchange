@@ -18,6 +18,18 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/books/content**",
       },
+      {
+        protocol: "https",
+        hostname: "*.pl",
+        port: "",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: "*.com",
+        port: "",
+        pathname: "**",
+      },
     ],
   },
 
