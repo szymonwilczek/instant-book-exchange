@@ -252,7 +252,7 @@ export function ProfileDashboard({
     { title: t("booksExchanged"), value: booksExchangedUser, icon: Package },
     {
       title: t("averageRating"),
-      value: `${averageRatingUser}/5`,
+      value: `${averageRatingUser.toFixed(1)}/5`,
       icon: TrendingUp,
     },
     { title: t("booksInWishlist"), value: booksInWishlistUser, icon: Edit },
