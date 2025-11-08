@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -37,7 +37,7 @@ interface Message {
   }>;
   readBy: string[];
   deliveredTo: string[];
-  createdAt: Date;
+  createdAt: string | Date;
 }
 
 interface Conversation {
@@ -63,7 +63,8 @@ interface ChatWindowProps {
 }
 
 export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
-  const { socket, isConnected } = useSocket();
+  const { socket, registerMessageListener, unregisterMessageListener } =
+    useSocket();
   const { data: session } = useSession();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,16 +76,16 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
       const audio = new Audio("/notification.mp3");
       audio.volume = 0.5;
 
-      // test czy plik istnieje
       audio.addEventListener("error", () => {
         console.log("notification.mp3 not found, using Web Audio API beep");
       });
 
       return {
-        play: () => {
-          return audio.play().catch((error) => {
+        play: async () => {
+          try {
+            return await audio.play();
+          } catch (error) {
             console.log("MP3 playback failed, using beep:", error);
-            // fallback do Web Audio API beep
             try {
               const AudioContext =
                 window.AudioContext ||
@@ -117,7 +118,7 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
               console.error("Both audio methods failed:", beepError);
               return Promise.reject(beepError);
             }
-          });
+          }
         },
       };
     }
@@ -143,103 +144,135 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
       otherParticipant.email
     : "Unknown User";
 
-  // fetchowanie wiadomosci
   useEffect(() => {
     if (conversation._id) {
       fetchMessages();
       markMessagesAsRead();
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversation._id]);
 
-  // dolaczanie do pokoju
+  // dolaczanie do konwersacji via polling
   useEffect(() => {
-    if (socket && isConnected && conversation._id) {
-      socket.emit("join-conversation", conversation._id);
+    socket.emit("join-conversation", conversation._id);
 
-      return () => {
-        socket.emit("leave-conversation", conversation._id);
-      };
+    return () => {
+      socket.emit("leave-conversation", conversation._id);
+    };
+  }, [socket, conversation._id]);
+
+  const markMessagesAsRead = useCallback(async () => {
+    try {
+      const unreadMessages = messages.filter(
+        (msg) =>
+          msg.sender.email !== session?.user?.email &&
+          !msg.readBy.includes(currentUserId)
+      );
+
+      if (unreadMessages.length > 0) {
+        await fetch("/api/messages/read", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ conversationId: conversation._id }),
+        });
+
+        await socket.emit("messages-read", {
+          conversationId: conversation._id,
+          userId: currentUserId,
+          messageIds: unreadMessages.map((m) => m._id),
+        });
+      }
+    } catch (error) {
+      console.error("Error marking messages as read:", error);
     }
-  }, [socket, isConnected, conversation._id]);
+  }, [messages, session?.user?.email, currentUserId, conversation._id, socket]);
 
-  // socket listenery
-  useEffect(() => {
-    if (!socket || !isConnected) return;
+  const handleNewMessage = useCallback(
+    (message: Message) => {
+      console.log("Received new message:", message);
 
-    socket.on("new-message", (message: Message) => {
-      console.log("New message received via socket:", message);
       setMessages((prev) => {
         const exists = prev.some((m) => m._id === message._id);
         if (exists) {
           console.log("Message already exists, skipping");
           return prev;
         }
+
         console.log("Adding message to list, current count:", prev.length);
-        return [...prev, message];
+
+        const wasNearBottom = (() => {
+          if (!scrollRef.current) return false;
+          const viewport = scrollRef.current.closest(
+            "[data-radix-scroll-area-viewport]"
+          ) as HTMLElement;
+          if (!viewport) return false;
+
+          const threshold = 100; // 100px od dolu
+          return (
+            viewport.scrollTop + viewport.clientHeight >=
+            viewport.scrollHeight - threshold
+          );
+        })();
+
+        // dzwiek tylko dla nowych wiadomosci
+        if (message.sender.email !== session?.user?.email) {
+          console.log("Playing notification sound");
+          if (notificationSound) {
+            notificationSound.play().catch((error) => {
+              console.log("Could not play notification sound:", error);
+            });
+          }
+        } else {
+          console.log("Message from self, not playing sound");
+        }
+
+        const newMessages = [...prev, message];
+
+        if (wasNearBottom) {
+          setTimeout(() => {
+            requestAnimationFrame(() => {
+              setTimeout(() => {
+                if (scrollRef.current) {
+                  const viewport = scrollRef.current.closest(
+                    "[data-radix-scroll-area-viewport]"
+                  ) as HTMLElement;
+                  if (viewport) {
+                    viewport.scrollTo({
+                      top: viewport.scrollHeight,
+                      behavior: "smooth",
+                    });
+                  }
+                }
+              }, 50);
+            });
+          }, 100);
+        }
+
+        return newMessages;
       });
-      markMessagesAsRead();
 
-      if (message.sender.email !== session?.user?.email) {
-        console.log("Playing notification sound");
-        if (notificationSound) {
-          notificationSound.play().catch((error) => {
-            console.log("Could not play notification sound:", error);
-          });
-        }
-      } else {
-        console.log("Message from self, not playing sound");
-      }
-    });
+      setTimeout(() => {
+        markMessagesAsRead();
+      }, 0);
+    },
+    [
+      conversation._id,
+      session?.user?.email,
+      notificationSound,
+      markMessagesAsRead,
+    ]
+  );
 
-    socket.on(
-      "messages-read",
-      (data: { userId: string; messageIds: string[] }) => {
-        setMessages((prev) =>
-          prev.map((msg) =>
-            data.messageIds.includes(msg._id)
-              ? { ...msg, readBy: [...msg.readBy, data.userId] }
-              : msg
-          )
-        );
-      }
-    );
-
-    socket.on("typing-start", (data: { userId: string; userName: string }) => {
-      if (data.userId !== currentUserId) {
-        setTypingUser(data.userName);
-
-        if (typingTimeoutRef.current) {
-          clearTimeout(typingTimeoutRef.current);
-        }
-
-        typingTimeoutRef.current = setTimeout(() => {
-          setTypingUser(null);
-        }, 3000);
-      }
-    });
-
-    socket.on("typing-stop", (data: { userId: string }) => {
-      if (data.userId !== currentUserId) {
-        setTypingUser(null);
-      }
-    });
+  useEffect(() => {
+    registerMessageListener(conversation._id, handleNewMessage);
 
     return () => {
-      socket.off("new-message");
-      socket.off("messages-read");
-      socket.off("typing-start");
-      socket.off("typing-stop");
+      unregisterMessageListener(conversation._id);
     };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    socket,
-    isConnected,
-    currentUserId,
     conversation._id,
-    session?.user?.email,
-    notificationSound,
+    registerMessageListener,
+    unregisterMessageListener,
+    handleNewMessage,
   ]);
 
   const fetchMessages = async () => {
@@ -260,47 +293,27 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
     }
   };
 
-  const markMessagesAsRead = async () => {
-    try {
-      const unreadMessages = messages.filter(
-        (msg) =>
-          msg.sender.email !== session?.user?.email &&
-          !msg.readBy.includes(currentUserId)
-      );
-
-      if (unreadMessages.length > 0) {
-        await fetch("/api/messages/read", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ conversationId: conversation._id }),
-        });
-
-        if (socket && isConnected) {
-          socket.emit("messages-read", {
-            conversationId: conversation._id,
-            userId: currentUserId,
-            messageIds: unreadMessages.map((m) => m._id),
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Error marking messages as read:", error);
-    }
-  };
-
   const scrollToBottom = () => {
     requestAnimationFrame(() => {
       setTimeout(() => {
         if (scrollRef.current) {
-          const viewport = scrollRef.current.closest(
+          const viewport = scrollRef.current.querySelector(
             "[data-radix-scroll-area-viewport]"
           ) as HTMLElement;
           if (viewport) {
+            console.log(
+              "Scrolling to bottom, scrollHeight:",
+              viewport.scrollHeight
+            );
             viewport.scrollTo({
               top: viewport.scrollHeight,
               behavior: "smooth",
             });
+          } else {
+            console.log("Viewport not found");
           }
+        } else {
+          console.log("scrollRef.current is null");
         }
       }, 50);
     });
@@ -334,259 +347,225 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
         console.log("Message sent successfully:", data.message);
 
         setMessages((prev) => [...prev, data.message]);
-        scrollToBottom();
 
-        if (socket && isConnected) {
-          console.log("Emitting via socket to conversation:", conversation._id);
-          socket.emit("send-message", {
-            conversationId: conversation._id,
-            participantEmails: conversation.participants.map((p) => p.email),
-            message: data.message,
-          });
-        } else {
-          console.warn("Socket not connected, message not emitted");
-        }
+        setTimeout(scrollToBottom, 100);
+
+        await socket.emit("send-message", {
+          conversationId: conversation._id,
+          participantEmails: conversation.participants.map((p) => p.email),
+          message: data.message,
+        });
       } else {
         const error = await res.json();
-        console.error("Error response:", error);
-        alert("Failed to send message");
+        console.error("Error sending message:", error);
+        alert(error.error || "Failed to send message");
       }
     } catch (error) {
-      console.error("Error sending message:", error);
-      alert("Error sending message");
+      console.error("Error in handleSendMessage:", error);
+      alert("Failed to send message");
     }
   };
 
-  const formatMessageDate = (date: Date) => {
-    const messageDate = new Date(date);
-
-    if (isToday(messageDate)) {
-      return format(messageDate, "HH:mm", { locale: pl });
-    } else if (isYesterday(messageDate)) {
-      return `Wczoraj ${format(messageDate, "HH:mm", { locale: pl })}`;
-    } else {
-      return format(messageDate, "d MMM, HH:mm", { locale: pl });
-    }
-  };
-
-  const getReadStatus = (message: Message) => {
-    // status tylko dla wlasnych wiadomosci
-    if (message.sender.email !== session?.user?.email) return null;
-
-    const isRead = message.readBy.some((id) => id !== currentUserId);
-    const isDelivered = message.deliveredTo.some((id) => id !== currentUserId);
-
-    if (isRead) {
-      return <CheckCheck className="h-4 w-4 text-blue-500" />;
-    } else if (isDelivered) {
-      return <CheckCheck className="h-4 w-4 text-muted-foreground" />;
-    } else {
-      return <Check className="h-4 w-4 text-muted-foreground" />;
-    }
-  };
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+          <p className="text-muted-foreground">Loading messages...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex h-full flex-col">
-      {/* Header */}
-      <div className="flex items-center gap-3 border-b p-4 flex-shrink-0">
-        <Avatar>
-          <AvatarImage src={otherParticipant?.profileImage} />
-          <AvatarFallback>
-            {otherParticipantName.charAt(0).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
-
-        <div className="flex-1">
-          <p className="font-semibold">{otherParticipantName}</p>
-          <div className="flex items-center gap-2">
-            {conversation.book.imageUrl && (
-              <Image
-                src={conversation.book.imageUrl}
-                alt={conversation.book.title}
-                className="h-4 w-3 object-cover rounded"
-              />
-            )}
-            <p className="text-sm text-muted-foreground">
+    <div className="flex flex-col h-full">
+      <div className="flex-shrink-0 border-b p-4 bg-background">
+        <div className="flex items-center gap-3">
+          {otherParticipant?.profileImage && (
+            <Avatar>
+              <AvatarImage src={otherParticipant.profileImage} />
+              <AvatarFallback>
+                {otherParticipantName.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          )}
+          <div>
+            <h2 className="font-semibold">{otherParticipantName}</h2>
+            <p className="text-xs text-muted-foreground">
               {conversation.book.title}
             </p>
           </div>
         </div>
-
-        <Badge
-          variant="outline"
-          className={cn(
-            isConnected
-              ? "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-400"
-              : "bg-gray-50 text-gray-700 dark:bg-gray-900 dark:text-gray-400"
-          )}
-        >
-          {isConnected ? "Online" : "Offline"}
-        </Badge>
       </div>
 
-      {/* Messages - dodaj overflow-hidden */}
-      <div className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full">
-          <div className="p-4">
-            {loading ? (
-              <div className="flex h-full items-center justify-center">
-                <p className="text-muted-foreground">Loading messages...</p>
-              </div>
-            ) : messages.length === 0 ? (
-              <div className="flex h-full items-center justify-center">
-                <div className="text-center">
-                  <p className="text-muted-foreground">
-                    Start a conversation about the book
-                  </p>
-                  <p className="text-sm font-semibold">
-                    {conversation.book.title}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {messages.map((message) => {
-                  const isOwn = message.sender.email === session?.user?.email;
-                  const senderName =
-                    message.sender.username ||
-                    message.sender.name ||
-                    message.sender.email;
+      <ScrollArea className="flex-1 overflow-hidden" ref={scrollRef}>
+        <div className="p-4 space-y-4">
+          {messages.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>No messages yet. Start the conversation!</p>
+            </div>
+          ) : (
+            messages.map((message, index) => {
+              const isOwnMessage =
+                message.sender.email === session?.user?.email;
+              const showAvatar =
+                index === 0 ||
+                messages[index - 1].sender._id !== message.sender._id;
+              const showDate =
+                index === 0 ||
+                !isToday(new Date(message.createdAt)) ||
+                !isToday(new Date(messages[index - 1].createdAt));
 
-                  return (
+              return (
+                <div key={message._id}>
+                  {showDate && (
+                    <div className="flex items-center justify-center my-4">
+                      <div className="flex-1 border-t"></div>
+                      <span className="px-2 text-xs text-muted-foreground">
+                        {isToday(new Date(message.createdAt))
+                          ? "Today"
+                          : isYesterday(new Date(message.createdAt))
+                            ? "Yesterday"
+                            : format(
+                                new Date(message.createdAt),
+                                "dd MMMM yyyy",
+                                { locale: pl }
+                              )}
+                      </span>
+                      <div className="flex-1 border-t"></div>
+                    </div>
+                  )}
+
+                  <div
+                    className={cn("flex gap-2", isOwnMessage && "justify-end")}
+                  >
+                    {!isOwnMessage && showAvatar && (
+                      <Avatar className="h-8 w-8 flex-shrink-0">
+                        <AvatarImage src={message.sender.profileImage} />
+                        <AvatarFallback>
+                          {message.sender.username?.charAt(0).toUpperCase() ||
+                            "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
+                    {!isOwnMessage && !showAvatar && (
+                      <div className="w-8 flex-shrink-0"></div>
+                    )}
+
                     <div
-                      key={message._id}
                       className={cn(
-                        "flex gap-3",
-                        isOwn ? "flex-row-reverse" : "flex-row"
+                        "max-w-xs lg:max-w-md",
+                        isOwnMessage && "order-2"
                       )}
                     >
-                      {!isOwn && (
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={message.sender.profileImage} />
-                          <AvatarFallback>
-                            {senderName.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                      )}
+                      <div
+                        className={cn(
+                          "rounded-lg px-3 py-2 break-words",
+                          isOwnMessage
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted"
+                        )}
+                      >
+                        <p className="text-sm">{message.content}</p>
+
+                        {message.attachments &&
+                          message.attachments.length > 0 && (
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                              {message.attachments.map((attachment, idx) => (
+                                <button
+                                  key={idx}
+                                  onClick={() => {
+                                    const imageUrls =
+                                      message.attachments
+                                        ?.filter((a) => a.type === "image")
+                                        .map((a) => a.url) || [];
+                                    handleImageClick(
+                                      imageUrls,
+                                      imageUrls.indexOf(attachment.url)
+                                    );
+                                  }}
+                                  className="relative group cursor-pointer"
+                                  type="button"
+                                >
+                                  {attachment.type === "image" ? (
+                                    <Image
+                                      src={attachment.url}
+                                      alt={attachment.name}
+                                      width={150}
+                                      height={150}
+                                      className="rounded object-cover w-full h-24"
+                                    />
+                                  ) : (
+                                    <div className="flex items-center justify-center bg-secondary rounded h-24 w-full">
+                                      <FileText className="h-8 w-8 text-muted-foreground" />
+                                    </div>
+                                  )}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                      </div>
 
                       <div
                         className={cn(
-                          "max-w-[70%] space-y-1",
-                          isOwn && "items-end"
+                          "text-xs text-muted-foreground mt-1 flex items-center gap-1",
+                          isOwnMessage && "justify-end"
                         )}
                       >
-                        <div
-                          className={cn(
-                            "rounded-lg px-4 py-2",
-                            isOwn
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-muted"
-                          )}
-                        >
-                          {message.content && (
-                            <p className="break-words">{message.content}</p>
-                          )}
-
-                          {message.attachments &&
-                            message.attachments.length > 0 && (
-                              <div
-                                className={cn(
-                                  "mt-2",
-                                  message.content && "space-y-2"
-                                )}
-                              >
-                                {message.attachments.filter(
-                                  (a) => a.type === "image"
-                                ).length > 0 && (
-                                  <div
-                                    className={cn(
-                                      "grid gap-2",
-                                      message.attachments.filter(
-                                        (a) => a.type === "image"
-                                      ).length === 1 && "grid-cols-1",
-                                      message.attachments.filter(
-                                        (a) => a.type === "image"
-                                      ).length === 2 && "grid-cols-2",
-                                      message.attachments.filter(
-                                        (a) => a.type === "image"
-                                      ).length >= 3 && "grid-cols-2"
-                                    )}
-                                  >
-                                    {message.attachments
-                                      .filter((a) => a.type === "image")
-                                      .map((attachment, idx) => (
-                                        <Image
-                                          key={idx}
-                                          src={attachment.url}
-                                          alt={attachment.name}
-                                          onClick={() =>
-                                            handleImageClick(
-                                              message
-                                                .attachments!.filter(
-                                                  (a) => a.type === "image"
-                                                )
-                                                .map((a) => a.url),
-                                              idx
-                                            )
-                                          }
-                                          className="w-full h-48 object-cover rounded cursor-pointer hover:opacity-90 transition-opacity"
-                                        />
-                                      ))}
-                                  </div>
-                                )}
-
-                                {message.attachments
-                                  .filter((a) => a.type === "document")
-                                  .map((attachment, idx) => (
-                                    <a
-                                      key={idx}
-                                      href={attachment.url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="flex items-center gap-2 hover:underline"
-                                    >
-                                      <FileText className="h-4 w-4" />
-                                      {attachment.name}
-                                    </a>
-                                  ))}
-                              </div>
-                            )}
-                        </div>
-
-                        <div
-                          className={cn(
-                            "flex items-center gap-1 text-xs text-muted-foreground",
-                            isOwn && "justify-end"
-                          )}
-                        >
-                          <span>{formatMessageDate(message.createdAt)}</span>
-                          {getReadStatus(message)}
-                        </div>
+                        {format(new Date(message.createdAt), "HH:mm", {
+                          locale: pl,
+                        })}
+                        {isOwnMessage && (
+                          <>
+                            {message.readBy.length > 0 ? (
+                              <CheckCheck className="h-3 w-3" />
+                            ) : message.deliveredTo.length > 0 ? (
+                              <Check className="h-3 w-3" />
+                            ) : null}
+                          </>
+                        )}
                       </div>
                     </div>
-                  );
-                })}
-
-                {typingUser && (
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <span>{typingUser} is typing...</span>
                   </div>
-                )}
+                </div>
+              );
+            })
+          )}
 
-                <div ref={scrollRef} />
+          {typingUser && (
+            <div className="flex gap-2">
+              <Avatar className="h-8 w-8">
+                <AvatarFallback>T</AvatarFallback>
+              </Avatar>
+              <div className="flex items-center gap-1">
+                <span className="text-sm text-muted-foreground">
+                  {typingUser} is typing
+                </span>
+                <div className="flex gap-1">
+                  <div className="h-2 w-2 rounded-full bg-muted-foreground animate-bounce"></div>
+                  <div
+                    className="h-2 w-2 rounded-full bg-muted-foreground animate-bounce"
+                    style={{ animationDelay: "0.1s" }}
+                  ></div>
+                  <div
+                    className="h-2 w-2 rounded-full bg-muted-foreground animate-bounce"
+                    style={{ animationDelay: "0.2s" }}
+                  ></div>
+                </div>
               </div>
-            )}
-          </div>
-        </ScrollArea>
-      </div>
+            </div>
+          )}
+        </div>
+      </ScrollArea>
 
       <div className="flex-shrink-0">
         <MessageInput
           conversationId={conversation._id}
-          userName={session?.user?.name || session?.user?.email || "User"}
+          userName={session?.user?.name || session?.user?.email || "Anonymous"}
           onSendMessage={handleSendMessage}
         />
       </div>
+
       <ImageViewerModal
         images={selectedImages}
         initialIndex={selectedImageIndex}

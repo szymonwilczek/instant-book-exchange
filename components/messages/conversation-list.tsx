@@ -34,8 +34,14 @@ interface Conversation {
   };
   lastMessage?: {
     content: string;
-    sender: string;
-    createdAt: Date;
+    sender: {
+      _id: string;
+      email: string;
+      name?: string;
+      username?: string;
+      profileImage?: string;
+    };
+    createdAt: string | Date;
     attachments?: Array<{
       type: "image" | "document";
       url: string;
@@ -43,20 +49,20 @@ interface Conversation {
     }>;
   };
   unreadCount: number;
-  updatedAt: Date;
+  updatedAt: string | Date;
 }
 
 interface ConversationListProps {
   conversations: Conversation[];
   activeConversationId: string | null;
-  onSelectConversation: (id: string) => void;
+  onSelect: (id: string) => void;
   onDeleteConversation: (id: string) => void;
 }
 
 export function ConversationList({
   conversations,
   activeConversationId,
-  onSelectConversation,
+  onSelect,
   onDeleteConversation,
 }: ConversationListProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -83,12 +89,10 @@ export function ConversationList({
 
   return (
     <div className="flex h-full flex-col">
-      {/* Header */}
       <div className="border-b p-4">
         <h2 className="text-xl font-semibold">Messages</h2>
       </div>
 
-      {/* Search */}
       <div className="p-3">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -101,7 +105,6 @@ export function ConversationList({
         </div>
       </div>
 
-      {/* Conversations List */}
       <ScrollArea className="flex-1">
         <div className="space-y-1 p-2">
           {filteredConversations.length === 0 ? (
@@ -129,9 +132,8 @@ export function ConversationList({
                     "group flex flex-col cursor-pointer rounded-lg p-3 transition-colors hover:bg-accent",
                     isActive && "bg-accent"
                   )}
-                  onClick={() => onSelectConversation(conversation._id)}
+                  onClick={() => onSelect(conversation._id)}
                 >
-                  {/* Górna część - avatar, info, badge */}
                   <div className="flex items-start gap-3">
                     <Avatar className="h-14 w-12 rounded-lg">
                       <AvatarImage src={conversation.book.imageUrl} />
@@ -148,8 +150,10 @@ export function ConversationList({
                       {conversation.lastMessage && (
                         <p className="truncate text-sm text-muted-foreground mt-1">
                           <span className="font-bold">
-                            {otherParticipant._id !==
-                            conversation.lastMessage.sender
+                            {conversation.lastMessage.sender._id ===
+                              session?.user?.id ||
+                            conversation.lastMessage.sender.email ===
+                              session?.user?.email
                               ? "You"
                               : participantName}
                             :
@@ -204,20 +208,30 @@ export function ConversationList({
                     </div>
                   </div>
 
-                  {/* Dolna część - timestamp w prawym dolnym rogu */}
-                  {conversation.lastMessage && (
-                    <div className="flex justify-end -mt-1">
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">
-                        {formatDistanceToNow(
-                          new Date(conversation.lastMessage.createdAt),
-                          {
-                            addSuffix: true,
-                            locale: enUS,
-                          }
-                        )}
-                      </span>
-                    </div>
-                  )}
+                  {conversation.lastMessage &&
+                    conversation.lastMessage.createdAt && (
+                      <div className="flex justify-end -mt-1">
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">
+                          {(() => {
+                            try {
+                              const date = new Date(
+                                conversation.lastMessage.createdAt
+                              );
+                              if (isNaN(date.getTime())) {
+                                return "Invalid date";
+                              }
+                              return formatDistanceToNow(date, {
+                                addSuffix: true,
+                                locale: enUS,
+                              });
+                            } catch (error) {
+                              console.error("Error formatting date:", error);
+                              return "Invalid date";
+                            }
+                          })()}
+                        </span>
+                      </div>
+                    )}
                 </div>
               );
             })
