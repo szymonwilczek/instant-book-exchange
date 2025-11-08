@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
       amount: REVIEW_POINTS,
       type: "earned",
       source: "review",
-      description: `Review for ${reviewer.username}`,
+      description: `Review for ${reviewedUser.username || reviewedUser.name || reviewedUser.email}`,
       relatedTransaction: transaction._id,
     });
   }
