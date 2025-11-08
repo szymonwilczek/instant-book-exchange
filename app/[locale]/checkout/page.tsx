@@ -211,6 +211,8 @@ export default function CheckoutPage() {
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 {t("submittingOffers")}
               </>
+            ) : exchanges.length === 1 ? (
+              t("submitOffer")
             ) : (
               t("submitOffers")
             )}
