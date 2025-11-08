@@ -8,6 +8,7 @@ import { ArrowRightLeft, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ExchangeZoneProps {
@@ -22,6 +23,7 @@ export function ExchangeZone({
   onRemoveBook,
 }: ExchangeZoneProps) {
   const t = useTranslations("cart");
+  const isMobile = useMediaQuery("(max-width: 1024px)");
   const { setNodeRef, isOver } = useDroppable({
     id: "exchange-zone",
   });
@@ -44,16 +46,22 @@ export function ExchangeZone({
       >
         <div className="flex items-center gap-2 mb-3">
           <Badge variant="outline">
-            {t('offering')}{" "}
+            {t("offering")}{" "}
             {offeredBooks.length > 0 ? `(${offeredBooks.length})` : ""}
           </Badge>
         </div>
 
         {offeredBooks.length === 0 ? (
           <div className="flex items-center justify-center h-32 text-sm text-muted-foreground text-center">
-            {t('dragBooksHere')}
-            <br />
-            {t('leaveEmpty')}
+            {isMobile ? (
+              <div>{t("pickBooks")}</div>
+            ) : (
+              <div>
+                {t("dragBooksHere")}
+                <br />
+                {t("leaveEmpty")}
+              </div>
+            )}
           </div>
         ) : (
           <div className="space-y-2">
@@ -93,7 +101,7 @@ export function ExchangeZone({
       {/* Książka którą chcesz otrzymać */}
       <Card className="p-4 bg-primary/5 border-primary/20">
         <div className="flex items-center gap-2 mb-3">
-          <Badge variant="default">{t('willReceive')}</Badge>
+          <Badge variant="default">{t("willReceive")}</Badge>
         </div>
         <div className="flex gap-3">
           <Image
@@ -114,8 +122,8 @@ export function ExchangeZone({
               {requestedBook.condition === "new"
                 ? t("new")
                 : requestedBook.condition === "used"
-                  ? t("used") 
-                  : t("damaged")} 
+                  ? t("used")
+                  : t("damaged")}
             </Badge>
           </div>
         </div>
