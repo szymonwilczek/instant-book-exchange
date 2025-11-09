@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle2 } from "lucide-react";
 import { TransactionCard } from "@/components/transactions/transaction-card";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 interface TransactionData {
   _id: string;
@@ -74,11 +75,17 @@ export default function TransactionsPage() {
         fetchTransactions();
       } else {
         const error = await res.json();
-        alert(error.error || t("failedToUpdate"));
+        toast.error(`Wystąpił błąd!`, {
+          position: "top-center",
+          description: error.error || t("failedToUpdate"),
+        });
       }
     } catch (error) {
       console.error("Error updating transaction:", error);
-      alert(t("failedToUpdate"));
+      toast.error(`Wystąpił błąd!`, {
+        position: "top-center",
+        description: t("failedToUpdate"),
+      });
     }
   };
 
