@@ -13,6 +13,7 @@ import { Check, CheckCheck, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ImageViewerModal } from "./image-viewer-modal";
 import Image from "next/image";
+import { toast } from "sonner";
 
 interface Attachment {
   type: "image" | "document";
@@ -358,11 +359,17 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
       } else {
         const error = await res.json();
         console.error("Error sending message:", error);
-        alert(error.error || "Failed to send message");
+        toast.error(`Wystąpił błąd!`, {
+          position: "top-center",
+          description: error.error || "Failed to send message",
+        });
       }
     } catch (error) {
       console.error("Error in handleSendMessage:", error);
-      alert("Failed to send message");
+      toast.error(`Wystąpił błąd!`, {
+        position: "top-center",
+        description: "Failed to send message",
+      });
     }
   };
 

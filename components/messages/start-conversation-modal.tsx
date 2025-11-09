@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { toast } from "sonner";
 
 interface Book {
   _id: string;
@@ -78,7 +79,10 @@ export function StartConversationModal({
       router.push(`/messages?conversation=${convData.conversation._id}`);
     } catch (error) {
       console.error("Error starting conversation:", error);
-      alert("Failed to send message. Please try again.");
+      toast.error(`Wystąpił błąd!`, {
+        position: "top-center",
+        description: "Failed to send message. Please try again.",
+      });
     } finally {
       setLoading(false);
     }

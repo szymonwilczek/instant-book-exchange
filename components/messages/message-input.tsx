@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Paperclip, Send, X, Loader2 } from "lucide-react";
 import { useSocket } from "@/lib/context/socket-context";
 import Image from "next/image";
+import { toast } from "sonner";
 
 interface Attachment {
   url: string;
@@ -41,7 +42,10 @@ export function MessageInput({
     if (!files || files.length === 0) return;
 
     if (files.length + attachments.length > 5) {
-      alert("Maximum 5 images allowed per message");
+      toast.error(`Limit przekroczony!`, {
+        position: "top-center",
+        description: "Maximum 5 images are allowed per one message",
+      });
       return;
     }
 
@@ -63,11 +67,17 @@ export function MessageInput({
         setAttachments((prev) => [...prev, ...data.attachments]);
       } else {
         const error = await res.json();
-        alert(error.error || "Failed to upload images");
+        toast.error(`Wystąpił błąd!`, {
+          position: "top-center",
+          description: error.error || "Failed to upload images",
+        });
       }
     } catch (error) {
       console.error("Upload error:", error);
-      alert("Failed to upload images");
+      toast.error(`Wystąpił błąd!`, {
+        position: "top-center",
+        description: "Failed to upload images",
+      });
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
