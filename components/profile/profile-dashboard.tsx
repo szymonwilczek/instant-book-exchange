@@ -29,7 +29,7 @@ import { PromotedBooksSection } from "./sections/promoted-books-section";
 import { PointsHistorySection } from "./sections/points-history-section";
 import { HistorySection } from "./sections/history-section";
 import { toast } from "sonner";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface BookBase {
   id: string;
