@@ -11,6 +11,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { ExchangeSection } from "@/components/checkout/exchange-section";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 interface BookData {
   _id: string;
@@ -103,7 +104,10 @@ export default function CheckoutPage() {
   const handleSubmit = async () => {
     const invalid = exchanges.find((ex) => !ex.exchangeLocation);
     if (invalid) {
-      alert(t("locationError"));
+      toast.error(`Wystąpił błąd!`, {
+        position: "top-center",
+        description: t("locationError"),
+      });
       return;
     }
 
@@ -116,14 +120,25 @@ export default function CheckoutPage() {
       });
 
       if (!res.ok) {
-        throw new Error(t("failedToCreateTransaction"));
+        console.error(t("failedToCreateTransaction"));
       }
 
       clearCart();
       router.push("/transactions?success=true");
+      toast(`🎉 Oferta złożona!`, {
+        position: "top-center",
+        action: {
+          label: "Zobacz",
+          onClick: () => router.push("/transactions"),
+        },
+        description: `Twoja oferta została złożona. Możesz przejrzeć wszystkie swoje oferty w zakładce Transakcje.`,
+      });
     } catch (error) {
       console.error("Checkout error:", error);
-      alert(t("errorOccured"));
+      toast.error(`Wystąpił błąd!`, {
+        position: "top-center",
+        description: t("errorOccured"),
+      });
     } finally {
       setLoading(false);
     }
