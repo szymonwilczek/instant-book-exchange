@@ -130,16 +130,31 @@ export function AddBookModal({
           ? await googleResponse.json()
           : [];
 
-        const combined = [
-          ...localBooks.map((b: BookBase) => ({
-            ...b,
-            source: "local" as const,
-          })),
-          ...googleBooks.map((b: BookBase) => ({
-            ...b,
-            source: "google" as const,
-          })),
-        ];
+        const seen = new Set<string>();
+        const combined: SearchBook[] = [];
+
+        googleBooks.forEach((b: BookBase) => {
+          const id = b.isbn || `${b.title}-${b.author}`;
+          if (!seen.has(id)) {
+            seen.add(id);
+            combined.push({
+              ...b,
+              source: "google" as const,
+            });
+          }
+        });
+
+        localBooks.forEach((b: BookBase) => {
+          const id = b.isbn || `${b.title}-${b.author}`;
+          if (!seen.has(id)) {
+            seen.add(id);
+            combined.push({
+              ...b,
+              source: "local" as const,
+            });
+          }
+        });
+
         setSearchResults(combined);
       } catch (error) {
         console.error("Error fetching books:", error);
