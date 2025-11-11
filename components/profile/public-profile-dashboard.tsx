@@ -94,7 +94,7 @@ export function PublicProfileDashboard({
           <h1 className="text-3xl font-bold">
             {t("usersProfile", { username: user.username })}
           </h1>
-          <p className="text-muted-foreground">Public profile view</p>
+          <p className="text-muted-foreground">{t("publicProfileView")}</p>
         </div>
       </div>
 
