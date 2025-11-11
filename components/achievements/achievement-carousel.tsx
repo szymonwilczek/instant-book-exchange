@@ -55,7 +55,7 @@ export function AchievementCarousel({ series }: { series: AchievementSeries }) {
       </Carousel>
       <div className="mt-2 text-center text-sm text-muted-foreground">
         {series.tiers.filter((t) => t.unlocked).length}/{series.tiers.length}{" "}
-        {t("achievements.unlocked").toLowerCase()}
+        {t("unlocked").toLowerCase()}
       </div>
     </div>
   );

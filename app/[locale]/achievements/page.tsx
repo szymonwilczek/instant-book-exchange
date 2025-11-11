@@ -186,7 +186,7 @@ export default function AchievementsPage() {
       {/* Tabs */}
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-3 max-w-md">
-          <TabsTrigger value="all">{t("achievements.all")}</TabsTrigger>
+          <TabsTrigger value="all">{t("all")}</TabsTrigger>
           <TabsTrigger value="unlocked">{t("unlocked")}</TabsTrigger>
           <TabsTrigger value="locked">{t("locked")}</TabsTrigger>
         </TabsList>
