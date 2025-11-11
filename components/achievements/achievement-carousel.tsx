@@ -24,8 +24,8 @@ interface AchievementSeries {
     unlocked: boolean;
     unlockedAt?: Date;
   }>;
-  currentTierIndex: number; 
-  nextTierIndex: number; 
+  currentTierIndex: number;
+  nextTierIndex: number;
 }
 
 export function AchievementCarousel({ series }: { series: AchievementSeries }) {
@@ -52,8 +52,8 @@ export function AchievementCarousel({ series }: { series: AchievementSeries }) {
         <CarouselNext />
       </Carousel>
       <div className="mt-2 text-center text-sm text-muted-foreground">
-        {series.seriesName} • {series.tiers.filter((t) => t.unlocked).length}/
-        {series.tiers.length} odblokowane
+        {series.tiers.filter((t) => t.unlocked).length}/{series.tiers.length}{" "}
+        odblokowane
       </div>
     </div>
   );
