@@ -348,6 +348,29 @@
   },
 
   "achievements": {
+    "achievements": "Osiągnięcia",
+    "subtitle": "Śledź swój postęp i odblokowuj nagrody",
+    "unlocked": "Odblokowane",
+    "locked": "Zablokowane",
+    "points": "Punkty zdobyte z osiągnięć",
+    "progress": "Postęp",
+    "all": "Wszystkie",
+
+    "series": {
+      "trading": "🪙 Handlowiec",
+      "reputation": "⚖️ Zaufany Handlarz",
+      "collection": "📖 Kolekcjoner",
+      "community": "🏘️ Dusza Towarzystwa",
+      "activity": "🚀 Aktywność",
+      "special": "🌟 Unikatowe"
+    },
+
+    "errors": {
+      "failedToFetchDescription": "Bardzo przepraszamy, prosimy - zgłoś ten błąd!",
+      "failedToFetchProfile": "Nie udało się pobrać danych z profilu",
+      "failedToFetchAchievements": "Nie udało się pobrać danych osiągnięć"
+    },
+
     "exchange_master_bronze": {
       "name": "Małe szczęścia",
       "description": "Szukasz radości w drobnych transakcjach. Nawet małe szczęścia bywają wielkie."

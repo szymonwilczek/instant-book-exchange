@@ -6,6 +6,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { AchievementCard } from "./achievement-card";
+import { useTranslations } from "next-intl";
 
 interface AchievementSeries {
   seriesId: string;
@@ -29,6 +30,7 @@ interface AchievementSeries {
 }
 
 export function AchievementCarousel({ series }: { series: AchievementSeries }) {
+  const t = useTranslations("achievements");
   return (
     <div className="relative px-12">
       <Carousel
@@ -53,7 +55,7 @@ export function AchievementCarousel({ series }: { series: AchievementSeries }) {
       </Carousel>
       <div className="mt-2 text-center text-sm text-muted-foreground">
         {series.tiers.filter((t) => t.unlocked).length}/{series.tiers.length}{" "}
-        odblokowane
+        {t("achievements.unlocked").toLowerCase()}
       </div>
     </div>
   );

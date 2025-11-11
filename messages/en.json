@@ -348,6 +348,29 @@
   },
 
   "achievements": {
+    "achievements": "Achievements",
+    "subtitle": "Track your progress and unlock rewards",
+    "unlocked": "Unlocked",
+    "locked": "Locked",
+    "points": "Points earned",
+    "progress": "Progress",
+    "all": "All",
+
+    "series": {
+      "trading": "🪙 Salesperson",
+      "reputation": "⚖️ Trusted Dealer",
+      "collection": "📖 Collector",
+      "community": "🏘️ Social Butterfly",
+      "activity": "🚀 Activity",
+      "special": "🌟 Unique"
+    },
+
+    "errors": {
+      "failedToFetchDescription": "We apologize, please report this error!",
+      "failedToFetchProfile": "Unable to retrieve data from profile",
+      "failedToFetchAchievements": "Unable to retrieve achievements data"
+    },
+
     "exchange_master_bronze": {
       "name": "Little Wonders",
       "description": "You found joy in small transactions. Remember, even little wonders can be huge."

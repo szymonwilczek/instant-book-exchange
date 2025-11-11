@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AchievementCarousel } from "@/components/achievements/achievement-carousel";
 import { Progress } from "@/components/ui/progress";
 import { Trophy, Lock, CheckCircle2, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 interface AchievementTier {
   _id: string;
@@ -42,21 +44,22 @@ interface AchievementsData {
   };
 }
 
-const categoryLabels: Record<string, string> = {
-  trading: "🪙 Handlowiec",
-  reputation: "⚖️ Zaufany Handlarz",
-  collection: "📖 Kolekcjoner",
-  community: "🏘️ Dusza Towarzystwa",
-  activity: "🚀 Aktywność",
-  special: "🌟 Unikatowe",
-};
-
 export default function AchievementsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [data, setData] = useState<AchievementsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [mongoUserId, setMongoUserId] = useState<string | null>(null);
+  const t = useTranslations("achievements");
+
+  const categoryLabels: Record<string, string> = {
+    trading: t("achievements.series.trading"),
+    reputation: t("achievements.series.reputation"),
+    collection: t("achievements.series.collection"),
+    community: t("achievements.series.community"),
+    activity: t("achievements.series.activity"),
+    special: t("achievements.series.special"),
+  };
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -69,7 +72,11 @@ export default function AchievementsPage() {
 
       try {
         const res = await fetch("/api/user/profile");
-        if (!res.ok) throw new Error("Failed to fetch profile");
+        if (!res.ok)
+          toast.error(t("achievements.errors.failedToFetchProfile"), {
+            position: "top-center",
+            description: t("achievements.errors.failedToFetchDescription"),
+          });
         const profile = await res.json();
         setMongoUserId(profile._id);
       } catch (error) {
@@ -90,7 +97,11 @@ export default function AchievementsPage() {
       try {
         setLoading(true);
         const res = await fetch(`/api/achievements/user/${mongoUserId}`);
-        if (!res.ok) throw new Error("Failed to fetch achievements");
+        if (!res.ok)
+          toast.error(t("achievements.errors.failedToFetchAchievements"), {
+            position: "top-center",
+            description: t("achievements.errors.failedToFetchDescription"),
+          });
         const achievementsData = await res.json();
         setData(achievementsData);
       } catch (error) {
@@ -128,11 +139,9 @@ export default function AchievementsPage() {
       <div>
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <Trophy className="h-8 w-8 text-yellow-500" />
-          Osiągnięcia
+          {t("achievements.achievements")}
         </h1>
-        <p className="text-muted-foreground">
-          Śledź swój postęp i odblokowuj nagrody
-        </p>
+        <p className="text-muted-foreground">{t("achievements.subtitle")}</p>
       </div>
 
       {/* Stats Overview */}
@@ -140,7 +149,9 @@ export default function AchievementsPage() {
         <div className="bg-card border rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle2 className="h-5 w-5 text-green-600" />
-            <span className="text-sm font-medium">Odblokowane</span>
+            <span className="text-sm font-medium">
+              {t("achievements.unlocked")}
+            </span>
           </div>
           <p className="text-2xl font-bold">
             {data.stats.unlockedCount}/{data.stats.totalCount}
@@ -150,7 +161,9 @@ export default function AchievementsPage() {
         <div className="bg-card border rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <Lock className="h-5 w-5 text-muted-foreground" />
-            <span className="text-sm font-medium">Zablokowane</span>
+            <span className="text-sm font-medium">
+              {t("achievements.locked")}
+            </span>
           </div>
           <p className="text-2xl font-bold">
             {data.stats.totalCount - data.stats.unlockedCount}
@@ -161,7 +174,7 @@ export default function AchievementsPage() {
           <div className="flex items-center gap-2 mb-2">
             <Trophy className="h-5 w-5 text-yellow-500" />
             <span className="text-sm font-medium">
-              Punkty zdobyte z osiągnięć
+              {t("achievements.points")}
             </span>
           </div>
           <p className="text-2xl font-bold">{data.stats.totalPoints}</p>
@@ -169,7 +182,9 @@ export default function AchievementsPage() {
 
         <div className="bg-card border rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-sm font-medium">Postęp</span>
+            <span className="text-sm font-medium">
+              {t("achievements.progress")}
+            </span>
           </div>
           <p className="text-2xl font-bold">{data.stats.progress}%</p>
           <Progress value={parseFloat(data.stats.progress)} className="mt-2" />
@@ -179,9 +194,11 @@ export default function AchievementsPage() {
       {/* Tabs */}
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-3 max-w-md">
-          <TabsTrigger value="all">Wszystkie</TabsTrigger>
-          <TabsTrigger value="unlocked">Odblokowane</TabsTrigger>
-          <TabsTrigger value="locked">Zablokowane</TabsTrigger>
+          <TabsTrigger value="all">{t("achievements.all")}</TabsTrigger>
+          <TabsTrigger value="unlocked">
+            {t("achievements.unlocked")}
+          </TabsTrigger>
+          <TabsTrigger value="locked">{t("achievements.locked")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="mt-6 space-y-8">
