@@ -40,8 +40,6 @@ export async function POST(req: NextRequest) {
       }
     );
 
-    console.log(`Message ${messageId} marked as delivered to ${userId}`);
-
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error in delivered-socket-event:", error);

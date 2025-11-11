@@ -65,10 +65,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log(
-      `Message event processed for ${conversationId}: ${message.content.substring(0, 30)}...`
-    );
-
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error in send-socket-event:", error);

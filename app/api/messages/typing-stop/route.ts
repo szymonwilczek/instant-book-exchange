@@ -49,8 +49,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    console.log(`User ${userId} stopped typing in ${conversationId}`);
-
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error in typing-stop:", error);

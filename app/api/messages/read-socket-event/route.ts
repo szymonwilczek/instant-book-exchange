@@ -43,10 +43,6 @@ export async function POST(req: NextRequest) {
       }
     );
 
-    console.log(
-      `Marked ${messageIds.length} messages as read in ${conversationId}`
-    );
-
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error in read-socket-event:", error);
