@@ -53,12 +53,12 @@ export default function AchievementsPage() {
   const t = useTranslations("achievements");
 
   const categoryLabels: Record<string, string> = {
-    trading: t("achievements.series.trading"),
-    reputation: t("achievements.series.reputation"),
-    collection: t("achievements.series.collection"),
-    community: t("achievements.series.community"),
-    activity: t("achievements.series.activity"),
-    special: t("achievements.series.special"),
+    trading: t("series.trading"),
+    reputation: t("series.reputation"),
+    collection: t("series.collection"),
+    community: t("series.community"),
+    activity: t("series.activity"),
+    special: t("series.special"),
   };
 
   useEffect(() => {
@@ -73,9 +73,9 @@ export default function AchievementsPage() {
       try {
         const res = await fetch("/api/user/profile");
         if (!res.ok)
-          toast.error(t("achievements.errors.failedToFetchProfile"), {
+          toast.error(t("errors.failedToFetchProfile"), {
             position: "top-center",
-            description: t("achievements.errors.failedToFetchDescription"),
+            description: t("errors.failedToFetchDescription"),
           });
         const profile = await res.json();
         setMongoUserId(profile._id);
@@ -98,9 +98,9 @@ export default function AchievementsPage() {
         setLoading(true);
         const res = await fetch(`/api/achievements/user/${mongoUserId}`);
         if (!res.ok)
-          toast.error(t("achievements.errors.failedToFetchAchievements"), {
+          toast.error(t("errors.failedToFetchAchievements"), {
             position: "top-center",
-            description: t("achievements.errors.failedToFetchDescription"),
+            description: t("errors.failedToFetchDescription"),
           });
         const achievementsData = await res.json();
         setData(achievementsData);
@@ -139,9 +139,9 @@ export default function AchievementsPage() {
       <div>
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <Trophy className="h-8 w-8 text-yellow-500" />
-          {t("achievements.achievements")}
+          {t("achievements")}
         </h1>
-        <p className="text-muted-foreground">{t("achievements.subtitle")}</p>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       {/* Stats Overview */}
@@ -149,9 +149,7 @@ export default function AchievementsPage() {
         <div className="bg-card border rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle2 className="h-5 w-5 text-green-600" />
-            <span className="text-sm font-medium">
-              {t("achievements.unlocked")}
-            </span>
+            <span className="text-sm font-medium">{t("unlocked")}</span>
           </div>
           <p className="text-2xl font-bold">
             {data.stats.unlockedCount}/{data.stats.totalCount}
@@ -161,9 +159,7 @@ export default function AchievementsPage() {
         <div className="bg-card border rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <Lock className="h-5 w-5 text-muted-foreground" />
-            <span className="text-sm font-medium">
-              {t("achievements.locked")}
-            </span>
+            <span className="text-sm font-medium">{t("locked")}</span>
           </div>
           <p className="text-2xl font-bold">
             {data.stats.totalCount - data.stats.unlockedCount}
@@ -173,18 +169,14 @@ export default function AchievementsPage() {
         <div className="bg-card border rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <Trophy className="h-5 w-5 text-yellow-500" />
-            <span className="text-sm font-medium">
-              {t("achievements.points")}
-            </span>
+            <span className="text-sm font-medium">{t("points")}</span>
           </div>
           <p className="text-2xl font-bold">{data.stats.totalPoints}</p>
         </div>
 
         <div className="bg-card border rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-sm font-medium">
-              {t("achievements.progress")}
-            </span>
+            <span className="text-sm font-medium">{t("progress")}</span>
           </div>
           <p className="text-2xl font-bold">{data.stats.progress}%</p>
           <Progress value={parseFloat(data.stats.progress)} className="mt-2" />
@@ -195,10 +187,8 @@ export default function AchievementsPage() {
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-3 max-w-md">
           <TabsTrigger value="all">{t("achievements.all")}</TabsTrigger>
-          <TabsTrigger value="unlocked">
-            {t("achievements.unlocked")}
-          </TabsTrigger>
-          <TabsTrigger value="locked">{t("achievements.locked")}</TabsTrigger>
+          <TabsTrigger value="unlocked">{t("unlocked")}</TabsTrigger>
+          <TabsTrigger value="locked">{t("locked")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="mt-6 space-y-8">
