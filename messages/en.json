@@ -355,6 +355,17 @@
     "points": "Points earned",
     "progress": "Progress",
     "all": "All",
+    "current": "Current",
+    "nextGoal": "Next goal",
+    "pointsGained": "points",
+    "hasBeenUnlocked": "Unlocked",
+
+    "tiers": {
+      "bronze": "Bronze",
+      "silver": "Silver",
+      "gold": "Gold",
+      "platinum": "Platinum"
+    },
 
     "series": {
       "trading": "🪙 Salesperson",

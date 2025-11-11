@@ -94,7 +94,7 @@ export function AchievementBadge({
             </p>
             {!unlocked && (
               <p className="text-xs text-yellow-600 dark:text-yellow-400">
-                🔒 Locked
+                🔒 {t("achievements.locked")}
               </p>
             )}
           </div>

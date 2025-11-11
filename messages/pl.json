@@ -325,14 +325,6 @@
     "wishlist": "Wishlist"
   },
 
-  "messages": {
-    "title": "Messages",
-    "newMessage": "New Message",
-    "noMessages": "No messages yet",
-    "sendMessage": "Send message",
-    "typePlaceholder": "Type a message..."
-  },
-
   "auth": {
     "loginTitle": "Login",
     "registerTitle": "Register",
@@ -355,6 +347,17 @@
     "points": "Punkty zdobyte z osiągnięć",
     "progress": "Postęp",
     "all": "Wszystkie",
+    "current": "Aktualny",
+    "nextGoal": "Następny cel",
+    "pointsGained": "punktów",
+    "hasBeenUnlocked": "Odblokowano",
+
+    "tiers": {
+      "bronze": "Brązowy",
+      "silver": "Srebrny",
+      "gold": "Złoty",
+      "platinum": "Platynowy"
+    },
 
     "series": {
       "trading": "🪙 Handlowiec",
@@ -531,6 +534,11 @@
       "name": "\"The Man Who Can't Be Moved\"",
       "description": "Najlepszy z najlepszych. Nic Cię stąd nie ruszy."
     }
+  },
+
+  "messages": {
+    "back": "Back",
+    "selectConversation": "Select conversation to start messaging"
   },
 
   "errors": {

@@ -82,6 +82,13 @@ export function AchievementCard({
     ? darkMetallicGradients[achievement.tier]
     : lightMetallicGradients[achievement.tier];
 
+  const tierLabels = {
+    bronze: t("achievements.tiers.bronze"),
+    silver: t("achievements.tiers.silver"),
+    gold: t("achievements.tiers.gold"),
+    platinum: t("achievements.tiers.platinum"),
+  };
+
   return (
     <Card
       className={cn(
@@ -151,10 +158,14 @@ export function AchievementCard({
               {tierLabels[achievement.tier]}
             </Badge>
             {isCurrentTier && (
-              <Badge className="text-xs bg-primary">Aktualny</Badge>
+              <Badge className="text-xs bg-primary">
+                {t("achievements.current")}
+              </Badge>
             )}
             {isNextTier && (
-              <Badge className="text-xs bg-yellow-600">Następny cel</Badge>
+              <Badge className="text-xs bg-yellow-600">
+                {t("achievements.nextGoal")}
+              </Badge>
             )}
           </div>
         </div>
@@ -173,7 +184,7 @@ export function AchievementCard({
         {!achievement.unlocked && (
           <div className="space-y-1">
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Postęp</span>
+              <span>{t("achievements.progress")}</span>
               <span>
                 {progress}/{requirement}
               </span>
@@ -191,13 +202,13 @@ export function AchievementCard({
                 : "text-primary"
             )}
           >
-            +{achievement.points} punktów
+            +{achievement.points} {t("achievements.pointsGained")}
           </span>
         </div>
 
         {achievement.unlockedAt && (
           <p className="text-xs text-foreground/70">
-            Odblokowano{" "}
+            {t("achievements.hasBeenUnlocked")}{" "}
             {new Date(achievement.unlockedAt).toLocaleDateString("pl-PL")}
           </p>
         )}
