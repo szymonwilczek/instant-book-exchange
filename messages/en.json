@@ -325,14 +325,6 @@
     "wishlist": "Wishlist"
   },
 
-  "messages": {
-    "title": "Messages",
-    "newMessage": "New Message",
-    "noMessages": "No messages yet",
-    "sendMessage": "Send message",
-    "typePlaceholder": "Type a message..."
-  },
-
   "auth": {
     "loginTitle": "Login",
     "registerTitle": "Register",
@@ -542,6 +534,41 @@
       "name": "\"The Man Who Can't Be Moved\"",
       "description": "The best of the best. Nothing can move you from here."
     }
+  },
+
+  "messages": {
+    "messages": "Messages",
+    "errors": {
+      "errorOccured": "An error occured!",
+      "failedToSendMessage": "The message could not be sent. Check the console.",
+      "maxLengthError": "You can attach up to 5 photos per message.",
+      "maxLengthExceeded": "Limit exceeded!",
+      "failedToUploadImages": "Failed to upload photos",
+      "failedToCreateConversation": "Unable to create conversation"
+    },
+    "back": "Back",
+    "selectConversation": "Select conversation to start messaging",
+    "unknownUser": "Unknown User",
+    "loadingMessages": "Loading messages...",
+    "noMessagesYet": "No messages yet. Start a conversation and it'll definitely show up here!",
+    "isTyping": "is typing",
+    "anonymous": "Anonymous",
+    "searchForConversation": "Search conversation",
+    "noResults": "No results",
+    "noConversation": "No conversation",
+    "you": "You",
+    "photo": "Photo",
+    "deleteConversation": "Delete conversation",
+    "imageViewer": "Image Viewer",
+    "of": "of",
+    "typeMessage": "Type message...",
+    "sendMessageTo": "Send message to ",
+    "startConversationAboutBook": "Start conversation about a book",
+    "message": "Message",
+    "characters": "characters",
+    "cancelButton": "Cancel",
+    "sendingMessage": "Sending...",
+    "sendMessage": "Send message"
   },
 
   "errors": {

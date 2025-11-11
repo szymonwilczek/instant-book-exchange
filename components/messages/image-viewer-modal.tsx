@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 interface ImageViewerModalProps {
   images: string[];
@@ -21,6 +22,7 @@ export function ImageViewerModal({
   onClose,
 }: ImageViewerModalProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const t = useTranslations("messages");
 
   const handlePrevious = () => {
     setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
@@ -56,17 +58,15 @@ export function ImageViewerModal({
     >
       <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 border-0 bg-black/95">
         <DialogTitle className="sr-only">
-          Image viewer - {currentIndex + 1} of {images.length}
+          {t("imageViewer")} - {currentIndex + 1} {t("of")} {images.length}
         </DialogTitle>
 
-        {/* Image counter */}
         {images.length > 1 && (
           <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
             {currentIndex + 1} / {images.length}
           </div>
         )}
 
-        {/* Main image */}
         <div className="relative flex items-center justify-center w-full h-[95vh] p-12">
           <Image
             src={images[currentIndex]}
@@ -74,7 +74,6 @@ export function ImageViewerModal({
             className="max-w-full max-h-full object-contain"
           />
 
-          {/* Navigation arrows */}
           {images.length > 1 && (
             <>
               <Button
@@ -98,7 +97,6 @@ export function ImageViewerModal({
           )}
         </div>
 
-        {/* Thumbnail strip */}
         {images.length > 1 && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 bg-black/60 p-2 rounded-lg max-w-[90vw] overflow-x-auto">
             {images.map((image, index) => (

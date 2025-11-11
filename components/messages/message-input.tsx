@@ -7,6 +7,7 @@ import { Paperclip, Send, X, Loader2 } from "lucide-react";
 import { useSocket } from "@/lib/context/socket-context";
 import Image from "next/image";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 interface Attachment {
   url: string;
@@ -32,6 +33,7 @@ export function MessageInput({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const t = useTranslations("message");
 
   const handleFileClick = () => {
     fileInputRef.current?.click();
@@ -42,9 +44,9 @@ export function MessageInput({
     if (!files || files.length === 0) return;
 
     if (files.length + attachments.length > 5) {
-      toast.error(`Limit przekroczony!`, {
+      toast.error(t("errors.maxLengthExceeded"), {
         position: "top-center",
-        description: "Maximum 5 images are allowed per one message",
+        description: t("errors.maxLengthError"),
       });
       return;
     }
@@ -67,16 +69,16 @@ export function MessageInput({
         setAttachments((prev) => [...prev, ...data.attachments]);
       } else {
         const error = await res.json();
-        toast.error(`Wystąpił błąd!`, {
+        toast.error(t("errors.errorOccured"), {
           position: "top-center",
-          description: error.error || "Failed to upload images",
+          description: error.error || t("errors.failedToUploadImages"),
         });
       }
     } catch (error) {
       console.error("Upload error:", error);
-      toast.error(`Wystąpił błąd!`, {
+      toast.error(t("errors.errorOccured"), {
         position: "top-center",
-        description: "Failed to upload images",
+        description: t("errors.failedToUploadImages"),
       });
     } finally {
       setIsUploading(false);
@@ -197,7 +199,7 @@ export function MessageInput({
           value={message}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          placeholder="Type a message..."
+          placeholder={t("typeMessage")}
           className="min-h-[44px] max-h-32 resize-none"
           rows={1}
         />

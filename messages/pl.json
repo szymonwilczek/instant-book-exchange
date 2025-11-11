@@ -537,8 +537,38 @@
   },
 
   "messages": {
-    "back": "Back",
-    "selectConversation": "Select conversation to start messaging"
+    "messages": "Wiadomości",
+    "errors": {
+      "errorOccured": "Wystąpił błąd!",
+      "failedToSendMessage": "Nie udało się wysłać wiadomości. Sprawdź konsolę",
+      "maxLengthError": "Maksymalnie można załączyć do 5 zdjęć dla jednej wiadomości",
+      "maxLengthExceeded": "Limit przekroczony!",
+      "failedToUploadImages": "Nie udało się przesłać zdjęć",
+      "failedToCreateConversation": "Nie udało się utworzyć konwersacji"
+    },
+    "back": "Wstecz",
+    "selectConversation": "Wybierz konwersację żeby zacząć rozmowę",
+    "unknownUser": "Nieznany Użytkownik",
+    "loadingMessages": "Ładowanie wiadomości...",
+    "noMessagesYet": "Brak wiadomości. Zacznij jakąś rozmowę a na pewno się tutaj pojawi!",
+    "isTyping": "pisze",
+    "anonymous": "Anonim",
+    "searchForConversation": "Szukaj konwersacji",
+    "noResults": "Brak wyników",
+    "noConversation": "Brak konwersacji",
+    "you": "Ty",
+    "photo": "Zdjęcie",
+    "deleteConversation": "Usuń konwersację",
+    "imageViewer": "Przeglądarka zdjęć",
+    "of": "z",
+    "typeMessage": "Napisz wiadomość...",
+    "sendMessageTo": "Wyślij wiadomość do ",
+    "startConversationAboutBook": "Zacznij rozmowę o książce",
+    "message": "Wiadomość",
+    "characters": "znaków",
+    "cancelButton": "Anuluj",
+    "sendingMessage": "Wysyłanie...",
+    "sendMessage": "Wyślij wiadomość"
   },
 
   "errors": {

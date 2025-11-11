@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { ImageViewerModal } from "./image-viewer-modal";
 import Image from "next/image";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 interface Attachment {
   type: "image" | "document";
@@ -128,6 +129,7 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const t = useTranslations("messages");
 
   const handleImageClick = (images: string[], index: number) => {
     setSelectedImages(images);
@@ -143,7 +145,7 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
     ? otherParticipant.username ||
       otherParticipant.name ||
       otherParticipant.email
-    : "Unknown User";
+    : t("unknownUser");
 
   useEffect(() => {
     if (conversation._id) {
@@ -189,16 +191,11 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
 
   const handleNewMessage = useCallback(
     (message: Message) => {
-      console.log("Received new message:", message);
-
       setMessages((prev) => {
         const exists = prev.some((m) => m._id === message._id);
         if (exists) {
-          console.log("Message already exists, skipping");
           return prev;
         }
-
-        console.log("Adding message to list, current count:", prev.length);
 
         const wasNearBottom = (() => {
           if (!scrollRef.current) return false;
@@ -222,8 +219,6 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
               console.log("Could not play notification sound:", error);
             });
           }
-        } else {
-          console.log("Message from self, not playing sound");
         }
 
         const newMessages = [...prev, message];
@@ -302,10 +297,6 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
             "[data-radix-scroll-area-viewport]"
           ) as HTMLElement;
           if (viewport) {
-            console.log(
-              "Scrolling to bottom, scrollHeight:",
-              viewport.scrollHeight
-            );
             viewport.scrollTo({
               top: viewport.scrollHeight,
               behavior: "smooth",
@@ -327,12 +318,6 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
     if (!content.trim() && (!attachments || attachments.length === 0)) return;
 
     try {
-      console.log("Sending message:", {
-        conversationId: conversation._id,
-        content,
-        attachments: attachments?.length || 0,
-      });
-
       const res = await fetch("/api/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -345,7 +330,6 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
 
       if (res.ok) {
         const data = await res.json();
-        console.log("Message sent successfully:", data.message);
 
         setMessages((prev) => [...prev, data.message]);
 
@@ -359,16 +343,16 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
       } else {
         const error = await res.json();
         console.error("Error sending message:", error);
-        toast.error(`Wystąpił błąd!`, {
+        toast.error(t("errors.errorOccured"), {
           position: "top-center",
-          description: error.error || "Failed to send message",
+          description: error.error || t("errors.failedToSendMessage"),
         });
       }
     } catch (error) {
       console.error("Error in handleSendMessage:", error);
-      toast.error(`Wystąpił błąd!`, {
+      toast.error(t("errors.errorOccured"), {
         position: "top-center",
-        description: "Failed to send message",
+        description: t("errors.failedToSendMessage"),
       });
     }
   };
@@ -378,7 +362,7 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-          <p className="text-muted-foreground">Loading messages...</p>
+          <p className="text-muted-foreground">{t("loadingMessages")}</p>
         </div>
       </div>
     );
@@ -409,7 +393,7 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
         <div className="p-4 space-y-4">
           {messages.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              <p>No messages yet. Start the conversation!</p>
+              <p>{t("noMessagesYet")}</p>
             </div>
           ) : (
             messages.map((message, index) => {
@@ -546,7 +530,7 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
               </Avatar>
               <div className="flex items-center gap-1">
                 <span className="text-sm text-muted-foreground">
-                  {typingUser} is typing
+                  {typingUser} {t("isTyping")}
                 </span>
                 <div className="flex gap-1">
                   <div className="h-2 w-2 rounded-full bg-muted-foreground animate-bounce"></div>
@@ -568,7 +552,9 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
       <div className="flex-shrink-0">
         <MessageInput
           conversationId={conversation._id}
-          userName={session?.user?.name || session?.user?.email || "Anonymous"}
+          userName={
+            session?.user?.name || session?.user?.email || t("anonymous")
+          }
           onSendMessage={handleSendMessage}
         />
       </div>

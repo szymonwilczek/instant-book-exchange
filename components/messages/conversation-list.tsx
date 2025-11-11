@@ -17,6 +17,7 @@ import { formatDistanceToNow } from "date-fns";
 import { enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 
 interface Conversation {
   _id: string;
@@ -67,6 +68,7 @@ export function ConversationList({
 }: ConversationListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const { data: session } = useSession();
+  const t = useTranslations("messages");
 
   const filteredConversations = conversations.filter((conv) => {
     const otherParticipant = conv.participants.find(
@@ -90,14 +92,14 @@ export function ConversationList({
   return (
     <div className="flex h-full flex-col">
       <div className="border-b p-4">
-        <h2 className="text-xl font-semibold">Messages</h2>
+        <h2 className="text-xl font-semibold">{t("messages")}</h2>
       </div>
 
       <div className="p-3">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search for conversation"
+            placeholder={t("searchForConversation")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -109,7 +111,7 @@ export function ConversationList({
         <div className="space-y-1 p-2">
           {filteredConversations.length === 0 ? (
             <p className="p-4 text-center text-sm text-muted-foreground">
-              {searchQuery ? "Brak wyników" : "Brak konwersacji"}
+              {searchQuery ? t("noResults") : t("noConversation")}
             </p>
           ) : (
             filteredConversations.map((conversation) => {
@@ -154,14 +156,14 @@ export function ConversationList({
                               session?.user?.id ||
                             conversation.lastMessage.sender.email ===
                               session?.user?.email
-                              ? "You"
+                              ? t("you")
                               : participantName}
                             :
                           </span>{" "}
                           {conversation.lastMessage.attachments &&
                           conversation.lastMessage.attachments.length > 0 &&
                           !conversation.lastMessage.content ? (
-                            <span>📷 Photo</span>
+                            <span>📷 {t("photo")}</span>
                           ) : (
                             conversation.lastMessage.content
                           )}
@@ -201,7 +203,7 @@ export function ConversationList({
                             }}
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
-                            Delete conversation
+                            {t("deleteConversation")}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

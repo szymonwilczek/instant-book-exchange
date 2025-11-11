@@ -9,6 +9,7 @@ import { useSocket } from "@/lib/context/socket-context";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
+import { useTranslations } from "next-intl";
 
 interface Conversation {
   _id: string;
@@ -60,6 +61,7 @@ export default function MessagesPage() {
     string | null
   >(null);
   const [loading, setLoading] = useState(true);
+  const t = useTranslations("messages");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -95,8 +97,6 @@ export default function MessagesPage() {
         profileImage?: string;
       }>;
     }) => {
-      console.log("Received conversation update:", update);
-
       fetchConversations();
     };
 
@@ -154,7 +154,7 @@ export default function MessagesPage() {
                 className="mb-2"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
+                {t("messages.back")}
               </Button>
             </div>
           )}
@@ -165,7 +165,7 @@ export default function MessagesPage() {
         </div>
       ) : (
         <div className="hidden md:flex flex-1 items-center justify-center text-muted-foreground">
-          <p>Select a conversation to start messaging</p>
+          <p>{t("messages.selectConversation")}</p>
         </div>
       )}
     </div>
