@@ -351,6 +351,11 @@
     },
     "match": {
       "title": "We found a match!"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "morePages": "More pages"
     }
   },
 

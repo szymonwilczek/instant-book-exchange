@@ -351,6 +351,11 @@
     },
     "match": {
       "title": "Znaleźliśmy dopasowanie!"
+    },
+    "pagination": {
+      "previous": "Poprzednia",
+      "next": "Następna",
+      "morePages": "Więcej stron"
     }
   },
 
