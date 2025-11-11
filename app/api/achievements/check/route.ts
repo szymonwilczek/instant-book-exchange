@@ -216,7 +216,7 @@ export async function POST(req: NextRequest) {
           progressUpdates.push({
             achievementId: achievement._id,
             id: achievement.id,
-            name: achievement.name,
+            nameKey: achievement.nameKey,
             current: currentProgress,
             target: targetProgress,
           });
@@ -245,7 +245,7 @@ export async function POST(req: NextRequest) {
         progressUpdates.push({
           achievementId: achievement._id,
           id: achievement.id,
-          name: achievement.name,
+          nameKey: achievement.nameKey,
           current: currentProgress,
           target: targetProgress,
         });

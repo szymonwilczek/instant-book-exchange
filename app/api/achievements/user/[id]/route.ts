@@ -64,7 +64,7 @@ export async function GET(
       if (!acc[achievement.seriesId]) {
         acc[achievement.seriesId] = {
           seriesId: achievement.seriesId,
-          seriesName: achievement.seriesName,
+          seriesName: achievement.seriesNameKey,
           category: achievement.category,
           tiers: [],
           currentTierIndex: -1,

@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
+import { useTranslations } from "next-intl";
 
 export function useAchievements(userId?: string) {
   const [checking, setChecking] = useState(false);
+  const t = useTranslations();
 
   const triggerConfetti = () => {
     const duration = 3 * 1000;
@@ -55,9 +57,9 @@ export function useAchievements(userId?: string) {
         triggerConfetti();
 
         for (const achievement of data.newlyUnlocked) {
-          toast(`🎉 ${achievement.name}`, {
+          toast(`🎉 ${t(achievement.nameKey)}`, {
             position: "top-center",
-            description: `${achievement.icon} ${achievement.description} (+${achievement.points} points)`,
+            description: `${achievement.icon} ${t(achievement.descriptionKey)} (+${achievement.points} points)`,
           });
 
           if (data.newlyUnlocked.length > 1) {

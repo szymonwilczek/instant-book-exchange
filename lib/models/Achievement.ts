@@ -27,9 +27,9 @@ export interface AchievementRequirement {
 export interface IAchievement extends Document {
   id: string;
   seriesId: string;
-  seriesName: string;
-  name: string;
-  description: string;
+  seriesNameKey: string;
+  nameKey: string;
+  descriptionKey: string;
   icon: string;
   tier: AchievementTier;
   category: AchievementCategory;
@@ -43,10 +43,10 @@ export interface IAchievement extends Document {
 const AchievementSchema: Schema = new Schema(
   {
     id: { type: String, required: true, unique: true },
-    name: { type: String, required: true },
+    nameKey: { type: String, required: true },
     seriesId: { type: String, required: true },
-    seriesName: { type: String, required: true },
-    description: { type: String, required: true },
+    seriesNameKey: { type: String, required: true },
+    descriptionKey: { type: String, required: true },
     icon: { type: String, required: true },
     tier: {
       type: String,

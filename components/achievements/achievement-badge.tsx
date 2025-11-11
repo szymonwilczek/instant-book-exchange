@@ -7,12 +7,13 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
 
 interface AchievementBadgeProps {
   achievement: {
     icon: string;
-    name: string;
-    description: string;
+    nameKey?: string;
+    descriptionKey?: string;
     tier: "bronze" | "silver" | "gold" | "platinum";
     points: number;
   };
@@ -50,6 +51,7 @@ export function AchievementBadge({
   const { theme, systemTheme } = useTheme();
   const currentTheme = theme === "system" ? systemTheme : theme;
   const isDark = currentTheme === "dark";
+  const t = useTranslations();
 
   const metallicGradient = isDark
     ? darkMetallicGradients[achievement.tier]
@@ -81,9 +83,11 @@ export function AchievementBadge({
         </TooltipTrigger>
         <TooltipContent className="max-w-xs">
           <div className="space-y-1">
-            <p className="font-semibold text-background">{achievement.name}</p>
+            <p className="font-semibold text-background">
+              {t(achievement.nameKey || "")}
+            </p>
             <p className="text-sm text-muted-background">
-              {achievement.description}
+              {t(achievement.descriptionKey || "")}
             </p>
             <p className="text-xs font-medium text-muted-foreground">
               +{achievement.points} points

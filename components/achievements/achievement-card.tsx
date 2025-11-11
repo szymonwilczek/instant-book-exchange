@@ -6,13 +6,14 @@ import { Progress } from "@/components/ui/progress";
 import { Lock, Check, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
 
 interface AchievementCardProps {
   achievement: {
     _id: string;
     id: string;
-    name: string;
-    description: string;
+    nameKey?: string;
+    descriptionKey?: string;
     icon: string;
     tier: "bronze" | "silver" | "gold" | "platinum";
     points: number;
@@ -69,6 +70,7 @@ export function AchievementCard({
   const { theme, systemTheme } = useTheme();
   const currentTheme = theme === "system" ? systemTheme : theme;
   const isDark = currentTheme === "dark";
+  const t = useTranslations();
 
   const requirement = achievement.requirement
     ? Object.values(achievement.requirement)[0] || 1
@@ -135,7 +137,7 @@ export function AchievementCard({
               achievement.unlocked && "drop-shadow-sm"
             )}
           >
-            {achievement.name}
+            {t(achievement.nameKey || "")}
           </h3>
           <div className="flex items-center gap-2 mt-1">
             <Badge
@@ -165,7 +167,7 @@ export function AchievementCard({
               : "text-muted-foreground"
           )}
         >
-          {achievement.description}
+          {t(achievement.descriptionKey || "")}
         </p>
 
         {!achievement.unlocked && (
