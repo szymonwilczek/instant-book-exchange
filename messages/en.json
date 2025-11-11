@@ -27,8 +27,8 @@
     "or": "or",
     "google": "Sign in with Google",
     "errors": {
-      "emailRequired": "Email is required",
-      "passwordRequired": "Password is required"
+      "emailRequired": "Email is required.",
+      "passwordRequired": "Password is required."
     }
   },
 
@@ -45,7 +45,14 @@
     "signUp": "Sign Up to Instant Book Exchange",
     "alreadyHaveAccount": "Already have an account? <signInLink>Sign In instead</signInLink>",
     "or": "or",
-    "google": "Sign in with Google"
+    "google": "Sign in with Google",
+    "errors": {
+      "usernameRequired": "Username is required.",
+      "emailRequired": "Email is required.",
+      "passwordRequired": "Password is required.",
+      "passwordDontMatch": "Passwords do not match.",
+      "privacyPolicy": "You must agree to the privacy policy & terms."
+    }
   },
 
   "checkout": {

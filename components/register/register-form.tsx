@@ -33,13 +33,12 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
     e.preventDefault();
     const newErrors: { [key: string]: string } = {};
 
-    if (!username) newErrors.username = "Username is required.";
-    if (!email) newErrors.email = "Email is required.";
-    if (!password) newErrors.password = "Password is required.";
+    if (!username) newErrors.username = t("errors.usernameRequired");
+    if (!email) newErrors.email = t("errors.emailRequired");
+    if (!password) newErrors.password = t("errors.passwordRequired");
     if (password !== confirmPassword)
-      newErrors.confirmPassword = "Passwords do not match.";
-    if (!agreeToTerms)
-      newErrors.agreeToTerms = "You must agree to the privacy policy & terms.";
+      newErrors.confirmPassword = t("errors.passwordDontMatch");
+    if (!agreeToTerms) newErrors.agreeToTerms = t("errors.privacyPolicy");
 
     setErrors(newErrors);
 

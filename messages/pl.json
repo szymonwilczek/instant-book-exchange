@@ -27,8 +27,8 @@
     "or": "lub",
     "google": "Zaloguj się przez Google",
     "errors": {
-      "emailRequired": "Adres e-mail jest wymagany",
-      "passwordRequired": "Hasło jest wymagane"
+      "emailRequired": "Adres e-mail jest wymagany.",
+      "passwordRequired": "Hasło jest wymagane."
     }
   },
 
@@ -45,7 +45,14 @@
     "signUp": "Zarejestuj się w Instant Book Exchange",
     "alreadyHaveAccount": "Posiadasz już konto? <signInLink>Zaloguj się</signInLink>",
     "or": "lub",
-    "google": "Kontynuuj przez Google"
+    "google": "Kontynuuj przez Google",
+    "errors": {
+      "usernameRequired": "Nazwa użytkownika jest wymagana.",
+      "emailRequired": "Adres e-mail jest wymagany.",
+      "passwordRequired": "Hasło jest wymagane.",
+      "passwordDontMatch": "Hasła się nie zgadzają.",
+      "privacyPolicy": "Musisz zaakceptować politykę prywatności i warunki korzystania."
+    }
   },
 
   "checkout": {
