@@ -43,7 +43,7 @@ export function ExchangeSection({
   const [activeId, setActiveId] = useState<string | null>(null);
   const [selectionModalOpen, setSelectionModalOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width: 1024px)");
-  const t = useTranslations("cart");
+  const t = useTranslations("checkout");
 
   const handleDragStart = (event: any) => {
     setActiveId(event.active.id);

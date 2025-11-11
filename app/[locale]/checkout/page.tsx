@@ -43,7 +43,7 @@ export default function CheckoutPage() {
   const [globalLocation, setGlobalLocation] = useState("");
   const [loading, setLoading] = useState(false);
   const [userLocation, setUserLocation] = useState("");
-  const t = useTranslations("cart");
+  const t = useTranslations("checkout");
 
   useEffect(() => {
     if (!session) {

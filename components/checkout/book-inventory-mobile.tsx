@@ -21,7 +21,7 @@ export function BookInventoryMobile({
   offeredBooks,
   onOpenSelectionModal,
 }: BookInventoryMobileProps) {
-  const t = useTranslations("cart");
+  const t = useTranslations("checkout");
 
   if (books.length === 0) {
     return (

@@ -22,7 +22,7 @@ export function ExchangeZone({
   offeredBooks,
   onRemoveBook,
 }: ExchangeZoneProps) {
-  const t = useTranslations("cart");
+  const t = useTranslations("checkout");
   const isMobile = useMediaQuery("(max-width: 1024px)");
   const { setNodeRef, isOver } = useDroppable({
     id: "exchange-zone",

@@ -36,7 +36,7 @@ export function BookSelectionModal({
 }: BookSelectionModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [localSelected, setLocalSelected] = useState<string[]>([]);
-  const t = useTranslations("cart");
+  const t = useTranslations("checkout");
 
   const handleOpenChange = (newOpen: boolean) => {
     if (newOpen) {

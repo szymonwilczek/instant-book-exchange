@@ -14,7 +14,7 @@ interface BookInventoryProps {
 }
 
 function DraggableBook({ book, isOffered }: { book: any; isOffered: boolean }) {
-  const t = useTranslations("cart");
+  const t = useTranslations("checkout");
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: book._id,
@@ -53,10 +53,10 @@ function DraggableBook({ book, isOffered }: { book: any; isOffered: boolean }) {
           </p>
           <Badge variant="outline" className="text-xs mt-1">
             {book.condition === "new"
-              ? t('new') 
+              ? t("new")
               : book.condition === "used"
-                ? t('used') 
-                : t('damaged')} 
+                ? t("used")
+                : t("damaged")}
           </Badge>
         </div>
       </div>
@@ -73,7 +73,7 @@ export function BookInventory({ books, offeredBooks }: BookInventoryProps) {
   if (books.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground text-sm">
-        {t('dontHaveAnyOffers')}
+        {t("dontHaveAnyOffers")}
       </div>
     );
   }
