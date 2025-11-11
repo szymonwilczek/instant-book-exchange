@@ -58,13 +58,22 @@ export function PublicProfileDashboard({
     title: book.title,
     author: book.author,
     imageUrl: book.imageUrl,
-    createdAt: book.createdAt.toISOString(),
+    createdAt:
+      book.createdAt instanceof Date
+        ? book.createdAt.toISOString()
+        : book.createdAt,
     status: (book.status === "available" ? "active" : "inactive") as
       | "active"
       | "inactive",
     condition: book.condition,
-    promotedUntil: book.promotedUntil?.toISOString(),
-    promotedAt: book.promotedAt?.toISOString(),
+    promotedUntil:
+      book.promotedUntil instanceof Date
+        ? book.promotedUntil.toISOString()
+        : book.promotedUntil,
+    promotedAt:
+      book.promotedAt instanceof Date
+        ? book.promotedAt.toISOString()
+        : book.promotedAt,
   }));
 
   const mappedWishlist = wishlist.map((book: IBook) => ({
@@ -72,7 +81,10 @@ export function PublicProfileDashboard({
     title: book.title,
     author: book.author,
     image: book.imageUrl,
-    createdAt: book.createdAt.toISOString(),
+    createdAt:
+      book.createdAt instanceof Date
+        ? book.createdAt.toISOString()
+        : book.createdAt,
   }));
 
   return (
