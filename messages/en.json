@@ -306,6 +306,44 @@
     }
   },
 
+  "listings": {
+    "title": "Listings",
+    "date": "Date",
+    "popularity": "Popularity",
+    "noBooksAvailable": "No books available at this moment... Check later!",
+    "conditions": {
+      "new": "New",
+      "used": "Used",
+      "damaged": "Damaged"
+    },
+    "errors": {
+      "waitASecond": "Wait a second!",
+      "messageToYourself": "You cannot send message to yourself... Come on now...",
+      "loggedInCartError": "You have to be logged in to add the book to the cart",
+      "noLocation": "No location",
+      "noDescription": "No description",
+      "unknown": "Unknown"
+    },
+    "author": "Author",
+    "bookDescription": "Book Description",
+    "ownerNote": "Owner's note",
+    "views": "views",
+    "owner": "Owner",
+    "sendMessage": "Send message",
+    "profile": "Profile",
+    "searchBarPlaceholder": "Search by title or book author...",
+    "search": "Search",
+    "createOffer": "Create offer",
+    "promoted": {
+      "title": "Promoted Books",
+      "badge": "⭐ Promoted",
+      "promoted": "Promoted"
+    },
+    "match": {
+      "title": "We found a match!"
+    }
+  },
+
   "books": {
     "addBook": "Add Book",
     "editBook": "Edit Book",

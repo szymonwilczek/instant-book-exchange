@@ -12,6 +12,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ListingCardProps {
@@ -45,6 +46,7 @@ export function ListingCard({
   const { addToCart, loading } = useCart();
   const { data: session } = useSession();
   const router = useRouter();
+  const t = useTranslations("listings");
 
   const isPromoted =
     book.promotedUntil && new Date(book.promotedUntil) > new Date();
@@ -69,9 +71,9 @@ export function ListingCard({
     }
 
     if (owner._id === session.user?.id) {
-      toast.error(`Poczekaj sekundę!`, {
+      toast.error(t("errors.waitASecond"), {
         position: "top-center",
-        description: "You cannot send message to yourself... Come on now...",
+        description: t("errors.messageToYourself"),
       });
       return;
     }
@@ -81,9 +83,9 @@ export function ListingCard({
 
   const handleAddToCart = async () => {
     if (!session) {
-      toast.error(`Wystąpił błąd!`, {
+      toast.error(t("errors.waitASecond"), {
         position: "top-center",
-        description: "You have to be logged in to add the book to the cart.",
+        description: t("errors.leggedInCartError"),
       });
       return;
     }
@@ -97,9 +99,9 @@ export function ListingCard({
   };
 
   const conditionLabel = {
-    new: "New",
-    used: "Used",
-    damaged: "Damaged",
+    new: t("conditions.new"),
+    used: t("conditions.used"),
+    damaged: t("conditions.damaged"),
   };
 
   return (
@@ -110,7 +112,7 @@ export function ListingCard({
         <div className="hidden md:flex h-full gap-4 p-5">
           {isPromoted && (
             <div className="absolute top-2 right-2 bg-purple-500 text-white px-2 py-1 rounded text-xs font-semibold">
-              ⭐ Promoted
+              {t("promoted.badge")}
             </div>
           )}
 
@@ -141,14 +143,16 @@ export function ListingCard({
                 </p>
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   <MapPin className="w-3.5 h-3.5" />
-                  {owner.location || "No location"}
+                  {owner.location || t("errors.noLocation")}
                 </div>
               </div>
             </div>
 
             <div className="flex-1 mb-3">
               <p className="text-sm line-clamp-2 max-w-2xl text-muted-foreground">
-                {book.ownerNote || book.description || "Brak opisu"}
+                {book.ownerNote ||
+                  book.description ||
+                  t("errors.noDescription")}
               </p>
             </div>
 
@@ -170,7 +174,7 @@ export function ListingCard({
                 {isPromoted && (
                   <Badge className="bg-purple-500 text-white">
                     <Star className="w-3 h-3 mr-1" />
-                    Promoted
+                    {t("promoted.promoted")}
                   </Badge>
                 )}
               </div>
@@ -205,7 +209,7 @@ export function ListingCard({
         >
           {isPromoted && (
             <div className="absolute top-2 right-2 bg-purple-500 text-white px-2 py-1 rounded text-xs font-semibold">
-              ⭐ Promoted
+              {t("promoted.badge")}
             </div>
           )}
 
@@ -241,13 +245,13 @@ export function ListingCard({
               {isPromoted && (
                 <Badge className="bg-purple-500 text-white w-fit">
                   <Star className="w-3 h-3 mr-1" />
-                  Promoted
+                  {t("promoted.promoted")}
                 </Badge>
               )}
             </div>
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <MapPin className="w-3 h-3" />
-              {owner.location || "No location"}
+              {owner.location || t("errors.noLocation")}
             </div>
           </div>
 
@@ -287,7 +291,7 @@ export function ListingCard({
           coverImage: book.imageUrl,
         }}
         recipientId={owner._id}
-        recipientName={owner.username || owner.name || "Unknown"}
+        recipientName={owner.username || owner.name || t("errors.unknown")}
       />
     </>
   );

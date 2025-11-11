@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/pagination";
 import { ListingCard } from "./listing-card";
 import { Badge } from "../ui/badge";
+import { useTranslations } from "next-intl";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ListingsProps {
@@ -34,11 +35,12 @@ export function Listings({
   setCurrentPage,
   totalPages,
 }: ListingsProps) {
+  const t = useTranslations("listings");
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold flex items-center gap-2">
-          Listings
+          {t("title")}
           <Badge variant="secondary">{books.length}</Badge>
         </h2>
         <Select value={sortBy} onValueChange={setSortBy}>
@@ -46,17 +48,15 @@ export function Listings({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="date">Date</SelectItem>
-            <SelectItem value="popularity">Popularity</SelectItem>
+            <SelectItem value="date">{t("date")}</SelectItem>
+            <SelectItem value="popularity">{t("popularity")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {books.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">
-            No books available at this moment... Check later!
-          </p>
+          <p className="text-muted-foreground">{t("noBooksAvailable")}</p>
         </div>
       ) : (
         <>

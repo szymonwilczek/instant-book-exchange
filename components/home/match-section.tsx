@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { BookHeart } from "lucide-react";
 import { ListingCard } from "./listing-card";
+import { useTranslations } from "next-intl";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface MatchSectionProps {
@@ -10,13 +11,14 @@ interface MatchSectionProps {
 }
 
 export function MatchSection({ matches }: MatchSectionProps) {
+  const t = useTranslations("listings.match");
   if (matches.length === 0) return null;
 
   return (
     <div className="mb-8">
       <div className="flex items-center gap-2 mb-4">
         <BookHeart className="h-5 w-5 text-orange-500" />
-        <h2 className="text-xl font-bold">We found a match!</h2>
+        <h2 className="text-xl font-bold">{t("title")}</h2>
         <Badge variant="secondary">{matches.length}</Badge>
       </div>
       <div className="flex flex-col gap-4">

@@ -306,6 +306,44 @@
     }
   },
 
+  "listings": {
+    "title": "Ogłoszenia",
+    "date": "Data",
+    "popularity": "Popularność",
+    "noBooksAvailable": "W tej chwili nie ma dostępnych książek... Sprawdź później!",
+    "conditions": {
+      "new": "Nowa",
+      "used": "Używana",
+      "damaged": "Uszkodzona"
+    },
+    "errors": {
+      "waitASecond": "Poczekaj sekundę!",
+      "messageToYourself": "Nie możesz wysłać wiadomości do siebie... Daj spokój...",
+      "loggedInCartError": "Aby dodać książkę do koszyka, musisz być zalogowany.",
+      "noLocation": "Brak lokalizacji",
+      "noDescription": "Brak opisu",
+      "unknown": "Nieznany"
+    },
+    "author": "Autor",
+    "bookDescription": "Opis książki",
+    "ownerNote": "Notatka właściciela",
+    "views": "wyświetleń",
+    "owner": "Właściciel",
+    "sendMessage": "Wyślij wiadomość",
+    "profile": "Profil",
+    "searchBarPlaceholder": "Wyszukaj według tytułu lub autora książki...",
+    "search": "Szukaj",
+    "createOffer": "Utwórz ofertę",
+    "promoted": {
+      "title": "Promowane książki",
+      "badge": "⭐ Promowana",
+      "promoted": "Promowana"
+    },
+    "match": {
+      "title": "Znaleźliśmy dopasowanie!"
+    }
+  },
+
   "books": {
     "addBook": "Add Book",
     "editBook": "Edit Book",

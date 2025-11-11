@@ -144,7 +144,7 @@ export default function HomePage() {
 
           {loading ? (
             <div className="flex justify-center items-center py-12">
-              <p className="text-muted-foreground">Ładowanie...</p>
+              <p className="text-muted-foreground">{t("common.loading")}</p>
             </div>
           ) : (
             <Listings

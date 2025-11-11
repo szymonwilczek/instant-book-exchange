@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import { Search, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface SearchBarProps {
   searchQuery: string;
@@ -17,6 +18,7 @@ export function SearchBar({
   onAddBook,
 }: SearchBarProps) {
   const [open, setOpen] = useState(false);
+  const t = useTranslations("listings");
 
   return (
     <div className="flex gap-2">
@@ -24,7 +26,7 @@ export function SearchBar({
         <PopoverTrigger asChild>
           <div className="relative flex-1">
             <Input
-              placeholder="Search by title or book author..."
+              placeholder={t("searchBarPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pr-10"
@@ -33,7 +35,7 @@ export function SearchBar({
           </div>
         </PopoverTrigger>
       </Popover>
-      <Button onClick={() => setOpen(false)}>Szukaj</Button>
+      <Button onClick={() => setOpen(false)}>{t("search")}</Button>
       {onAddBook && (
         <Button
           variant="default"
@@ -41,7 +43,7 @@ export function SearchBar({
           className="bg-green-600 hover:bg-green-700 text-white"
         >
           <Plus className="h-4 w-4 mr-2" />
-          Utwórz ofertę
+          {t("createOffer")}
         </Button>
       )}
     </div>

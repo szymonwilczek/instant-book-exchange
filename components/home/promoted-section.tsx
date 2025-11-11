@@ -6,6 +6,7 @@ import { Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { ListingCard } from "./listing-card";
 import { Badge } from "../ui/badge";
+import { useTranslations } from "next-intl";
 
 interface PromotedBook {
   _id: string;
@@ -30,6 +31,7 @@ interface PromotedSectionProps {
 
 export function PromotedSection({ books, onBookClick }: PromotedSectionProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const t = useTranslations("listings.promoted");
 
   if (books.length === 0) return null;
 
@@ -40,7 +42,7 @@ export function PromotedSection({ books, onBookClick }: PromotedSectionProps) {
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
             <CardTitle className="text-purple-700 dark:text-purple-300">
-              Promoted Books
+              {t("title")}
             </CardTitle>
             <Badge variant="secondary">{books.length}</Badge>
           </div>

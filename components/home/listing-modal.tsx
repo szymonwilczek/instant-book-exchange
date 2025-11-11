@@ -23,6 +23,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ListingModalProps {
@@ -42,11 +43,12 @@ export function ListingModal({
   const [messageModalOpen, setMessageModalOpen] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
+  const t = useTranslations("listings");
 
   const conditionLabel = {
-    new: "Nowy",
-    used: "Używany",
-    damaged: "Uszkodzony",
+    new: t("conditions.new"),
+    used: t("conditions.used"),
+    damaged: t("conditions.damaged"),
   };
 
   const handleSendMessage = () => {
@@ -56,9 +58,9 @@ export function ListingModal({
     }
 
     if (owner._id === session.user?.id) {
-      toast.error(`Poczekaj sekundę!`, {
+      toast.error(t("errors.waitASecond"), {
         position: "top-center",
-        description: "You cannot send message to yourself... Come on now...",
+        description: t("errors.messageToYourself"),
       });
       return;
     }
@@ -84,7 +86,7 @@ export function ListingModal({
       <div className="space-y-3">
         <div>
           <h4 className="text-sm font-medium text-muted-foreground mb-1">
-            Autor
+            {t("author")}
           </h4>
           <p className="text-base">{book.author}</p>
         </div>
@@ -92,7 +94,7 @@ export function ListingModal({
         {book.description && (
           <div>
             <h4 className="text-sm font-medium text-muted-foreground mb-1">
-              Opis książki
+              {t("bookDescription")}
             </h4>
             <p className="text-sm">{book.description}</p>
           </div>
@@ -101,7 +103,7 @@ export function ListingModal({
         {book.ownerNote && (
           <div>
             <h4 className="text-sm font-medium text-muted-foreground mb-1">
-              Notatka właściciela
+              {t("ownerNote")}
             </h4>
             <p className="text-sm italic">{book.ownerNote}</p>
           </div>
@@ -113,13 +115,13 @@ export function ListingModal({
           </Badge>
           <Badge variant="outline">
             <Eye className="w-3 h-3 mr-1" />
-            {book.viewCount || 0} wyświetleń
+            {book.viewCount || 0} {t("views")}
           </Badge>
         </div>
 
         <div className="pt-2 border-t">
           <h4 className="text-sm font-medium text-muted-foreground mb-2">
-            Właściciel
+            {t("owner")}
           </h4>
           <div
             onClick={handleViewProfile}
@@ -145,11 +147,11 @@ export function ListingModal({
         <div className="flex gap-2">
           <Button className="flex-1" onClick={handleSendMessage}>
             <MessageCircle className="mr-2 h-4 w-4" />
-            Wyślij wiadomość
+            {t("sendMessage")}
           </Button>
           <Button variant="outline" onClick={handleViewProfile}>
             <User className="mr-2 h-4 w-4" />
-            Profil
+            {t("profile")}
           </Button>
         </div>
       </div>
