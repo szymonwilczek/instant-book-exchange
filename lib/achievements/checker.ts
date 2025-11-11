@@ -5,6 +5,8 @@ import User from "@/lib/models/User";
 import Transaction from "@/lib/models/Transaction";
 import Review from "@/lib/models/Review";
 import Book from "@/lib/models/Book";
+import Conversation from "@/lib/models/Conversation";
+import LoginStreak, { ILoginStreak } from "@/lib/models/LoginStreak";
 
 interface ProgressUpdate {
   achievementId: string;
@@ -60,6 +62,17 @@ export async function checkAchievements(userId: string) {
   const totalBooksAdded = await Book.countDocuments({
     owner: userId,
   });
+
+  // 6. CONVERSATIONS STARTED
+  const conversationsStarted = await Conversation.countDocuments({
+    participants: userId,
+  });
+
+  // 7. LOGIN STREAK
+  const loginStreakDoc = (await LoginStreak.findOne({
+    user: userId,
+  }).lean()) as ILoginStreak | null;
+  const loginStreak = loginStreakDoc ? loginStreakDoc.currentStreak : 0;
 
   // === SPRAWDZANIE OSIĄGNIĘĆ ===
 
@@ -121,6 +134,20 @@ export async function checkAchievements(userId: string) {
     if (achievement.requirement.totalBooksAdded) {
       targetProgress = achievement.requirement.totalBooksAdded;
       currentProgress = totalBooksAdded;
+      unlocked = currentProgress >= targetProgress;
+    }
+
+    // SOCIAL - Conversations Started
+    if (achievement.requirement.conversationsStarted) {
+      targetProgress = achievement.requirement.conversationsStarted;
+      currentProgress = conversationsStarted;
+      unlocked = currentProgress >= targetProgress;
+    }
+
+    // LOYALTY - Login Streak
+    if (achievement.requirement.loginStreak) {
+      targetProgress = achievement.requirement.loginStreak;
+      currentProgress = loginStreak;
       unlocked = currentProgress >= targetProgress;
     }
 
