@@ -26,16 +26,14 @@ export async function GET() {
   if (!user)
     return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-  // surowe transakcje
   const rawTransactions = await Transaction.find({
     $or: [{ initiator: user._id }, { receiver: user._id }],
   })
     .lean()
-    .sort({ createdAt: -1 });
+    .sort({ updatedAt: -1 });
 
   const transactionsWithSnapshots = await Promise.all(
     rawTransactions.map(async (rawTransaction) => {
-      // populate users
       const initiator = await User.findById(rawTransaction.initiator)
         .select("email username profileImage")
         .lean();
@@ -43,39 +41,49 @@ export async function GET() {
         .select("email username profileImage")
         .lean();
 
-      // populate lub fallback requestedBook
-      const requestedBook = await Book.findById(
-        rawTransaction.requestedBook
-      ).lean();
+      let requestedBook = null;
+      const requestedSnapshot = (await BookSnapshot.findOne({
+        originalBookId: rawTransaction.requestedBook,
+      }).lean()) as IBookSnapshot | null;
 
-      // populate lub fallback offeredBooks
+      if (requestedSnapshot) {
+        requestedBook = {
+          _id: requestedSnapshot.originalBookId,
+          title: requestedSnapshot.title,
+          author: requestedSnapshot.author,
+          imageUrl: requestedSnapshot.imageUrl,
+          condition: requestedSnapshot.condition,
+          ownerNote: requestedSnapshot.ownerNote,
+        };
+      } else {
+        requestedBook = await Book.findById(
+          rawTransaction.requestedBook
+        ).lean();
+      }
+
       const offeredBooks = await Promise.all(
         rawTransaction.offeredBooks.map(
           async (bookId: mongoose.Types.ObjectId) => {
-            const book = await Book.findById(bookId).lean();
-            if (!book) {
-              const snapshot = (await BookSnapshot.findOne({
-                originalBookId: bookId,
-              }).lean()) as IBookSnapshot | null;
+            const snapshot = (await BookSnapshot.findOne({
+              originalBookId: bookId,
+            }).lean()) as IBookSnapshot | null;
 
-              if (snapshot) {
-                return {
-                  _id: snapshot.originalBookId,
-                  title: snapshot.title,
-                  author: snapshot.author,
-                  imageUrl: snapshot.imageUrl,
-                  condition: snapshot.condition,
-                  ownerNote: snapshot.ownerNote,
-                };
-              }
+            if (snapshot) {
+              return {
+                _id: snapshot.originalBookId,
+                title: snapshot.title,
+                author: snapshot.author,
+                imageUrl: snapshot.imageUrl,
+                condition: snapshot.condition,
+                ownerNote: snapshot.ownerNote,
+              };
             }
 
-            return book;
+            return await Book.findById(bookId).lean();
           }
         )
       );
 
-      // filtrowanie null/undefined
       const validOfferedBooks = offeredBooks.filter(Boolean);
 
       return {

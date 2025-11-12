@@ -246,9 +246,18 @@ export function TransactionCard({
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
-                {format(new Date(transaction.createdAt), "d MMM yyyy, HH:mm", {
-                  locale: pl,
-                })}
+                {transaction.status === "accepted" && transaction.acceptedAt
+                  ? `${t("acceptedOn")}: ${format(new Date(transaction.acceptedAt), "d MMM yyyy, HH:mm", { locale: pl })}`
+                  : transaction.status === "rejected" && transaction.rejectedAt
+                    ? `${t("rejectedOn")}: ${format(new Date(transaction.rejectedAt), "d MMM yyyy, HH:mm", { locale: pl })}`
+                    : transaction.status === "completed" &&
+                        transaction.completedAt
+                      ? `${t("completedOn")}: ${format(new Date(transaction.completedAt), "d MMM yyyy, HH:mm", { locale: pl })}`
+                      : format(
+                          new Date(transaction.createdAt),
+                          "d MMM yyyy, HH:mm",
+                          { locale: pl }
+                        )}
               </div>
             </div>
 

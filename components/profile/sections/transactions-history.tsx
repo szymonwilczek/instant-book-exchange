@@ -14,6 +14,7 @@ interface TransactionUser {
 interface TransactionBook {
   _id: string;
   title: string;
+  author?: string;
 }
 
 interface TransactionItem {
@@ -21,9 +22,12 @@ interface TransactionItem {
   initiator: TransactionUser;
   receiver: TransactionUser;
   requestedBook?: TransactionBook;
-  offeredBooks?: unknown[];
+  offeredBooks?: TransactionBook[];
   status: string;
   createdAt: string;
+  acceptedAt?: string;
+  rejectedAt?: string;
+  completedAt?: string;
 }
 
 interface TransactionHistoryProps {
@@ -43,8 +47,6 @@ export function TransactionHistory({ userEmail }: TransactionHistoryProps) {
       try {
         const res = await fetch("/api/transactions/user");
         const data: TransactionItem[] = await res.json();
-
-        // na razie tylko ostatnie 5 transakcji
         setTransactions(data.slice(0, 5));
       } catch (error) {
         console.error("Error fetching transactions:", error);
@@ -81,6 +83,19 @@ export function TransactionHistory({ userEmail }: TransactionHistoryProps) {
     return labels[status] || status;
   };
 
+  const getTransactionDate = (transaction: TransactionItem) => {
+    if (transaction.completedAt) {
+      return new Date(transaction.completedAt).toLocaleDateString("pl-PL");
+    }
+    if (transaction.rejectedAt) {
+      return new Date(transaction.rejectedAt).toLocaleDateString("pl-PL");
+    }
+    if (transaction.acceptedAt) {
+      return new Date(transaction.acceptedAt).toLocaleDateString("pl-PL");
+    }
+    return new Date(transaction.createdAt).toLocaleDateString("pl-PL");
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-8">
@@ -103,6 +118,12 @@ export function TransactionHistory({ userEmail }: TransactionHistoryProps) {
               ? transaction.receiver
               : transaction.initiator;
 
+            const receivedBook = isInitiator
+              ? transaction.requestedBook
+              : transaction.offeredBooks?.[0];
+
+            const actionLabel = t("receivedFrom");
+
             return (
               <div
                 key={transaction._id}
@@ -111,7 +132,7 @@ export function TransactionHistory({ userEmail }: TransactionHistoryProps) {
                 <div className="space-y-2 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="font-medium line-clamp-1">
-                      {transaction.requestedBook?.title || t("unknownBook")}
+                      {receivedBook?.title || t("unknownBook")}
                     </p>
                     <Badge
                       className={getStatusColor(transaction.status)}
@@ -123,7 +144,7 @@ export function TransactionHistory({ userEmail }: TransactionHistoryProps) {
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <ArrowRightLeft className="h-3 w-3" />
-                      {isInitiator ? t("sentTo") : t("receivedFrom")}
+                      {actionLabel}
                     </span>
                     <span className="flex items-center gap-1">
                       <User className="h-3 w-3" />
@@ -132,21 +153,9 @@ export function TransactionHistory({ userEmail }: TransactionHistoryProps) {
                     <span className="hidden sm:inline">•</span>
                     <span className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
-                      {new Date(transaction.createdAt).toLocaleDateString(
-                        "pl-PL"
-                      )}
+                      {getTransactionDate(transaction)}
                     </span>
                   </div>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {transaction.offeredBooks &&
-                  transaction.offeredBooks.length > 0
-                    ? `${transaction.offeredBooks.length} ${
-                        transaction.offeredBooks.length === 1
-                          ? t("book")
-                          : t("books")
-                      }`
-                    : t("noExchange")}
                 </div>
               </div>
             );

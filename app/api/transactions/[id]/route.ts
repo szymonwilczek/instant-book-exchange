@@ -27,22 +27,9 @@ interface PopulatedTransaction {
     _id: mongoose.Types.ObjectId;
   }>;
   status: string;
-  requestedBookSnapshot?: {
-    _id: string;
-    title: string;
-    author: string;
-    imageUrl?: string;
-    condition?: string;
-    ownerNote?: string;
-  };
-  offeredBooksSnapshots?: Array<{
-    _id: string;
-    title: string;
-    author: string;
-    imageUrl?: string;
-    condition?: string;
-    ownerNote?: string;
-  }>;
+  acceptedAt?: Date;
+  rejectedAt?: Date;
+  completedAt?: Date;
   save: () => Promise<void>;
   populate: (fields: string) => Promise<PopulatedTransaction>;
 }
@@ -54,6 +41,11 @@ interface BookDocument {
   imageUrl?: string;
   condition?: string;
   ownerNote?: string;
+}
+
+interface UserWishlistData {
+  wishlist: mongoose.Types.ObjectId[];
+  offeredBooks: mongoose.Types.ObjectId[];
 }
 
 export async function PUT(
@@ -114,7 +106,16 @@ export async function PUT(
   const oldStatus = transaction.status;
   transaction.status = status;
 
-  // snapshots
+  const now = new Date();
+  if (status === "accepted" && oldStatus === "pending") {
+    transaction.acceptedAt = now;
+  } else if (status === "rejected" && oldStatus === "pending") {
+    transaction.rejectedAt = now;
+  } else if (status === "completed" && oldStatus === "accepted") {
+    transaction.completedAt = now;
+  }
+
+  // snapshoty i czyszczenie
   if (status === "completed" && oldStatus === "accepted") {
     const rawTransaction = (await Transaction.findById(
       id
@@ -126,6 +127,13 @@ export async function PUT(
         { status: 404 }
       );
     }
+
+    const initiatorBefore = (await User.findById(transaction.initiator._id)
+      .select("wishlist offeredBooks")
+      .lean()) as UserWishlistData | null;
+    const receiverBefore = (await User.findById(transaction.receiver._id)
+      .select("wishlist offeredBooks")
+      .lean()) as UserWishlistData | null;
 
     // snapshot dla requestedBook
     const requestedBookSnapshot = await BookSnapshot.findOne({
@@ -171,7 +179,72 @@ export async function PUT(
       }
     }
 
-    // punkty
+    const requestedBookData = (await Book.findById(rawTransaction.requestedBook)
+      .select("title")
+      .lean()) as { title: string } | null;
+
+    // usuwanie z offeredBooks receivera (ID)
+    await User.findByIdAndUpdate(transaction.receiver._id, {
+      $pull: { offeredBooks: rawTransaction.requestedBook },
+    });
+
+    // usuwanie z wishlist initiatora (po tytule, bo moze byc inne id)
+    if (requestedBookData?.title) {
+      const initiatorWishlistBooks = await Book.find({
+        _id: { $in: initiatorBefore?.wishlist || [] },
+        title: requestedBookData.title,
+      })
+        .select("_id")
+        .lean();
+
+      if (initiatorWishlistBooks.length > 0) {
+        await User.findByIdAndUpdate(transaction.initiator._id, {
+          $pull: {
+            wishlist: { $in: initiatorWishlistBooks.map((b) => b._id) },
+          },
+        });
+      }
+    }
+
+    await Book.findByIdAndDelete(rawTransaction.requestedBook);
+
+    // offeredBooks: ksiazki ktore OFERUJE INITIATOR
+    if (rawTransaction.offeredBooks.length > 0) {
+      const offeredBooksData = await Book.find({
+        _id: { $in: rawTransaction.offeredBooks },
+      })
+        .select("title")
+        .lean();
+
+      // usuwanie z offeredBooks initiatora (ID)
+      await User.findByIdAndUpdate(transaction.initiator._id, {
+        $pull: { offeredBooks: { $in: rawTransaction.offeredBooks } },
+      });
+
+      // usuwanie z wishlist receivera (po tytule, bo moga byc inne ID!)
+      if (offeredBooksData.length > 0) {
+        const titles = offeredBooksData.map((b) => b.title);
+        const receiverWishlistBooks = await Book.find({
+          _id: { $in: receiverBefore?.wishlist || [] },
+          title: { $in: titles },
+        })
+          .select("_id")
+          .lean();
+
+        if (receiverWishlistBooks.length > 0) {
+          await User.findByIdAndUpdate(transaction.receiver._id, {
+            $pull: {
+              wishlist: { $in: receiverWishlistBooks.map((b) => b._id) },
+            },
+          });
+        }
+      }
+
+      await Book.deleteMany({
+        _id: { $in: rawTransaction.offeredBooks },
+      });
+    }
+
     transaction.initiator.points += 10;
     transaction.receiver.points += 10;
     await transaction.initiator.save();
@@ -244,7 +317,6 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
-  // populate
   const initiator = await User.findById(rawTransaction.initiator)
     .select("email username profileImage")
     .lean();
@@ -252,51 +324,42 @@ export async function GET(
     .select("email username profileImage")
     .lean();
 
-  // populate lub fallback requestedBook
-  let requestedBook: BookDocument | null = await Book.findById(
-    rawTransaction.requestedBook
-  ).lean();
+  let requestedBook: BookDocument | null = null;
+  const requestedSnapshot = (await BookSnapshot.findOne({
+    originalBookId: rawTransaction.requestedBook,
+  }).lean()) as IBookSnapshot | null;
 
-  if (!requestedBook) {
-    const snapshot = (await BookSnapshot.findOne({
-      originalBookId: rawTransaction.requestedBook,
-    }).lean()) as IBookSnapshot | null;
-
-    if (snapshot) {
-      requestedBook = {
-        _id: snapshot.originalBookId as mongoose.Types.ObjectId,
-        title: snapshot.title,
-        author: snapshot.author,
-        imageUrl: snapshot.imageUrl,
-        condition: snapshot.condition,
-        ownerNote: snapshot.ownerNote,
-      };
-    }
+  if (requestedSnapshot) {
+    requestedBook = {
+      _id: requestedSnapshot.originalBookId as mongoose.Types.ObjectId,
+      title: requestedSnapshot.title,
+      author: requestedSnapshot.author,
+      imageUrl: requestedSnapshot.imageUrl,
+      condition: requestedSnapshot.condition,
+      ownerNote: requestedSnapshot.ownerNote,
+    };
+  } else {
+    requestedBook = await Book.findById(rawTransaction.requestedBook).lean();
   }
 
-  // populate lub fallback offeredBooks
   const offeredBooks = await Promise.all(
     rawTransaction.offeredBooks.map(async (bookId: mongoose.Types.ObjectId) => {
-      let book: BookDocument | null = await Book.findById(bookId).lean();
+      const snapshot = (await BookSnapshot.findOne({
+        originalBookId: bookId,
+      }).lean()) as IBookSnapshot | null;
 
-      if (!book) {
-        const snapshot = (await BookSnapshot.findOne({
-          originalBookId: bookId,
-        }).lean()) as IBookSnapshot | null;
-
-        if (snapshot) {
-          book = {
-            _id: snapshot.originalBookId as mongoose.Types.ObjectId,
-            title: snapshot.title,
-            author: snapshot.author,
-            imageUrl: snapshot.imageUrl,
-            condition: snapshot.condition,
-            ownerNote: snapshot.ownerNote,
-          };
-        }
+      if (snapshot) {
+        return {
+          _id: snapshot.originalBookId as mongoose.Types.ObjectId,
+          title: snapshot.title,
+          author: snapshot.author,
+          imageUrl: snapshot.imageUrl,
+          condition: snapshot.condition,
+          ownerNote: snapshot.ownerNote,
+        };
       }
 
-      return book;
+      return await Book.findById(bookId).lean();
     })
   );
 

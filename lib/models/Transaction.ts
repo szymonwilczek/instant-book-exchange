@@ -8,6 +8,9 @@ export interface ITransaction extends Document {
   exchangeLocation: string;
   deliveryMethod: "personal" | "paczkomat" | "courier";
   status: "pending" | "accepted" | "rejected" | "completed";
+  acceptedAt?: Date;
+  rejectedAt?: Date;
+  completedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,6 +32,9 @@ const TransactionSchema: Schema = new Schema(
       enum: ["pending", "accepted", "rejected", "completed"],
       default: "pending",
     },
+    acceptedAt: { type: Date },
+    rejectedAt: { type: Date },
+    completedAt: { type: Date },
   },
   { timestamps: true }
 );
