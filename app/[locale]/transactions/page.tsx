@@ -103,18 +103,21 @@ export default function TransactionsPage() {
 
   const userEmail = session.user?.email;
 
-  // sortowanie po dacie (najnowsze najpierw)
+  // najnowsze najpierw
   const sortedTransactions = [...transactions].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
-  // filtrowanie transakcji
-  const sentTransactions = sortedTransactions.filter(
-    (t) => t.initiator.email === userEmail && t.status !== "completed"
+  const pendingTransactions = sortedTransactions.filter(
+    (t) =>
+      t.status === "pending" &&
+      (t.initiator.email === userEmail || t.receiver.email === userEmail)
   );
 
-  const receivedTransactions = sortedTransactions.filter(
-    (t) => t.receiver.email === userEmail && t.status !== "completed"
+  const acceptedTransactions = sortedTransactions.filter(
+    (t) =>
+      t.status === "accepted" &&
+      (t.initiator.email === userEmail || t.receiver.email === userEmail)
   );
 
   const completedTransactions = sortedTransactions.filter(
@@ -123,9 +126,14 @@ export default function TransactionsPage() {
       (t.initiator.email === userEmail || t.receiver.email === userEmail)
   );
 
-  // statystyki
-  const pendingReceived = receivedTransactions.filter(
-    (t) => t.status === "pending"
+  const rejectedTransactions = sortedTransactions.filter(
+    (t) =>
+      t.status === "rejected" &&
+      (t.initiator.email === userEmail || t.receiver.email === userEmail)
+  );
+
+  const pendingReceivedCount = pendingTransactions.filter(
+    (t) => t.receiver.email === userEmail
   ).length;
 
   return (
@@ -144,20 +152,30 @@ export default function TransactionsPage() {
         </Alert>
       )}
 
-      <Tabs defaultValue="received" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 max-w-2xl">
-          <TabsTrigger value="received" className="relative">
-            {t("received")}
-            {pendingReceived > 0 && (
+      <Tabs defaultValue="pending" className="w-full">
+        <TabsList className="grid w-full grid-cols-4 max-w-3xl">
+          <TabsTrigger value="pending" className="relative">
+            {t("pending")}
+            {pendingReceivedCount > 0 && (
               <Badge
                 variant="destructive"
                 className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
               >
-                {pendingReceived}
+                {pendingReceivedCount}
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="sent">{t("sent")}</TabsTrigger>
+          <TabsTrigger value="accepted">
+            {t("accepted")}
+            {acceptedTransactions.length > 0 && (
+              <Badge
+                variant="outline"
+                className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+              >
+                {acceptedTransactions.length}
+              </Badge>
+            )}
+          </TabsTrigger>
           <TabsTrigger value="completed">
             {t("completed")}
             {completedTransactions.length > 0 && (
@@ -169,22 +187,33 @@ export default function TransactionsPage() {
               </Badge>
             )}
           </TabsTrigger>
+          <TabsTrigger value="rejected">
+            {t("rejected")}
+            {rejectedTransactions.length > 0 && (
+              <Badge
+                variant="outline"
+                className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+              >
+                {rejectedTransactions.length}
+              </Badge>
+            )}
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="received" className="mt-6">
+        <TabsContent value="pending" className="mt-6">
           {loading ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">{t("loading")}</p>
             </div>
-          ) : receivedTransactions.length === 0 ? (
+          ) : pendingTransactions.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">
-                {t("notReceivedAnyOffers")}
+                {t("noPendingTransactions")}
               </p>
             </div>
           ) : (
             <div className="space-y-4">
-              {receivedTransactions.map((transaction) => (
+              {pendingTransactions.map((transaction) => (
                 <TransactionCard
                   key={transaction._id}
                   transaction={transaction}
@@ -196,20 +225,20 @@ export default function TransactionsPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="sent" className="mt-6">
+        <TabsContent value="accepted" className="mt-6">
           {loading ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">{t("loading")}</p>
             </div>
-          ) : sentTransactions.length === 0 ? (
+          ) : acceptedTransactions.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">
-                {t("haventSentAnyOffers")}
+                {t("noAcceptedTransactions")}
               </p>
             </div>
           ) : (
             <div className="space-y-4">
-              {sentTransactions.map((transaction) => (
+              {acceptedTransactions.map((transaction) => (
                 <TransactionCard
                   key={transaction._id}
                   transaction={transaction}
@@ -235,6 +264,31 @@ export default function TransactionsPage() {
           ) : (
             <div className="space-y-4">
               {completedTransactions.map((transaction) => (
+                <TransactionCard
+                  key={transaction._id}
+                  transaction={transaction}
+                  userEmail={userEmail || ""}
+                  onStatusUpdate={handleStatusUpdate}
+                />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="rejected" className="mt-6">
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">{t("loading")}</p>
+            </div>
+          ) : rejectedTransactions.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">
+                {t("noRejectedTransactions")}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {rejectedTransactions.map((transaction) => (
                 <TransactionCard
                   key={transaction._id}
                   transaction={transaction}
