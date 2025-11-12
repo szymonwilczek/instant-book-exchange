@@ -134,7 +134,13 @@
     "markAsCompleted": "Mark as completed",
     "waitingForUser": "Waiting for {username} to complete",
     "reviewExchange": "Review exchange",
-    "sendMessage": "Send message"
+    "sendMessage": "Send message",
+    "acceptedOn": "Accepted on",
+    "rejectedOn": "Rejected on",
+    "completedOn": "Completed on",
+    "noPendingTransactions": "No pending transactions",
+    "noAcceptedTransactions": "No accepted transactions",
+    "noRejectedTransactions": "No rejected transactions"
   },
 
   "profile": {

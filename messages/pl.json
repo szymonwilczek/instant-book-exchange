@@ -134,7 +134,13 @@
     "markAsCompleted": "Oznacz jako ukończona",
     "waitingForUser": "Oczekiwanie na {username}",
     "reviewExchange": "Oceń wymianę",
-    "sendMessage": "Wyślij wiadomość"
+    "sendMessage": "Wyślij wiadomość",
+    "acceptedOn": "Zaakceptowana",
+    "rejectedOn": "Odrzucona",
+    "completedOn": "Zakończona",
+    "noPendingTransactions": "Brak oczekujących transakcji",
+    "noAcceptedTransactions": "Brak zaakceptowanych transakcji",
+    "noRejectedTransactions": "Brak odrzuconych transakcji"
   },
 
   "profile": {
