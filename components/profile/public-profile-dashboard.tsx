@@ -6,7 +6,7 @@ import { StatsSection } from "./sections/stats-section";
 import { OfferedBooksSection } from "./sections/offered-books-section";
 import { WishlistSection } from "./sections/wishlist-section";
 import { ReviewsSection } from "./sections/reviews-section";
-import { TrendingUp, User, Star, Trophy, Package, Rocket } from "lucide-react";
+import { User, Star, Trophy, Package, Rocket } from "lucide-react";
 import { StartConversationModal } from "@/components/messages/start-conversation-modal";
 import { IBook } from "@/lib/models/Book";
 import { useRouter } from "next/navigation";
