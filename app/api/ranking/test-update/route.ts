@@ -6,6 +6,7 @@ import {
   recalculateRankings,
 } from "@/lib/ranking/updater";
 import UserRanking from "@/lib/models/UserRanking";
+import { UserRankingData } from "@/lib/types/ranking";
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
     } else if (userId) {
       await updateSingleUser(userId);
 
-      const ranking = await UserRanking.findOne({ userId }).lean();
+      const ranking = (await UserRanking.findOne({ userId }).lean()) as UserRankingData | null;
 
       if (!ranking) {
         return NextResponse.json(
