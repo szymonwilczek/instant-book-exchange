@@ -6,7 +6,6 @@ import Book from "../models/Book";
 import Conversation from "../models/Conversation";
 import LoginStreak from "../models/LoginStreak";
 import UserAchievement from "../models/UserAchievement";
-import Achievement from "../models/Achievement";
 import { ScoreBreakdown, RankingStats, TierType } from "../types/ranking";
 
 interface CalculatedScore {
@@ -108,87 +107,47 @@ async function calculateReputationScore(
 }
 
 /**
- * Oblicza Community Score (20% wagi)
- * - Rozpoczęte konwersacje: 5 pkt/konwersacja
- * - Responsiveness: +50 pkt za średni czas odpowiedzi <24h
- * - Free giveaways: 75 pkt/darmowa wymiana
- * - Detailed reviews wystawione: 15 pkt/opinia z >50 znakami
+ * Oblicza punkty za aktywność społecznościową
+ * - Konwersacje z innymi użytkownikami
+ * - Wiadomości wysłane
+ * - Aktywne dyskusje
  */
 async function calculateCommunityScore(
   userId: string,
 ): Promise<{ score: number; stats: Partial<RankingStats> }> {
   const conversations = await Conversation.find({
     participants: userId,
-  })
-    .populate("messages")
-    .lean();
-
-  const givenReviews = await Review.find({ reviewer: userId }).lean();
-
-  const freeGiveaways = await Transaction.find({
-    initiator: userId,
-    status: "completed",
-    $or: [{ offeredBooks: { $size: 0 } }, { offeredBooks: { $exists: false } }],
   }).lean();
 
-  let score = 0;
-
-  score += conversations.length * 5;
-
-  // sredni czas odpowiedzi
-  let totalResponseTime = 0;
-  let responseCount = 0;
-
-  interface Message {
-    sender?: { toString: () => string } | string;
-    timestamp: Date | string;
+  if (!conversations || conversations.length === 0) {
+    return { score: 0, stats: {} };
   }
 
+  let totalMessages = 0;
+  let activeConversations = 0;
+
+  // liczenie wiadomosci we wszystkich konwersacjach 
   for (const conv of conversations) {
-    const messages = ((conv as unknown as { messages?: Message[] }).messages ||
-      []) as Message[];
+    const messageCount = conv.messages?.length || 0;
+    totalMessages += messageCount;
 
-    for (let i = 1; i < messages.length; i++) {
-      const currentSender = messages[i].sender?.toString() ?? "";
-      const previousSender = messages[i - 1].sender?.toString() ?? "";
-
-      if (currentSender === userId && previousSender !== userId) {
-        const responseTime =
-          new Date(messages[i].timestamp).getTime() -
-          new Date(messages[i - 1].timestamp).getTime();
-        totalResponseTime += responseTime;
-        responseCount++;
-      }
+    // aktywna jesli ma > 2 wiadomosci
+    if (messageCount > 2) {
+      activeConversations++;
     }
   }
 
-  const avgResponseTimeHours =
-    responseCount > 0
-      ? totalResponseTime / responseCount / (1000 * 60 * 60)
-      : 0;
-
-  if (avgResponseTimeHours < 24 && responseCount > 0) {
-    score += 50;
-  }
-
-  score += freeGiveaways.length * 75;
-
-  const detailedReviewsGiven = givenReviews.filter(
-    (r) => r.comment && r.comment.length >= 50,
-  ).length;
-  score += detailedReviewsGiven * 15;
+  // Punktacja:
+  // - 10 pkt za kazda aktywna konwersacje (max 500)
+  // - 2 pkt za kazda wiadomosc (max 500)
+  const conversationScore = Math.min(activeConversations * 10, 500);
+  const messageScore = Math.min(totalMessages * 2, 500);
 
   return {
-    score,
-    stats: {
-      conversationsStarted: conversations.length,
-      responseTimeAvg: avgResponseTimeHours,
-      freeGiveaways: freeGiveaways.length,
-      detailedReviewsGiven,
-    },
+    score: conversationScore + messageScore,
+    stats: {},
   };
 }
-
 /**
  * Oblicza Activity Score (15% wagi)
  * - Login streak: 2 pkt/dzień (max 730 pkt za rok)
