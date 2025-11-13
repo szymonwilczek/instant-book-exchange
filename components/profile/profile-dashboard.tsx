@@ -14,7 +14,7 @@ import { OnboardingModal } from "./modals/onboarding-modal";
 import { DeleteConfirmModal } from "./modals/delete-confirm-modal";
 import { useProfileData, UserData } from "./hooks/useProfileData";
 import { useOnboarding } from "./hooks/useOnboarding";
-import { Package, DollarSign, User, TrendingUp, Edit } from "lucide-react";
+import { Package, DollarSign, User, TrendingUp, Edit, Rocket } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -295,7 +295,7 @@ export function ProfileDashboard({
   ];
 
   const userStats = [
-    { title: t("booksExchanged"), value: booksExchangedUser, icon: Package },
+    { title: t("booksExchanged"), value: booksExchangedUser, icon: User },
     {
       title: t("averageRating"),
       value: `${averageRatingUser.toFixed(1)}/5`,
@@ -305,7 +305,7 @@ export function ProfileDashboard({
   ];
 
   const activityStats = [
-    { title: t("pendingExchanges"), value: pendingExchanges, icon: DollarSign },
+    { title: t("pendingExchanges"), value: pendingExchanges, icon: Rocket },
     {
       title: t("averageExchangeTime"),
       value: formatExchangeTime(
