@@ -9,6 +9,7 @@ import Book from "@/lib/models/Book";
 import Conversation from "@/lib/models/Conversation";
 import LoginStreak from "@/lib/models/LoginStreak";
 import Achievement, { IAchievement } from "@/lib/models/Achievement";
+import PointsHistory from "@/lib/models/PointsHistory";
 
 type EventType =
   | "transaction_completed"
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest) {
   if (!userEmail) {
     return NextResponse.json(
       { error: "User email not found" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -96,7 +97,7 @@ export async function POST(req: NextRequest) {
   // sprawdzanie kazdeg osiagniecia
   for (const achievement of allAchievements) {
     const existingUserAchievement = userAchievements.find(
-      (ua) => ua.achievementId.toString() === achievement._id.toString()
+      (ua) => ua.achievementId.toString() === achievement._id.toString(),
     );
 
     // jesli odblokowane -> pomin
@@ -212,6 +213,13 @@ export async function POST(req: NextRequest) {
           // punkty bonusowe
           user.points += achievement.points;
           await user.save();
+          await PointsHistory.create({
+            user: targetUserId,
+            amount: achievement.points,
+            type: "earned",
+            source: "achievement",
+            description: `${achievement.nameKey}`,
+          });
         } else {
           progressUpdates.push({
             achievementId: achievement._id,
@@ -241,6 +249,13 @@ export async function POST(req: NextRequest) {
         // punkty bonusowe
         user.points += achievement.points;
         await user.save();
+        await PointsHistory.create({
+          user: targetUserId,
+          amount: achievement.points,
+          type: "earned",
+          source: "achievement",
+          description: `${achievement.nameKey}`,
+        });
       } else {
         progressUpdates.push({
           achievementId: achievement._id,
