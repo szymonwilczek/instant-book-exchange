@@ -23,7 +23,7 @@ export function RankingCard({
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(`/profile/${entry.userId}`);
+    router.push(`/users/${entry.userId}`);
   };
 
   const getRankColor = (rank: number) => {
