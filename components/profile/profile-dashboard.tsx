@@ -29,6 +29,8 @@ import { PromotedBooksSection } from "./sections/promoted-books-section";
 import { HistorySection } from "./sections/history-section";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
+import { formatExchangeTime } from "@/lib/utils/format-time";
 
 interface BookBase {
   id: string;
@@ -120,6 +122,13 @@ export function ProfileDashboard({
   const t = useTranslations("profile");
   const { update } = useSession();
   const router = useRouter();
+  const locale = useLocale();
+  const [wishlistMatchesCount, setWishlistMatchesCount] = useState(0);
+  const [averageExchangeTimeData, setAverageExchangeTimeData] = useState<{
+    averageDays: number;
+    averageHours: number;
+    count: number;
+  }>({ averageDays: 0, averageHours: 0, count: 0 });
 
   const {
     userData: fetchedUserData,
@@ -231,6 +240,42 @@ export function ProfileDashboard({
     }
   }, [currentUserData?.email]);
 
+  useEffect(() => {
+    const fetchWishlistMatches = async () => {
+      try {
+        const res = await fetch("/api/matches");
+        const data = await res.json();
+        setWishlistMatchesCount(data.count || 0);
+      } catch (error) {
+        console.error("Error fetching wishlist matches:", error);
+      }
+    };
+
+    if (currentUserData?.email) {
+      fetchWishlistMatches();
+    }
+  }, [currentUserData?.email]);
+
+  useEffect(() => {
+    const fetchAverageExchangeTime = async () => {
+      try {
+        const res = await fetch("/api/user/average-exchange-time");
+        const data = await res.json();
+        setAverageExchangeTimeData({
+          averageDays: data.averageDays || 0,
+          averageHours: data.averageHours || 0,
+          count: data.count || 0,
+        });
+      } catch (error) {
+        console.error("Error fetching average exchange time:", error);
+      }
+    };
+
+    if (currentUserData?.email) {
+      fetchAverageExchangeTime();
+    }
+  }, [currentUserData?.email]);
+
   const totalBooksOffered = books.length;
   const totalExchanges = transactions.filter(
     (t) => t.status === "completed"
@@ -242,8 +287,6 @@ export function ProfileDashboard({
   const pendingExchanges = transactions.filter(
     (t) => t.status === "pending"
   ).length;
-  const averageExchangeTime = "2.5 days";
-  const wishlistMatches = 8;
 
   const platformStats = [
     { title: t("totalBooksOffered"), value: totalBooksOffered, icon: Package },
@@ -265,10 +308,15 @@ export function ProfileDashboard({
     { title: t("pendingExchanges"), value: pendingExchanges, icon: DollarSign },
     {
       title: t("averageExchangeTime"),
-      value: averageExchangeTime,
+      value: formatExchangeTime(
+        averageExchangeTimeData.averageDays,
+        averageExchangeTimeData.averageHours,
+        t,
+        locale
+      ),
       icon: TrendingUp,
     },
-    { title: t("wishlistMatches"), value: wishlistMatches, icon: Edit },
+    { title: t("wishlistMatches"), value: wishlistMatchesCount, icon: Edit },
   ];
 
   const handleProfileUpdate = async (updatedProfile: UserProfile) => {
@@ -563,7 +611,7 @@ export function ProfileDashboard({
 
       <OnboardingModal
         open={isOnboardingOpen}
-        onOpenChange={() => {}}
+        onOpenChange={() => { }}
         genres={genres}
         selectedGenres={selectedGenres}
         selectedBooks={selectedBooks}

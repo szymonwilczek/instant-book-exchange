@@ -53,7 +53,7 @@ export default function HomePage() {
     if (session) {
       fetch("/api/matches")
         .then((res) => res.json())
-        .then(setMatches)
+        .then((data) => setMatches(data.matches || []))
         .catch(console.error);
     }
   }, [session]);
