@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ChevronDownIcon, User, LogOut, Sun, Moon, Trophy } from "lucide-react";
+import { ChevronDownIcon, User, LogOut, Sun, Moon, Trophy, TableProperties } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { LanguageSwitcher } from "./LanguageSwitcher";
@@ -77,6 +77,15 @@ export const UserMenu = ({
         >
           <Trophy className="mr-2 h-4 w-4" />
           {t("achievements")}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            onItemClick?.("leaderboard");
+            router.push("/leaderboard");
+          }}
+        >
+          <TableProperties className="mr-2 h-4 w-4" />
+          {t("leaderboard")}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
