@@ -694,5 +694,53 @@
     "minLength": "Minimum {count} characters",
     "maxLength": "Maximum {count} characters",
     "email": "Invalid email format"
+  },
+  "ranking": {
+    "leaderboard": {
+      "title": "Leaderboard",
+      "description": "Top users ranked by their activity and contributions"
+    },
+    "tiers": {
+      "bronze": "Bronze",
+      "silver": "Silver",
+      "gold": "Gold",
+      "platinum": "Platinum",
+      "diamond": "Diamond",
+      "legendary": "Legendary"
+    },
+    "stats": {
+      "rank": "Rank",
+      "totalScore": "Total Score",
+      "tier": "Tier",
+      "trades": "Trades",
+      "rating": "Rating",
+      "reviews": "Reviews",
+      "booksAdded": "Books Added",
+      "loginStreak": "Login Streak"
+    },
+    "categories": {
+      "trading": "Trading",
+      "reputation": "Reputation",
+      "community": "Community",
+      "activity": "Activity",
+      "quality": "Quality"
+    },
+    "compare": {
+      "title": "Compare Users",
+      "description": "Side-by-side comparison of user rankings and statistics",
+      "scoreDifference": "Score Difference",
+      "viewProfile": "View Profile",
+      "detailedStats": "Detailed Statistics"
+    },
+    "search": {
+      "placeholder": "Search by username...",
+      "noResults": "No users found",
+      "startTyping": "Start typing to search for users"
+    },
+    "progress": {
+      "nextTier": "Next Tier",
+      "pointsNeeded": "points needed",
+      "currentProgress": "Current Progress"
+    }
   }
 }

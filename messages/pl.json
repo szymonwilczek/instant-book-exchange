@@ -696,5 +696,53 @@
     "minLength": "Minimum {count} characters",
     "maxLength": "Maximum {count} characters",
     "email": "Invalid email format"
+  },
+  "ranking": {
+    "leaderboard": {
+      "title": "Ranking",
+      "description": "Najlepsi użytkownicy ranked według aktywności i wkładu"
+    },
+    "tiers": {
+      "bronze": "Brązowy",
+      "silver": "Srebrny",
+      "gold": "Złoty",
+      "platinum": "Platynowy",
+      "diamond": "Diamentowy",
+      "legendary": "Legendarny"
+    },
+    "stats": {
+      "rank": "Pozycja",
+      "totalScore": "Łączne Punkty",
+      "tier": "Poziom",
+      "trades": "Wymiany",
+      "rating": "Ocena",
+      "reviews": "Opinie",
+      "booksAdded": "Dodane Książki",
+      "loginStreak": "Seria Logowań"
+    },
+    "categories": {
+      "trading": "Wymiany",
+      "reputation": "Reputacja",
+      "community": "Społeczność",
+      "activity": "Aktywność",
+      "quality": "Jakość"
+    },
+    "compare": {
+      "title": "Porównaj Użytkowników",
+      "description": "Porównanie rankingów i statystyk użytkowników",
+      "scoreDifference": "Różnica Punktów",
+      "viewProfile": "Zobacz Profil",
+      "detailedStats": "Szczegółowe Statystyki"
+    },
+    "search": {
+      "placeholder": "Szukaj po nazwie użytkownika...",
+      "noResults": "Nie znaleziono użytkowników",
+      "startTyping": "Zacznij pisać aby wyszukać użytkowników"
+    },
+    "progress": {
+      "nextTier": "Następny Poziom",
+      "pointsNeeded": "punktów potrzebnych",
+      "currentProgress": "Obecny Postęp"
+    }
   }
 }
