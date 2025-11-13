@@ -6,11 +6,14 @@ import { StatsSection } from "./sections/stats-section";
 import { OfferedBooksSection } from "./sections/offered-books-section";
 import { WishlistSection } from "./sections/wishlist-section";
 import { ReviewsSection } from "./sections/reviews-section";
-import { TrendingUp, User, Star } from "lucide-react";
+import { TrendingUp, User, Star, Trophy } from "lucide-react";
 import { StartConversationModal } from "@/components/messages/start-conversation-modal";
 import { IBook } from "@/lib/models/Book";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useRanking } from "@/lib/hooks/useRanking";
+import { Card, CardContent } from "../ui/card";
+import { TierBadge } from "../ranking/tier-badge";
 
 interface PublicProfileDashboardProps {
   profileData: {
@@ -50,6 +53,7 @@ export function PublicProfileDashboard({
   const router = useRouter();
   const [messageModalOpen, setMessageModalOpen] = useState(false);
   const t = useTranslations("profile");
+  const { ranking, isLoading: rankingLoading } = useRanking(profileData.user._id);
 
   const { user, offeredBooks, wishlist, reviews, stats } = profileData;
 
@@ -110,10 +114,35 @@ export function PublicProfileDashboard({
           twitter: user.twitter,
           website: user.website,
         }}
-        onEditProfile={() => {}}
+        onEditProfile={() => { }}
         isPublicView={true}
         userId={user._id}
       />
+
+      {!rankingLoading && ranking && (
+        <Card>
+          <CardContent>
+            <div className="flex items-center gap-2 mb-4">
+              <Trophy className="h-5 w-5 text-orange-500" />
+              <h3 className="font-semibold">{t("ranking.position")}</h3>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">{t("ranking.rank")}</span>
+                <span className="text-2xl font-bold">#{ranking.rank}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">{t("ranking.tier")}</span>
+                <TierBadge tier={ranking.tier as "bronze" | "silver" | "gold" | "platinum" | "diamond" | "legendary"} showLabel />
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">{t("ranking.totalScore")}</span>
+                <span className="text-lg font-semibold">{ranking.totalScore}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <StatsSection
         platformStats={[
@@ -161,17 +190,17 @@ export function PublicProfileDashboard({
 
       <OfferedBooksSection
         books={mappedOfferedBooks}
-        onAddBook={() => {}}
-        onEditBook={() => {}}
-        onDeleteBook={() => {}}
+        onAddBook={() => { }}
+        onEditBook={() => { }}
+        onDeleteBook={() => { }}
         isPublicView={true}
       />
 
       {mappedWishlist.length > 0 && (
         <WishlistSection
           wishlist={mappedWishlist}
-          onAddToWishlist={() => {}}
-          onRemoveFromWishlist={() => {}}
+          onAddToWishlist={() => { }}
+          onRemoveFromWishlist={() => { }}
           isPublicView={true}
         />
       )}
