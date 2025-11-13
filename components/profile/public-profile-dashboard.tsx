@@ -6,7 +6,7 @@ import { StatsSection } from "./sections/stats-section";
 import { OfferedBooksSection } from "./sections/offered-books-section";
 import { WishlistSection } from "./sections/wishlist-section";
 import { ReviewsSection } from "./sections/reviews-section";
-import { TrendingUp, User, Star, Trophy } from "lucide-react";
+import { TrendingUp, User, Star, Trophy, Package, Rocket } from "lucide-react";
 import { StartConversationModal } from "@/components/messages/start-conversation-modal";
 import { IBook } from "@/lib/models/Book";
 import { useRouter } from "next/navigation";
@@ -149,7 +149,7 @@ export function PublicProfileDashboard({
           {
             title: t("userPoints"),
             value: user.points,
-            icon: TrendingUp,
+            icon: Package,
           },
           {
             title: t("userMemberSince"),
@@ -161,7 +161,7 @@ export function PublicProfileDashboard({
           {
             title: t("userCompletedExchanges"),
             value: stats.completedTransactions,
-            icon: TrendingUp,
+            icon: User,
           },
           {
             title: t("userAverageRating"),
@@ -173,7 +173,7 @@ export function PublicProfileDashboard({
           {
             title: t("userBooksOffered"),
             value: stats.offeredBooksCount,
-            icon: User,
+            icon: Rocket,
           },
           {
             title: t("userWishlistItems"),
