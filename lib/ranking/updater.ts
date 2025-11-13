@@ -3,6 +3,7 @@ import UserRanking from "../models/UserRanking";
 import User, { IUser } from "../models/User";
 import { calculateUserScore, assignTier } from "./calculator";
 import { subDays } from "date-fns";
+import { grantAchievement } from "../achievements/grant";
 
 /**
  * Aktualizuje ranking dla pojedynczego użytkownika
@@ -10,43 +11,26 @@ import { subDays } from "date-fns";
 export async function updateSingleUser(userId: string): Promise<void> {
   await connectToDB();
 
-  const user = await User.findById(userId);
-  if (!user) {
-    throw new Error(`User not found: ${userId}`);
-  }
+  const result = await calculateUserScore(userId);
 
-  // oblicz scores
-  const { totalScore, scores, stats } = await calculateUserScore(userId);
+  await UserRanking.findOneAndUpdate(
+    { userId },
+    {
+      $set: {
+        totalScore: result.totalScore,
+        scores: result.scores,
+        tier: result.tier,
+        stats: result.stats,
+        weeklyExchanges: result.weeklyExchanges,
+        weeklyReviews: result.weeklyReviews,
+        lastActivity: result.lastActivity,
+        lastCalculated: new Date(),
+      },
+    },
+    { upsert: true, new: true },
+  );
 
-  // przypisz tier
-  const tier = assignTier(totalScore);
-
-  // znajdz lub utworz ranking
-  let ranking = await UserRanking.findOne({ userId });
-
-  if (!ranking) {
-    ranking = await UserRanking.create({
-      userId,
-      totalScore,
-      scores,
-      tier,
-      rank: 0,
-      previousRank: 0,
-      stats,
-      weeklyExchanges: 0,
-      weeklyReviews: 0,
-      lastActivity: new Date(),
-      lastCalculated: new Date(),
-    });
-  } else {
-    ranking.totalScore = totalScore;
-    ranking.scores = scores;
-    ranking.tier = tier;
-    ranking.stats = stats;
-    ranking.lastCalculated = new Date();
-
-    await ranking.save();
-  }
+  await recalculateRankings();
 }
 
 /**
@@ -76,16 +60,40 @@ export async function updateAllUsers(): Promise<number> {
 export async function recalculateRankings(): Promise<void> {
   await connectToDB();
 
-  const rankings = await UserRanking.find({}).sort({ totalScore: -1 }).lean();
+  const rankings = await UserRanking.find()
+    .sort({ totalScore: -1 })
+    .select("_id userId totalScore rank");
 
-  for (let i = 0; i < rankings.length; i++) {
-    const currentRanking = rankings[i];
-    const newRank = i + 1;
+  const updates = rankings.map((ranking, index) => {
+    const newRank = index + 1;
+    const previousRank = ranking.rank;
 
-    await UserRanking.findByIdAndUpdate(currentRanking._id, {
-      previousRank: currentRanking.rank,
-      rank: newRank,
-    });
+    return {
+      updateOne: {
+        filter: { _id: ranking._id },
+        update: {
+          $set: {
+            rank: newRank,
+            previousRank,
+          },
+        },
+      },
+    };
+  });
+
+  if (updates.length > 0) {
+    await UserRanking.bulkWrite(updates);
+  }
+
+  if (rankings.length > 0) {
+    const firstPlace = rankings[0];
+    await grantAchievement(
+      firstPlace.userId.toString(),
+      "best_of_the_best",
+    );
+    console.log(
+      `🏆 Checked achievement for rank #1: ${firstPlace.userId.toString()}`,
+    );
   }
 }
 
