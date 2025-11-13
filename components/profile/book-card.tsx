@@ -69,7 +69,7 @@ export function BookCard({
         <Image
           width={200}
           height={200}
-          src={book.image || "/placeholder.svg"}
+          src={book.image || "/placeholder-book.png"}
           alt={book.title}
           className="object-contain w-full h-full"
         />
