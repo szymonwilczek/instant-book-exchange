@@ -151,7 +151,7 @@ export function TransactionCard({
             {/* Header z użytkownikiem */}
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
-                <Avatar className="h-12 w-12">
+                <Avatar className="md:h-12 md:w-12 h-8 w-8">
                   <AvatarImage src={otherUser.profileImage} />
                   <AvatarFallback>
                     {otherUser.username?.substring(0, 2).toUpperCase()}
