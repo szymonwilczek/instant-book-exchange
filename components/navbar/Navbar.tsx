@@ -9,11 +9,6 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -23,10 +18,11 @@ import { UserMenu } from "@/components/navbar/UserMenu";
 import { CartSheet } from "@/components/navbar/CartSheet";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
-import { MessageCircle, LogIn } from "lucide-react";
+import { MessageCircle, LogIn, Home, ArrowRightLeft, User, Trophy, TableProperties } from "lucide-react";
 import { PointsDisplay } from "./PointsDisplay";
 import { IUser } from "@/lib/models/User";
 import { useTranslations } from "next-intl";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
 
 export interface NavbarNavItem {
   href?: string;
@@ -54,6 +50,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
     ref
   ) => {
     const [isMobile, setIsMobile] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const containerRef = useRef<HTMLElement>(null);
     const { data: session } = useSession();
     const [userData, setUserData] = useState<IUser | null>(null);
@@ -65,6 +62,15 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
     const defaultNavigationLinks: NavbarNavItem[] = [
       { href: "/", label: t("navigationLinks.home") },
       { href: "/transactions", label: t("navigationLinks.transactions") },
+    ];
+
+    const mobileNavigationLinks: NavbarNavItem[] = [
+      { href: "/", label: t("navigationLinks.home") },
+      { href: "/transactions", label: t("navigationLinks.transactions") },
+      { href: "/profile", label: t("navigationLinks.profile") },
+      { href: "/messages", label: t("navigationLinks.messages") },
+      { href: "/achievements", label: t("navigationLinks.achievements") },
+      { href: "/leaderboard", label: t("navigationLinks.ranking") },
     ];
 
     useEffect(() => {
@@ -152,8 +158,8 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
           <div className="flex items-center gap-2">
             {/* Mobile menu trigger */}
             {isMobile && (
-              <Popover>
-                <PopoverTrigger asChild>
+              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                <SheetTrigger asChild>
                   <Button
                     className="group h-9 w-9 hover:bg-accent hover:text-accent-foreground"
                     variant="ghost"
@@ -161,42 +167,65 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                   >
                     <HamburgerIcon />
                   </Button>
-                </PopoverTrigger>
-                <PopoverContent align="start" className="w-64 p-1">
-                  <NavigationMenu className="max-w-none">
-                    <NavigationMenuList className="flex-col items-start gap-0">
-                      {defaultNavigationLinks.map((link, index) => (
-                        <NavigationMenuItem key={index} className="w-full">
-                          <button
-                            onClick={() => {
-                              if (onNavItemClick) {
-                                onNavItemClick(link.href!);
-                              } else {
-                                router.push(link.href!);
-                              }
-                            }}
-                            className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer no-underline"
-                          >
-                            {link.label}
-                          </button>
-                        </NavigationMenuItem>
-                      ))}
-                    </NavigationMenuList>
-                  </NavigationMenu>
-                </PopoverContent>
-              </Popover>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-[280px] sm:w-[320px] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+                  <SheetHeader>
+                    <SheetTitle className="flex items-center gap-2">
+                      {logo}
+                      <span className="font-bold text-lg">Menu</span>
+                    </SheetTitle>
+                    <SheetDescription className="sr-only">
+                      Navigation menu
+                    </SheetDescription>
+                  </SheetHeader>
+                  <div className="mt-2 flex flex-col gap-2">
+                    {mobileNavigationLinks.map((link, index) => {
+                      const icons = {
+                        "/": Home,
+                        "/transactions": ArrowRightLeft,
+                        "/profile": User,
+                        "/messages": MessageCircle,
+                        "/achievements": Trophy,
+                        "/leaderboard": TableProperties,
+                      };
+                      const Icon = icons[link.href as keyof typeof icons];
+
+                      return (
+                        <Button
+                          key={index}
+                          variant="ghost"
+                          className="w-full justify-start text-base gap-3 py-4 mt-2"
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            if (onNavItemClick) {
+                              onNavItemClick(link.href!);
+                            } else {
+                              router.push(link.href!);
+                            }
+                          }}
+                        >
+                          {Icon && <Icon className="h-5 w-5" />}
+                          {link.label}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </SheetContent>
+              </Sheet>
             )}
             {/* Main nav */}
             <div className="flex items-center gap-6">
-              <button
-                onClick={() => router.push("/")}
-                className="flex items-center space-x-2 text-primary hover:text-primary/90 transition-colors cursor-pointer"
-              >
-                <div className="text-2xl">{logo}</div>
-                <span className="hidden font-bold text-xl sm:inline-block">
-                  Instant Book Exchange
-                </span>
-              </button>
+              {!isMobile && (
+                <button
+                  onClick={() => router.push("/")}
+                  className="flex items-center space-x-2 text-primary hover:text-primary/90 transition-colors cursor-pointer"
+                >
+                  <div className="text-2xl">{logo}</div>
+                  <span className="hidden font-bold text-xl sm:inline-block">
+                    Instant Book Exchange
+                  </span>
+                </button>
+              )}
               {/* Navigation menu */}
               {!isMobile && (
                 <NavigationMenu className="flex">
