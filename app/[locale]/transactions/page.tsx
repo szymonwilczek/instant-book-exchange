@@ -4,6 +4,13 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle2 } from "lucide-react";
@@ -32,6 +39,7 @@ export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<TransactionData[]>([]);
   const [loading, setLoading] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [activeTab, setActiveTab] = useState("pending");
   const t = useTranslations("transactions");
 
   useEffect(() => {
@@ -136,6 +144,69 @@ export default function TransactionsPage() {
     (t) => t.receiver.email === userEmail
   ).length;
 
+  const getTransactionsByTab = (tab: string) => {
+    switch (tab) {
+      case "pending":
+        return pendingTransactions;
+      case "accepted":
+        return acceptedTransactions;
+      case "completed":
+        return completedTransactions;
+      case "rejected":
+        return rejectedTransactions;
+      default:
+        return [];
+    }
+  };
+
+  const getEmptyMessage = (tab: string) => {
+    switch (tab) {
+      case "pending":
+        return t("noPendingTransactions");
+      case "accepted":
+        return t("noAcceptedTransactions");
+      case "completed":
+        return t("dontHaveAnyCompleted");
+      case "rejected":
+        return t("noRejectedTransactions");
+      default:
+        return "";
+    }
+  };
+
+  const renderTransactionList = (tab: string) => {
+    const transactionList = getTransactionsByTab(tab);
+
+    if (loading) {
+      return (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">{t("loading")}</p>
+        </div>
+      );
+    }
+
+    if (transactionList.length === 0) {
+      return (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">{getEmptyMessage(tab)}</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        {transactionList.map((transaction) => (
+          <TransactionCard
+            key={transaction._id}
+            transaction={transaction}
+            userEmail={userEmail || ""}
+            onStatusUpdate={handleStatusUpdate}
+          />
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="container mx-auto p-4 max-w-6xl">
       <div className="mb-6">
@@ -152,7 +223,76 @@ export default function TransactionsPage() {
         </Alert>
       )}
 
-      <Tabs defaultValue="pending" className="w-full">
+      {/* mobilne: Select */}
+      <div className="md:hidden mb-6">
+        <Select value={activeTab} onValueChange={setActiveTab}>
+          <SelectTrigger className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="pending">
+              <div className="flex items-center gap-2">
+                {t("pending")}
+                {pendingReceivedCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                  >
+                    {pendingReceivedCount}
+                  </Badge>
+                )}
+              </div>
+            </SelectItem>
+            <SelectItem value="accepted">
+              <div className="flex items-center gap-2">
+                {t("accepted")}
+                {acceptedTransactions.length > 0 && (
+                  <Badge
+                    variant="outline"
+                    className="h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                  >
+                    {acceptedTransactions.length}
+                  </Badge>
+                )}
+              </div>
+            </SelectItem>
+            <SelectItem value="completed">
+              <div className="flex items-center gap-2">
+                {t("completed")}
+                {completedTransactions.length > 0 && (
+                  <Badge
+                    variant="outline"
+                    className="h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                  >
+                    {completedTransactions.length}
+                  </Badge>
+                )}
+              </div>
+            </SelectItem>
+            <SelectItem value="rejected">
+              <div className="flex items-center gap-2">
+                {t("rejected")}
+                {rejectedTransactions.length > 0 && (
+                  <Badge
+                    variant="outline"
+                    className="h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                  >
+                    {rejectedTransactions.length}
+                  </Badge>
+                )}
+              </div>
+            </SelectItem>
+          </SelectContent>
+        </Select>
+        <div className="mt-6">{renderTransactionList(activeTab)}</div>
+      </div>
+
+      {/* desktop: Tabs */}
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="w-full hidden md:block"
+      >
         <TabsList className="grid w-full grid-cols-4 max-w-3xl">
           <TabsTrigger value="pending" className="relative">
             {t("pending")}
@@ -201,103 +341,19 @@ export default function TransactionsPage() {
         </TabsList>
 
         <TabsContent value="pending" className="mt-6">
-          {loading ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">{t("loading")}</p>
-            </div>
-          ) : pendingTransactions.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">
-                {t("noPendingTransactions")}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {pendingTransactions.map((transaction) => (
-                <TransactionCard
-                  key={transaction._id}
-                  transaction={transaction}
-                  userEmail={userEmail || ""}
-                  onStatusUpdate={handleStatusUpdate}
-                />
-              ))}
-            </div>
-          )}
+          {renderTransactionList("pending")}
         </TabsContent>
 
         <TabsContent value="accepted" className="mt-6">
-          {loading ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">{t("loading")}</p>
-            </div>
-          ) : acceptedTransactions.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">
-                {t("noAcceptedTransactions")}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {acceptedTransactions.map((transaction) => (
-                <TransactionCard
-                  key={transaction._id}
-                  transaction={transaction}
-                  userEmail={userEmail || ""}
-                  onStatusUpdate={handleStatusUpdate}
-                />
-              ))}
-            </div>
-          )}
+          {renderTransactionList("accepted")}
         </TabsContent>
 
         <TabsContent value="completed" className="mt-6">
-          {loading ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">{t("loading")}</p>
-            </div>
-          ) : completedTransactions.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">
-                {t("dontHaveAnyCompleted")}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {completedTransactions.map((transaction) => (
-                <TransactionCard
-                  key={transaction._id}
-                  transaction={transaction}
-                  userEmail={userEmail || ""}
-                  onStatusUpdate={handleStatusUpdate}
-                />
-              ))}
-            </div>
-          )}
+          {renderTransactionList("completed")}
         </TabsContent>
 
         <TabsContent value="rejected" className="mt-6">
-          {loading ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">{t("loading")}</p>
-            </div>
-          ) : rejectedTransactions.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">
-                {t("noRejectedTransactions")}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {rejectedTransactions.map((transaction) => (
-                <TransactionCard
-                  key={transaction._id}
-                  transaction={transaction}
-                  userEmail={userEmail || ""}
-                  onStatusUpdate={handleStatusUpdate}
-                />
-              ))}
-            </div>
-          )}
+          {renderTransactionList("rejected")}
         </TabsContent>
       </Tabs>
     </div>
