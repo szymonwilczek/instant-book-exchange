@@ -63,12 +63,14 @@ export default function ProfilePage() {
     }
   }, [session]);
 
+  const handleProfileUpdate = async () => { await update(); };
+
   if (status === "loading") return <div>{t("loading")}</div>;
 
   return (
     <div>
       <div className="min-h-screen bg-background">
-        <ProfileDashboard userData={userData} promotedBooks={promotedBooks} onProfileUpdate={update} />
+        <ProfileDashboard userData={userData} promotedBooks={promotedBooks} onProfileUpdate={handleProfileUpdate} />
       </div>
     </div>
   );
