@@ -11,10 +11,15 @@ export async function GET(req: NextRequest) {
 
   try {
     const authHeader = req.headers.get("authorization");
-    const expectedAuth = `Bearer ${process.env.CRON_SECRET}`;
-
-    if (authHeader !== expectedAuth) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      // czy request z Vercel Cron
+      const vercelSignature = req.headers.get("x-vercel-signature");
+      if (
+        !vercelSignature &&
+        authHeader !== `Bearer ${process.env.CRON_SECRET}`
+      ) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
     }
 
     await connectToDB();
