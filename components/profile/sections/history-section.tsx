@@ -165,20 +165,28 @@ export function HistorySection({
       <CardContent>
         <Tabs defaultValue="transactions" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger
-              value="transactions"
-              className="flex items-center gap-2"
-            >
+            <TabsTrigger value="transactions">
               <ArrowRightLeft className="h-4 w-4" />
-              {t("transactions")}
+              <span className="hidden sm:inline ml-2">{t("transactions")}</span>
+              <span className="sr-only sm:hidden">{t("transactions")}</span>
             </TabsTrigger>
             <TabsTrigger value="points" className="flex items-center gap-2">
               <Coins className="h-4 w-4" />
-              {t("points")}
+              <span className="hidden sm:inline ml-2">
+                {t("points")}
+              </span>
+              <span className="sr-only sm:hidden">
+                {t("points")}
+              </span>
             </TabsTrigger>
             <TabsTrigger value="reviews" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
-              {t("reviews")}
+              <span className="hidden sm:inline ml-2">
+                {t("reviews")}
+              </span>
+              <span className="sr-only sm:hidden">
+                {t("reviews")}
+              </span>
             </TabsTrigger>
           </TabsList>
 
@@ -209,6 +217,6 @@ export function HistorySection({
           </TabsContent>
         </Tabs>
       </CardContent>
-    </Card>
+    </Card >
   );
 }
