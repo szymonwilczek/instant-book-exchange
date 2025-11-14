@@ -55,13 +55,6 @@ const tierBorders = {
   platinum: "border-[#4DD0E1]",
 };
 
-const tierLabels = {
-  bronze: "Brązowy",
-  silver: "Srebrny",
-  gold: "Złoty",
-  platinum: "Platynowy",
-};
-
 export function AchievementCard({
   achievement,
   isCurrentTier = false,
@@ -72,9 +65,18 @@ export function AchievementCard({
   const isDark = currentTheme === "dark";
   const t = useTranslations();
 
-  const requirement = achievement.requirement
-    ? Object.values(achievement.requirement)[0] || 1
-    : 1;
+  const getRequirementTarget = () => {
+    if (!achievement.requirement) return 1;
+
+    if (achievement.requirement.minReviews !== undefined) {
+      return achievement.requirement.minReviews;
+    }
+
+    const values = Object.values(achievement.requirement);
+    return values[0] || 1;
+  };
+
+  const requirement = getRequirementTarget();
   const progress = achievement.progress || 0;
   const progressPercent = Math.min((progress / requirement) * 100, 100);
 
@@ -100,8 +102,8 @@ export function AchievementCard({
       style={
         achievement.unlocked
           ? {
-              background: metallicGradient,
-            }
+            background: metallicGradient,
+          }
           : undefined
       }
     >
@@ -152,7 +154,7 @@ export function AchievementCard({
               className={cn(
                 "text-xs",
                 achievement.unlocked &&
-                  "bg-white/30 dark:bg-black/40 backdrop-blur-sm"
+                "bg-white/30 dark:bg-black/40 backdrop-blur-sm"
               )}
             >
               {tierLabels[achievement.tier]}
