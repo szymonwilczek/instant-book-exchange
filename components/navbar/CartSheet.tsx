@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -33,13 +34,12 @@ interface CartItemBook {
 }
 
 export function CartSheet() {
-  const { cart, cartCount, removeFromCart, loading } = useCart();
+  const { cart, cartCount, removeFromCart, loading, isCartOpen, setIsCartOpen } = useCart();
   const router = useRouter();
-  const [open, setOpen] = React.useState(false);
   const t = useTranslations("cart");
 
   const handleCheckout = () => {
-    setOpen(false);
+    setIsCartOpen(false);
     router.push("/checkout");
   };
 
@@ -69,7 +69,7 @@ export function CartSheet() {
   }, [cart]);
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="relative h-9 w-9">
           <ShoppingCart className="h-4 w-4" />
@@ -85,6 +85,9 @@ export function CartSheet() {
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-lg">
         <SheetHeader>
+          <SheetDescription>
+            <span className="sr-only">Cart</span>
+          </SheetDescription>
           <SheetTitle className="flex items-center gap-2">
             <ShoppingCart className="h-5 w-5" />
             {t("title")} ({cartCount})
@@ -97,7 +100,7 @@ export function CartSheet() {
             <p className="text-muted-foreground text-center">
               {t("feelsEmpty")}
             </p>
-            <Button variant="outline" onClick={() => setOpen(false)}>
+            <Button variant="outline" onClick={() => setIsCartOpen(false)}>
               {t("browseBooks")}
             </Button>
           </div>

@@ -32,6 +32,8 @@ interface CartContextType {
   refreshCart: () => Promise<void>;
   clearCart: () => void;
   loading: boolean;
+  isCartOpen: boolean;
+  setIsCartOpen: (open: boolean) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -40,6 +42,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const refreshCart = async () => {
     if (!session) {
@@ -60,7 +63,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     refreshCart();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
@@ -80,6 +82,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       const data: { cart?: { items: CartItem[] } } = await res.json();
       setCart(data.cart?.items || []);
+      setIsCartOpen(true);
     } catch (error) {
       if (error instanceof Error) {
         toast.error(`Wystąpił błąd!`, {
@@ -87,7 +90,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           description: error.message,
         });
       }
-      throw error;
     } finally {
       setLoading(false);
     }
@@ -128,6 +130,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         refreshCart,
         clearCart,
         loading,
+        isCartOpen,
+        setIsCartOpen,
       }}
     >
       {children}
