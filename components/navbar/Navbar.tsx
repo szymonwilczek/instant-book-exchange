@@ -20,7 +20,6 @@ import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
 import { MessageCircle, LogIn, Home, ArrowRightLeft, User, Trophy, TableProperties } from "lucide-react";
 import { PointsDisplay } from "./PointsDisplay";
-import { IUser } from "@/lib/models/User";
 import { useTranslations } from "next-intl";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
 
@@ -53,7 +52,6 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const containerRef = useRef<HTMLElement>(null);
     const { data: session } = useSession();
-    const [userData, setUserData] = useState<IUser | null>(null);
     const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
     const pathname = usePathname();
     const router = useRouter();
@@ -73,20 +71,14 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
       { href: "/leaderboard", label: t("navigationLinks.ranking") },
     ];
 
-    useEffect(() => {
-      if (session) {
-        fetch("/api/user/profile")
-          .then((res) => res.json())
-          .then(setUserData);
-      }
-    }, [session]);
-
-    // unread messages count
+    // polling dla unread messages z cache headers
     useEffect(() => {
       if (session?.user?.id) {
         const fetchUnreadCount = async () => {
           try {
-            const res = await fetch("/api/messages/unread-count");
+            const res = await fetch("/api/messages/unread-count", {
+              cache: "default",
+            });
             if (res.ok) {
               const data = await res.json();
               setUnreadMessagesCount(data.count || 0);
@@ -98,7 +90,6 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
 
         fetchUnreadCount();
 
-        // poll co 30 sekund
         const interval = setInterval(fetchUnreadCount, 30000);
         return () => clearInterval(interval);
       }
@@ -108,7 +99,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
       const checkWidth = () => {
         if (containerRef.current) {
           const width = containerRef.current.offsetWidth;
-          setIsMobile(width < 768); // 768px is md breakpoint
+          setIsMobile(width < 768);
         }
       };
 
@@ -124,7 +115,6 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
       };
     }, []);
 
-    // Combine refs
     const combinedRef = React.useCallback(
       (node: HTMLElement | null) => {
         containerRef.current = node;
@@ -279,13 +269,9 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
             <PointsDisplay />
             {session ? (
               <UserMenu
-                userName={session?.user?.name || userData?.username || "User"}
-                userEmail={
-                  session?.user?.email || userData?.email || "user@example.com"
-                }
-                userAvatar={
-                  userData?.profileImage || session?.user?.image || undefined
-                }
+                userName={session.user.username || session.user.name || "User"}
+                userEmail={session.user.email || "user@example.com"}
+                userAvatar={session.user.profileImage || session.user.image || undefined}
                 onItemClick={onUserItemClick}
               />
             ) : (

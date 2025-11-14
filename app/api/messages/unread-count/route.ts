@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/app/api/auth/[...nextauth]/auth";
 import connectToDB from "@/lib/db/connect";
-import Message from "@/lib/models/Message";
-import Conversation from "@/lib/models/Conversation";
 import User from "@/lib/models/User";
+import Conversation from "@/lib/models/Conversation";
+import Message from "@/lib/models/Message";
 
 export async function GET() {
   try {
@@ -33,12 +33,22 @@ export async function GET() {
       readBy: { $ne: user._id },
     });
 
-    return NextResponse.json({ count });
+    const response = NextResponse.json({ count });
+
+    // cache headers
+    response.headers.set(
+      "Cache-Control",
+      "private, max-age=10, stale-while-revalidate=30",
+    );
+    response.headers.set("CDN-Cache-Control", "private, max-age=10");
+    response.headers.set("Vercel-CDN-Cache-Control", "private, max-age=10");
+
+    return response;
   } catch (error) {
     console.error("Error counting unread messages:", error);
     return NextResponse.json(
-      { error: "Failed to count unread messages" },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }
