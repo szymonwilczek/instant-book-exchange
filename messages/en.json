@@ -684,7 +684,11 @@
     },
     "navigationLinks": {
       "home": "Home",
-      "transactions": "Transactions"
+      "transactions": "Transactions",
+      "profile": "Profile",
+      "messages": "Messages",
+      "achievements": "Achievements",
+      "ranking": "Ranking"
     },
     "logIn": "LOG IN"
   },

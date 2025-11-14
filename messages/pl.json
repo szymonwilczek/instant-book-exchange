@@ -686,7 +686,11 @@
     },
     "navigationLinks": {
       "home": "Strona główna",
-      "transactions": "Transakcje"
+      "transactions": "Transakcje",
+      "profile": "Profil",
+      "messages": "Wiadomości",
+      "achievements": "Osiągnięcia",
+      "ranking": "Ranking"
     },
     "logIn": "ZALOGUJ SIĘ"
   },
