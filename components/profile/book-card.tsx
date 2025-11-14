@@ -50,18 +50,10 @@ export function BookCard({
 
   const daysRemaining = book.promotedUntil
     ? Math.ceil(
-        (new Date(book.promotedUntil).getTime() - new Date().getTime()) /
-          (1000 * 60 * 60 * 24)
-      )
+      (new Date(book.promotedUntil).getTime() - new Date().getTime()) /
+      (1000 * 60 * 60 * 24)
+    )
     : 0;
-
-  console.log("BookCard book:", book);
-  console.log(
-    "BookCard status:",
-    book.status,
-    typeof book.status,
-    book.status === "active"
-  );
 
   return (
     <Card className="overflow-hidden max-sm:max-w-[250px] max-sm:w-full min-w-[200px] h-full">
@@ -75,9 +67,8 @@ export function BookCard({
         />
         {book.status && (
           <div
-            className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium text-white ${
-              book.status === "active" ? "bg-green-500" : "bg-gray-500"
-            }`}
+            className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium text-white ${book.status === "active" ? "bg-green-500" : "bg-gray-500"
+              }`}
           >
             {t(book.status === "active" ? "bookActive" : "bookInactive")}
           </div>
