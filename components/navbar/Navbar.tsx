@@ -18,10 +18,25 @@ import { UserMenu } from "@/components/navbar/UserMenu";
 import { CartSheet } from "@/components/navbar/CartSheet";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
-import { MessageCircle, LogIn, Home, ArrowRightLeft, User, Trophy, TableProperties } from "lucide-react";
+import {
+  MessageCircle,
+  LogIn,
+  Home,
+  ArrowRightLeft,
+  User,
+  Trophy,
+  TableProperties,
+} from "lucide-react";
 import { PointsDisplay } from "./PointsDisplay";
 import { useTranslations } from "next-intl";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "../ui/sheet";
 
 export interface NavbarNavItem {
   href?: string;
@@ -53,6 +68,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
     const containerRef = useRef<HTMLElement>(null);
     const { data: session } = useSession();
     const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+    const [pendingTransactionsCount, setPendingTransactionsCount] = useState(0);
     const pathname = usePathname();
     const router = useRouter();
     const t = useTranslations("navbar");
@@ -71,10 +87,9 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
       { href: "/leaderboard", label: t("navigationLinks.ranking") },
     ];
 
-    // polling dla unread messages z cache headers
     useEffect(() => {
       if (session?.user?.id) {
-        const fetchUnreadCount = async () => {
+        const fetchData = async () => {
           try {
             const res = await fetch("/api/messages/unread-count", {
               cache: "default",
@@ -86,11 +101,23 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
           } catch (error) {
             console.error("Error fetching unread count:", error);
           }
+
+          try {
+            const res = await fetch("/api/transactions/count", {
+              cache: "default",
+            });
+            if (res.ok) {
+              const data = await res.json();
+              setPendingTransactionsCount(data.count || 0);
+            }
+          } catch (error) {
+            console.error("Error fetching transactions count:", error);
+          }
         };
 
-        fetchUnreadCount();
+        fetchData();
 
-        const interval = setInterval(fetchUnreadCount, 30000);
+        const interval = setInterval(fetchData, 30000);
         return () => clearInterval(interval);
       }
     }, [session?.user?.id]);
@@ -127,6 +154,23 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
       [ref]
     );
 
+    const renderLabelWithBadge = (label: string, href?: string) => {
+      if (href === "/transactions" && pendingTransactionsCount > 0) {
+        return (
+          <div className="flex items-center gap-2">
+            {label}
+            <Badge
+              variant="destructive"
+              className="h-5 min-w-5 rounded-full px-1 text-xs flex items-center justify-center"
+            >
+              {pendingTransactionsCount > 9 ? "9+" : pendingTransactionsCount}
+            </Badge>
+          </div>
+        );
+      }
+      return label;
+    };
+
     if (
       (pathname && pathname.endsWith("/login")) ||
       (pathname && pathname.endsWith("/register"))
@@ -158,7 +202,10 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                     <HamburgerIcon />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-[280px] sm:w-[320px] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+                <SheetContent
+                  side="left"
+                  className="w-[280px] sm:w-[320px] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80"
+                >
                   <SheetHeader>
                     <SheetTitle className="flex items-center gap-2">
                       {logo}
@@ -194,8 +241,12 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                             }
                           }}
                         >
-                          {Icon && <Icon className="h-5 w-5" />}
-                          {link.label}
+                          <div className="flex items-center w-full gap-3">
+                            {Icon && <Icon className="h-5 w-5" />}
+                            <span className="flex-1 text-left">
+                              {renderLabelWithBadge(link.label, link.href)}
+                            </span>
+                          </div>
                         </Button>
                       );
                     })}
@@ -216,7 +267,6 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                   </span>
                 </button>
               )}
-              {/* Navigation menu */}
               {!isMobile && (
                 <NavigationMenu className="flex">
                   <NavigationMenuList className="gap-1">
@@ -233,7 +283,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                           }}
                           className="text-muted-foreground hover:text-primary py-1.5 font-medium transition-colors cursor-pointer group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
                         >
-                          {link.label}
+                          {renderLabelWithBadge(link.label, link.href)}
                         </NavigationMenuLink>
                       </NavigationMenuItem>
                     ))}
@@ -271,7 +321,9 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
               <UserMenu
                 userName={session.user.username || session.user.name || "User"}
                 userEmail={session.user.email || "user@example.com"}
-                userAvatar={session.user.profileImage || session.user.image || undefined}
+                userAvatar={
+                  session.user.profileImage || session.user.image || undefined
+                }
                 onItemClick={onUserItemClick}
               />
             ) : (
