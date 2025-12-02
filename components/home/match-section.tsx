@@ -14,6 +14,10 @@ interface MatchSectionProps {
       imageUrl?: string;
       condition: string;
       status: string;
+      ownerNotes?: string;
+      description?: string;
+      viewCount: number;
+      promotedUntil?: string;
     };
     owner: {
       _id: string;

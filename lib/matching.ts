@@ -20,6 +20,10 @@ interface BookDocument {
   imageUrl?: string;
   condition: string;
   status: string;
+  ownerNote?: string;
+  description?: string;
+  viewCount?: number;
+  promotedUntil?: Date;
   owner: {
     _id: mongoose.Types.ObjectId;
     username: string;
@@ -37,6 +41,10 @@ interface MatchResult {
     imageUrl?: string;
     condition: string;
     status: string;
+    ownerNote?: string;
+    description?: string;
+    viewCount?: number;
+    promotedUntil?: string;
   };
   owner: {
     _id: string;
@@ -51,10 +59,6 @@ interface MatchResult {
   matchType: string;
 }
 
-/**
- * Znajduje oferty pasujące do wishlist użytkownika
- * Priorytet: Platinum+ users są wyżej w wynikach
- */
 export async function getMatchingOffers(
   userEmail: string,
 ): Promise<MatchResult[]> {
@@ -110,6 +114,12 @@ export async function getMatchingOffers(
         imageUrl: book.imageUrl,
         condition: book.condition,
         status: book.status,
+        ownerNote: book.ownerNote,
+        description: book.description,
+        viewCount: book.viewCount || 0,
+        promotedUntil: book.promotedUntil
+          ? new Date(book.promotedUntil).toISOString()
+          : undefined,
       },
       owner: {
         _id: owner._id.toString(),
@@ -173,9 +183,6 @@ interface InterestedUser {
   profileImage?: string;
 }
 
-/**
- * Znajduje użytkowników zainteresowanych książką (którzy mają ją na wishlist)
- */
 export async function findInterestedUsers(bookId: string) {
   await connectToDB();
 
