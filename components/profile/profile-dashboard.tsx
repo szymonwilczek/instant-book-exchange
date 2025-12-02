@@ -43,6 +43,8 @@ interface BookBase {
 
 interface Book extends BookBase {
   status: "active" | "inactive";
+  condition?: "new" | "used" | "damaged";
+  ownerNote?: string;
 }
 
 interface UserProfile {
@@ -359,6 +361,7 @@ export function ProfileDashboard({
     condition?: string;
     promotedUntil?: string;
     promotedAt?: string;
+    ownerNote?: string;
   }) => {
     setSelectedBook({
       id: book._id,
@@ -367,6 +370,8 @@ export function ProfileDashboard({
       image: book.imageUrl,
       createdAt: book.createdAt,
       status: book.status,
+      condition: book.condition as "new" | "used" | "damaged",
+      ownerNote: book.ownerNote,
     });
     setIsEditBookModalOpen(true);
   };
@@ -612,6 +617,7 @@ export function ProfileDashboard({
         type={modalType}
       />
       <EditBookModal
+        key={selectedBook?.id || "edit-book-modal"}
         book={selectedBook}
         open={isEditBookModalOpen}
         onOpenChange={setIsEditBookModalOpen}

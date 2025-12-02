@@ -40,6 +40,7 @@ interface OfferedBooksSectionProps {
     condition?: string;
     promotedUntil?: string;
     promotedAt?: string;
+    ownerNote?: string;
   }>;
   onAddBook: () => void;
   onEditBook: (book: OfferedBooksSectionProps["books"][0]) => void;
