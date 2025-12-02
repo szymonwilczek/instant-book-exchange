@@ -279,7 +279,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                 onClick={() => router.push("/login")}
                 variant="default"
                 size="sm"
-                className="gap-2"
+                className="gap-2 cursor-pointer"
               >
                 <LogIn className="h-4 w-4" />
                 {t("logIn")}
