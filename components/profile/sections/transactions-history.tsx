@@ -107,11 +107,33 @@ export function TransactionHistory({
           ? transaction.receiver
           : transaction.initiator;
 
-        const receivedBook = isInitiator
-          ? transaction.requestedBook
-          : transaction.offeredBooks?.[0];
+        // ksiazki ktore "ja" otrzymuje w tej transakcji
+        const incomingBooks = isInitiator
+          ? (transaction.requestedBook ? [transaction.requestedBook] : [])
+          : (transaction.offeredBooks || []);
 
-        const actionLabel = t("receivedFrom");
+        // ksiazki ktore "ja" wysylam w tej transakcji
+        const outgoingBooks = isInitiator
+          ? (transaction.offeredBooks || [])
+          : (transaction.requestedBook ? [transaction.requestedBook] : []);
+
+        let displayBook = null;
+        let actionLabel = "";
+        let moreCount = 0;
+
+        // priorytet: pokaz to co otrzymalem. jesli nic nie otrzymalem, pokaz to co wyslalem
+        if (incomingBooks.length > 0) {
+          displayBook = incomingBooks[0];
+          actionLabel = t("receivedFrom");
+          moreCount = incomingBooks.length - 1;
+        } else if (outgoingBooks.length > 0) {
+          displayBook = outgoingBooks[0];
+          actionLabel = t("sentTo");
+          moreCount = outgoingBooks.length - 1;
+        } else {
+          // fallback
+          actionLabel = t("transactionWith");
+        }
 
         return (
           <div
@@ -121,7 +143,8 @@ export function TransactionHistory({
             <div className="space-y-2 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <p className="font-medium line-clamp-1">
-                  {receivedBook?.title || t("unknownBook")}
+                  {displayBook?.title || t("unknownBook")}
+                  {moreCount > 0 && <span className="text-muted-foreground ml-1 text-xs">(+{moreCount})</span>}
                 </p>
                 <Badge
                   className={getStatusColor(transaction.status)}
