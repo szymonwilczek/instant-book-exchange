@@ -569,10 +569,10 @@
 
     "loyal_member_bronze": {
       "name": "Circle of Friends",
-      "description": "You are now a member of our group. Trust is a luxury, but Popping Cherry is essential."
+      "description": "You are now a member of our group. Welcome to the community!"
     },
     "loyal_member_silver": {
-      "name": "Popping Cherry",
+      "name": "Veteran Member",
       "description": "You stick to the Code, even when everyone else is asleep in the big city."
     },
     "loyal_member_gold": {
