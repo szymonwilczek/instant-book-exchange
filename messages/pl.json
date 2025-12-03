@@ -42,7 +42,7 @@
     "passwordLabel": "Hasło",
     "confirmPasswordLabel": "Potwierdź Hasło",
     "privacyPolicy": "Zgadzam się z <privacyPolicyLink>warunkami i polityką prywatności </privacyPolicyLink>",
-    "signUp": "Zarejestuj się w Instant Book Exchange",
+    "signUp": "Zarejestruj się w Instant Book Exchange",
     "alreadyHaveAccount": "Posiadasz już konto? <signInLink>Zaloguj się</signInLink>",
     "or": "lub",
     "google": "Kontynuuj przez Google",
@@ -89,7 +89,7 @@
     "submittingOffers": "Składanie ofert...",
     "submitOffers": "Złóż oferty",
     "submitOffer": "Złóż ofertę",
-    "selectBooksToOffer": "Wybierz książki do ofertu",
+    "selectBooksToOffer": "Wybierz książki do oferty",
     "selectBooksDescription": "Kliknij na książki, które chcesz zaproponować w zamian",
     "searchBooks": "Szukaj po tytule lub autorze...",
     "noBookFound": "Nie znaleziono książek",
@@ -456,7 +456,7 @@
     },
     "exchange_master_silver": {
       "name": "Przesyłka Ekspresowa",
-      "description": "Twoje towary docierają na czas. Pamiętaj: czas to peniądz, a to wszystko Przesyłka Ekspresowa."
+      "description": "Twoje towary docierają na czas. Pamiętaj: czas to pieniądz, a to wszystko Przesyłka Ekspresowa."
     },
     "exchange_master_gold": {
       "name": "Co mi Panie dasz?",
@@ -582,13 +582,13 @@
       "description": "Długi staż. Życie jak sen, ale wiesz że za perfekcyjną fasadą kryje się coś więcej."
     },
     "loyal_member_platinum": {
-      "name": "Pamiętasz powtory?",
+      "name": "Pamiętasz potwory?",
       "description": "Wow. Pewne schematy się powtarzają, ale pamiętasz potwory?"
     },
 
     "pioneer": {
       "name": "Tańczący z wilkami",
-      "description": "Jedna z pierwszych osób, która stawiła czoła nowym wyzwaniom. Terytorium zostalo zasiedlone."
+      "description": "Jedna z pierwszych osób, która stawiła czoła nowym wyzwaniom. Terytorium zostało zasiedlone."
     },
 
     "summer_harvest": {
@@ -702,7 +702,7 @@
   "ranking": {
     "leaderboard": {
       "title": "Ranking",
-      "description": "Najlepsi użytkownicy ranked według aktywności i wkładu"
+      "description": "Najlepsi użytkownicy uszeregowani według aktywności i wkładu"
     },
     "tiers": {
       "bronze": "Brązowy",
