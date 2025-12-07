@@ -1,6 +1,7 @@
 # 📚 Instant Book Exchange - Book Exchange Platform
 
-> **University Project - Software Engineering** 
+> **University Project - Software Engineering**
+
 > **Silesian University of Technology (Politechnika Śląska)**
 
 ## 📖 Overview
