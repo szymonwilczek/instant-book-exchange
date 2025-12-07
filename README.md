@@ -48,7 +48,7 @@ Built with **Next.js 15 (App Router)** and **TypeScript**, it leverages **MongoD
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/szymonwilczek/instant-book-exchange.git](https://github.com/szymonwilczek/instant-book-exchange.git)
+    git clone https://github.com/szymonwilczek/instant-book-exchange.git
     cd instant-book-exchange 
     ```
 
