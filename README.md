@@ -1,6 +1,7 @@
 # 📚 Instant Book Exchange - Book Exchange Platform
 
-> **University Project - Software Engineering** 
+> **University Project - Software Engineering**
+
 > **Silesian University of Technology (Politechnika Śląska)**
 
 ## 📖 Overview
@@ -47,7 +48,7 @@ Built with **Next.js 15 (App Router)** and **TypeScript**, it leverages **MongoD
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/szymonwilczek/instant-book-exchange.git](https://github.com/szymonwilczek/instant-book-exchange.git)
+    git clone https://github.com/szymonwilczek/instant-book-exchange.git
     cd instant-book-exchange 
     ```
 
