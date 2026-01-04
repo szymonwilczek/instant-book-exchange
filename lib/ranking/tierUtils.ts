@@ -1,5 +1,5 @@
-// Pure utility functions for ranking - no database dependencies
-// These are extracted for testing and can be imported in tests without DB connection
+// pure utility functions for ranking - no database dependencies
+// extracted for testing without db connection
 
 export type TierType =
     | "bronze"
@@ -10,7 +10,7 @@ export type TierType =
     | "legendary";
 
 /**
- * Przypisuje tier na podstawie totalScore
+ * assigns tier based on total score
  */
 export function assignTier(totalScore: number): TierType {
     if (totalScore >= 10000) return "legendary";
@@ -22,7 +22,7 @@ export function assignTier(totalScore: number): TierType {
 }
 
 /**
- * Zwraca progi dla wszystkich tierów
+ * returns thresholds for all tiers
  */
 export function getTierThresholds(): Array<{
     tier: TierType;
@@ -40,7 +40,7 @@ export function getTierThresholds(): Array<{
 }
 
 /**
- * Zwraca wagę dla każdej kategorii score
+ * returns weight for each score category
  */
 export function getScoreWeights(): Record<string, number> {
     return {
@@ -53,7 +53,7 @@ export function getScoreWeights(): Record<string, number> {
 }
 
 /**
- * Oblicza progres do następnego tieru
+ * calculates progress to next tier
  */
 export function getProgressToNextTier(
     currentScore: number
