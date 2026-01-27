@@ -216,6 +216,8 @@ export function OnboardingBookSearch({
                               src={book.image || "/placeholder.svg"}
                               alt={book.title}
                               className="w-8 h-8 object-cover"
+                              width={150}
+                              height={150}
                             />
                             <div>
                               <p className="font-medium">{book.title}</p>
