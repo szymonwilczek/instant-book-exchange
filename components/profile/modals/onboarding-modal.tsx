@@ -31,6 +31,7 @@ interface OnboardingModalProps {
   selectedBooks: BookBase[];
   onGenreChange: (genre: string, checked: boolean) => void;
   onAddBook: () => void;
+  onRemoveBook: (bookId: string) => void;
   onSubmit: () => void;
   onSkip: () => void;
 }
@@ -43,6 +44,7 @@ export function OnboardingModal({
   selectedBooks,
   onGenreChange,
   onAddBook,
+  onRemoveBook,
   onSubmit,
   onSkip,
 }: OnboardingModalProps) {
@@ -84,7 +86,12 @@ export function OnboardingModal({
               <Button onClick={onAddBook}>Dodaj książkę</Button>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 {selectedBooks.map((book) => (
-                  <BookCard key={book.id} book={book} isReadOnly={true} />
+                  <BookCard
+                    key={book.id}
+                    book={book}
+                    isReadOnly={false}
+                    onDelete={onRemoveBook}
+                  />
                 ))}
               </div>
             </CardContent>
