@@ -68,12 +68,18 @@ export function useOnboarding(userData: UserData | null, onUpdate: () => void) {
     onUpdate();
   };
 
+  const handleRemoveBook = (bookId: string) => {
+    setSelectedBooks(selectedBooks.filter((book) => book.id !== bookId));
+  };
+
   return {
     selectedGenres,
     selectedBooks,
     handleGenreChange,
     handleAddBook,
+    handleRemoveBook,
     handleOnboardingSubmit,
     handleOnboardingSkip,
   };
 }
+

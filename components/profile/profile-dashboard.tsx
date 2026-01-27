@@ -145,6 +145,7 @@ export function ProfileDashboard({
     selectedBooks,
     handleGenreChange,
     handleAddBook,
+    handleRemoveBook,
     handleOnboardingSubmit,
     handleOnboardingSkip,
   } = useOnboarding(fetchedUserData, fetchData);
@@ -639,6 +640,7 @@ export function ProfileDashboard({
         selectedBooks={selectedBooks}
         onGenreChange={handleGenreChange}
         onAddBook={() => setIsAddBookOpen(true)}
+        onRemoveBook={handleRemoveBook}
         onSubmit={handleOnboardingSubmit}
         onSkip={handleOnboardingSkip}
       />
