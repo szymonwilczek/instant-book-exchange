@@ -634,7 +634,9 @@ export function ProfileDashboard({
 
       <OnboardingModal
         open={isOnboardingOpen}
-        onOpenChange={() => { }}
+        onOpenChange={(open) => {
+          if (!open) handleOnboardingSkip();
+        }}
         genres={genres}
         selectedGenres={selectedGenres}
         selectedBooks={selectedBooks}
