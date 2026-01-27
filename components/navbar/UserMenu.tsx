@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,8 +30,13 @@ export const UserMenu = ({
   onItemClick?: (item: string) => void;
 }) => {
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const t = useTranslations("navbar.userMenu");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <DropdownMenu>
@@ -92,13 +100,15 @@ export const UserMenu = ({
           <LanguageSwitcher />
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
           className="flex flex-row items-center cursor-pointer"
         >
-          <Sun className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="mr-2 absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          {/* Show Sun (Light) when current is Dark (Target is Light) */}
+          <Sun className="mr-2 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          {/* Show Moon (Dark) when current is Light (Target is Dark) */}
+          <Moon className="mr-2 absolute h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <span className="no-wrap w-full">
-            {theme == "dark" ? t("darkTheme") : t("lightTheme")}
+            {mounted ? (resolvedTheme === "dark" ? t("lightTheme") : t("darkTheme")) : t("lightTheme")}
           </span>
         </DropdownMenuItem>
 
