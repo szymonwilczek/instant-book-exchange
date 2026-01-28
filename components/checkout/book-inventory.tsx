@@ -23,9 +23,9 @@ function DraggableBook({ book, isOffered }: { book: any; isOffered: boolean }) {
 
   const style = transform
     ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-        opacity: isDragging ? 0.5 : 1,
-      }
+      transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      opacity: isDragging ? 0.5 : 1,
+    }
     : undefined;
 
   return (
@@ -34,9 +34,8 @@ function DraggableBook({ book, isOffered }: { book: any; isOffered: boolean }) {
       style={style}
       {...listeners}
       {...attributes}
-      className={`p-3 cursor-grab active:cursor-grabbing transition-all hover:shadow-md ${
-        isOffered ? "opacity-40 cursor-not-allowed" : ""
-      }`}
+      className={`p-3 cursor-grab active:cursor-grabbing transition-all hover:shadow-md ${isOffered ? "opacity-40 cursor-not-allowed" : ""
+        }`}
     >
       <div className="flex gap-3">
         <Image
@@ -68,7 +67,7 @@ export function BookInventory({ books, offeredBooks }: BookInventoryProps) {
   const { setNodeRef } = useDroppable({
     id: "inventory",
   });
-  const t = useTranslations("cart");
+  const t = useTranslations("checkout");
 
   if (books.length === 0) {
     return (
