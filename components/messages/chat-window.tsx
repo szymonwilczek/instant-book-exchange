@@ -143,8 +143,8 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
 
   const otherParticipantName = otherParticipant
     ? otherParticipant.username ||
-      otherParticipant.name ||
-      otherParticipant.email
+    otherParticipant.name ||
+    otherParticipant.email
     : t("unknownUser");
 
   useEffect(() => {
@@ -383,7 +383,7 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
           <div>
             <h2 className="font-semibold">{otherParticipantName}</h2>
             <p className="text-xs text-muted-foreground">
-              {conversation.book.title}
+              {conversation.book?.title || t("deletedBook")}
             </p>
           </div>
         </div>
@@ -418,10 +418,10 @@ export function ChatWindow({ conversation, currentUserId }: ChatWindowProps) {
                           : isYesterday(new Date(message.createdAt))
                             ? "Yesterday"
                             : format(
-                                new Date(message.createdAt),
-                                "dd MMMM yyyy",
-                                { locale: pl }
-                              )}
+                              new Date(message.createdAt),
+                              "dd MMMM yyyy",
+                              { locale: pl }
+                            )}
                       </span>
                       <div className="flex-1 border-t"></div>
                     </div>

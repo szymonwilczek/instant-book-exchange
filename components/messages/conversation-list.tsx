@@ -85,7 +85,7 @@ export function ConversationList({
 
     return (
       participantName.toLowerCase().includes(searchLower) ||
-      conv.book.title.toLowerCase().includes(searchLower)
+      (conv.book?.title?.toLowerCase() || "").includes(searchLower)
     );
   });
 
@@ -138,15 +138,15 @@ export function ConversationList({
                 >
                   <div className="flex items-start gap-3">
                     <Avatar className="h-14 w-12 rounded-lg">
-                      <AvatarImage src={conversation.book.imageUrl} />
+                      <AvatarImage src={conversation.book?.imageUrl} />
                       <AvatarFallback>
-                        {conversation.book.title.charAt(0).toUpperCase()}
+                        {(conversation.book?.title || "?").charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
 
                     <div className="flex-1 overflow-hidden">
                       <p className="truncate font-medium">
-                        {conversation.book.title}
+                        {conversation.book?.title || t("deletedBook")}
                       </p>
 
                       {conversation.lastMessage && (
@@ -154,15 +154,15 @@ export function ConversationList({
                           <span className="font-bold">
                             {conversation.lastMessage.sender._id ===
                               session?.user?.id ||
-                            conversation.lastMessage.sender.email ===
+                              conversation.lastMessage.sender.email ===
                               session?.user?.email
                               ? t("you")
                               : participantName}
                             :
                           </span>{" "}
                           {conversation.lastMessage.attachments &&
-                          conversation.lastMessage.attachments.length > 0 &&
-                          !conversation.lastMessage.content ? (
+                            conversation.lastMessage.attachments.length > 0 &&
+                            !conversation.lastMessage.content ? (
                             <span>📷 {t("photo")}</span>
                           ) : (
                             conversation.lastMessage.content
