@@ -59,6 +59,55 @@ interface MatchResult {
   matchType: string;
 }
 
+const TIER_PRIORITY: Record<string, number> = {
+  legendary: 6,
+  diamond: 5,
+  platinum: 4,
+  gold: 3,
+  silver: 2,
+  bronze: 1,
+};
+
+const getTierPriority = (tier?: string) => TIER_PRIORITY[tier || ""] || 0;
+
+interface SortableMatch {
+  matchScore?: number;
+  tier?: string;
+  ownerTier?: string;
+  rank?: number;
+  ownerRank?: number;
+}
+
+function compareMatches(a: SortableMatch, b: SortableMatch) {
+  const aTier = a.tier || a.ownerTier;
+  const bTier = b.tier || b.ownerTier;
+
+  const aPriority = getTierPriority(aTier);
+  const bPriority = getTierPriority(bTier);
+
+  const aIsPremium = aPriority >= 4;
+  const bIsPremium = bPriority >= 4;
+
+  if (aIsPremium && !bIsPremium) return -1;
+  if (!aIsPremium && bIsPremium) return 1;
+
+  if (aPriority !== bPriority) {
+    return bPriority - aPriority;
+  }
+
+  const aScore = a.matchScore || 0;
+  const bScore = b.matchScore || 0;
+
+  if (aScore !== bScore) {
+    return bScore - aScore;
+  }
+
+  const aRank = a.rank || a.ownerRank || Infinity;
+  const bRank = b.rank || b.ownerRank || Infinity;
+
+  return aRank - bRank;
+}
+
 export async function getMatchingOffers(
   userEmail: string,
 ): Promise<MatchResult[]> {
@@ -89,7 +138,7 @@ export async function getMatchingOffers(
     return [];
   }
 
-  // rankingi dla wszystkich ownerow
+  // rank for all owners
   const ownerIds = matchingBooks.map((book) => book.owner._id);
   const rankings = (await UserRanking.find({
     userId: { $in: ownerIds },
@@ -135,42 +184,8 @@ export async function getMatchingOffers(
     };
   });
 
-  // z priorytetem dla Platinum+
-  results.sort((a, b) => {
-    const tierPriority = (tier?: string) => {
-      if (!tier) return 0;
-      if (tier === "legendary") return 6;
-      if (tier === "diamond") return 5;
-      if (tier === "platinum") return 4;
-      if (tier === "gold") return 3;
-      if (tier === "silver") return 2;
-      if (tier === "bronze") return 1;
-      return 0;
-    };
-
-    const aTierPriority = tierPriority(a.ownerTier);
-    const bTierPriority = tierPriority(b.ownerTier);
-
-    // Platinum+ (tier priority >= 4) ma priorytet
-    const aIsPremium = aTierPriority >= 4;
-    const bIsPremium = bTierPriority >= 4;
-
-    if (aIsPremium && !bIsPremium) return -1;
-    if (!aIsPremium && bIsPremium) return 1;
-
-    // jesli obie sa premium lub obie nie sa -> sortuj po tier
-    if (aTierPriority !== bTierPriority) {
-      return bTierPriority - aTierPriority;
-    }
-
-    // jesli tier identyczny -> sortuj po match score
-    if (a.matchScore !== b.matchScore) {
-      return b.matchScore - a.matchScore;
-    }
-
-    // na koncu po rank (nizszy rank = lepszy)
-    return (a.ownerRank || Infinity) - (b.ownerRank || Infinity);
-  });
+  // Priority sort
+  results.sort(compareMatches);
 
   return results.slice(0, 10);
 }
@@ -195,7 +210,7 @@ export async function findInterestedUsers(bookId: string) {
     .select("username email location profileImage")
     .lean()) as InterestedUser[];
 
-  // rankingi zainteresowanych uzytkownikow
+  // rankings of interested users
   const userIds = interestedUsers.map((u) => u._id);
   const rankings = (await UserRanking.find({
     userId: { $in: userIds },
@@ -219,28 +234,8 @@ export async function findInterestedUsers(bookId: string) {
     };
   });
 
-  // z priorytetem dla Platinum+
-  results.sort((a, b) => {
-    const tierPriority = (tier?: string) => {
-      if (!tier) return 0;
-      if (tier === "legendary") return 6;
-      if (tier === "diamond") return 5;
-      if (tier === "platinum") return 4;
-      if (tier === "gold") return 3;
-      if (tier === "silver") return 2;
-      if (tier === "bronze") return 1;
-      return 0;
-    };
-
-    const aTierPriority = tierPriority(a.tier);
-    const bTierPriority = tierPriority(b.tier);
-
-    if (aTierPriority !== bTierPriority) {
-      return bTierPriority - aTierPriority;
-    }
-
-    return (a.rank || Infinity) - (b.rank || Infinity);
-  });
+  // priority sort
+  results.sort(compareMatches);
 
   return results;
 }
