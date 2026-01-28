@@ -634,7 +634,8 @@
     "characters": "znaków",
     "cancelButton": "Anuluj",
     "sendingMessage": "Wysyłanie...",
-    "sendMessage": "Wyślij wiadomość"
+    "sendMessage": "Wyślij wiadomość",
+    "deletedBook": "Usunięta Książka"
   },
 
   "cart": {
